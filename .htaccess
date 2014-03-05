@@ -1,0 +1,25 @@
+#
+# Apache/PHP settings:
+#
+
+# Don't show directory listings for URLs which map to a directory.
+Options -Indexes
+
+# Follow symbolic links in this directory.
+Options +FollowSymLinks
+
+# Make the site handle any 404 or 403 errors.
+ErrorDocument 403 /index.php
+ErrorDocument 404 /index.php
+
+# Set the default handler.
+DirectoryIndex index.php index.html index.htm
+
+# Make index.php handle all requests using rewrite, if file/directory not found
+RewriteEngine On
+#  Rules
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . index.php
+
+
