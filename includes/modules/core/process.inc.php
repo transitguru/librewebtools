@@ -119,7 +119,3 @@ function lwt_process_ajax(){
   return TRUE;
 }
 
-function lwt_process_install(){
-  echo 'no installation yet';
-  return;
-}

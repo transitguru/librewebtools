@@ -6,8 +6,8 @@
  * 
  * Bootstrap file for LibreWebTools
  * 
- * This bootstraps the entire application and will provide a means to access
- * all available modules.
+ * This bootstraps the entire application and will provide a means to 
+ * access all available modules.
  * 
  * @todo use settings module to ensure modules are turned on or off
  */
@@ -30,7 +30,7 @@ foreach ($modules as $module){
 }
 
 // Check to see if the database has been installed yet
-lwt_process_install($request);
+lwt_install($request);
 
 $maintenance = FALSE; /**< Set maintenance mode */
 $request = $_SERVER['REQUEST_URI']; /**< Request URI from user */
