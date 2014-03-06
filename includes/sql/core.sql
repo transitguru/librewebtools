@@ -22,7 +22,7 @@ USE `librewebtools`;
 DROP TABLE IF EXISTS `roles` ;
 
 CREATE TABLE IF NOT EXISTS `roles` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT ,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `sortorder`   INT(11) NOT NULL ,
   `name`  VARCHAR(255) NOT NULL ,
   PRIMARY KEY (`id`),
@@ -37,7 +37,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `companies` ;
 
 CREATE TABLE IF NOT EXISTS `companies` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT ,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(100) NOT NULL,
   `license_key` VARCHAR(20) NOT NULL,
   `license_users` INT(11) NOT NULL,
@@ -59,8 +59,8 @@ CREATE TABLE IF NOT EXISTS `companies` (
 DROP TABLE IF EXISTS `users` ;
 
 CREATE TABLE IF NOT EXISTS `users` (
-  `id`  INT(11) NOT NULL AUTO_INCREMENT ,
-  `company_id` INT(11) NOT NULL ,
+  `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `company_id` INT UNSIGNED NOT NULL ,
   `login`  VARCHAR(40) NOT NULL ,
   `firstname`  VARCHAR(100) NOT NULL ,
   `lastname`  VARCHAR(100) NOT NULL ,
@@ -80,8 +80,8 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `user_roles` ;
 
 CREATE TABLE IF NOT EXISTS `user_roles` (
-  `user_id` INT(11) NOT NULL ,
-  `role_id` INT(11) NOT NULL ,
+  `user_id` INT UNSIGNED NOT NULL ,
+  `role_id` INT UNSIGNED NOT NULL ,
   PRIMARY KEY (`role_id`, `user_id`) ,
   FOREIGN KEY (`user_id`) 
     REFERENCES `users` (`id`) 
@@ -101,7 +101,7 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `passwords` ;
 
 CREATE TABLE IF NOT EXISTS `passwords` (
-  `user_id`  INT(11) NOT NULL ,
+  `user_id`  INT UNSIGNED NOT NULL ,
   `valid_date` DATETIME NOT NULL ,
   `expire_date` DATETIME NULL ,
   `reset` TINYINT NOT NULL DEFAULT 0,
@@ -116,4 +116,97 @@ CREATE TABLE IF NOT EXISTS `passwords` (
 )
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `content`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `content` ;
+
+CREATE TABLE IF NOT EXISTS `content` (
+  `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(100) NOT NULL ,
+  `summary` LONGTEXT NULL ,
+  `content` LONGTEXT NULL ,
+  PRIMARY KEY (`id`)
+)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `content_hierarchy`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `content_hierarchy` ;
+
+CREATE TABLE IF NOT EXISTS `content_hierarchy` (
+  `parent_id` INT UNSIGNED NOT NULL DEFAULT 0,
+  `content_id`  INT UNSIGNED NOT NULL,
+  `url_code` VARCHAR(100) NOT NULL ,
+  PRIMARY KEY (`parent_id`, `content_id`) ,
+  UNIQUE KEY (`parent_id`,`url_code`) ,
+  FOREIGN KEY (`content_id`)
+    REFERENCES `content` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `menus`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `menus` ;
+
+CREATE TABLE IF NOT EXISTS `menus` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `name` VARCHAR(100) NOT NULL ,
+  `title` TEXT NULL ,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`name`)
+)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `menu_links`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `menu_links` ;
+
+CREATE TABLE IF NOT EXISTS `menus_links` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `menu_id` INT UNSIGNED NOT NULL ,
+  `content_id` INT UNSIGNED NOT NULL ,
+  `name` VARCHAR(100) NOT NULL ,
+  `title` TEXT NULL ,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`menu_id` , `name`),
+  FOREIGN KEY (`menu_id`)
+    REFERENCES `menus` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (`content_id`)
+    REFERENCES `content` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `role_access`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `role_access` ;
+
+CREATE TABLE IF NOT EXISTS `role_access` (
+  `role_id` INT UNSIGNED NOT NULL ,
+  `content_id` INT UNSIGNED NOT NULL ,
+  `view` TINYINT NOT NULL DEFAULT 1,
+  `edit` TINYINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`role_id`, `content_id`),
+  FOREIGN KEY (`role_id`)
+    REFERENCES `roles` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (`content_id`)
+    REFERENCES `content` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
 
