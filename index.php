@@ -29,11 +29,11 @@ foreach ($modules as $module){
   }
 }
 
+$request = $_SERVER['REQUEST_URI']; /**< Request URI from user */
 // Check to see if the database has been installed yet
 lwt_install($request);
 
 $maintenance = FALSE; /**< Set maintenance mode */
-$request = $_SERVER['REQUEST_URI']; /**< Request URI from user */
 $request = lwt_auth_session_gatekeeper($request, $maintenance);
 
 // Go ahead and process request
