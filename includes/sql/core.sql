@@ -32,11 +32,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `groups` 
+-- Table `companies` 
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `groups` ;
+DROP TABLE IF EXISTS `companies` ;
 
-CREATE TABLE IF NOT EXISTS `groups` (
+CREATE TABLE IF NOT EXISTS `companies` (
   `id` INT(11) NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(100) NOT NULL,
   `license_key` VARCHAR(20) NOT NULL,
@@ -60,15 +60,15 @@ DROP TABLE IF EXISTS `users` ;
 
 CREATE TABLE IF NOT EXISTS `users` (
   `id`  INT(11) NOT NULL AUTO_INCREMENT ,
-  `group_id` INT(11) NOT NULL ,
+  `company_id` INT(11) NOT NULL ,
   `login`  VARCHAR(40) NOT NULL ,
   `firstname`  VARCHAR(100) NOT NULL ,
   `lastname`  VARCHAR(100) NOT NULL ,
   `email`  VARCHAR(255) NOT NULL ,
   `notes`  TEXT NULL ,
   PRIMARY KEY (`id`) ,
-  FOREIGN KEY (`group_id`) 
-    REFERENCES `groups` (`id`) 
+  FOREIGN KEY (`company_id`) 
+    REFERENCES `companies` (`id`) 
     ON DELETE NO ACTION 
     ON UPDATE CASCADE
 )

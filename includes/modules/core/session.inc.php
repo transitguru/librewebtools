@@ -37,7 +37,7 @@ function lwt_auth_authenticate_user($username,$password){
         //Fetching user info
         $user_info = lwt_database_fetch_simple('librewebtools', 'users', NULL, array('login' => $user));
         $_SESSION['authenticated']['company'] = $company_id = $user_info[0]['id'];
-        $_SESSION['authenticated']['user'] = $user_info[0]['user_id'];
+        $_SESSION['authenticated']['user'] = $user_info[0]['login'];
         $_SESSION['authenticated']['firstname'] = $user_info[0]['firstname'];
         $_SESSION['authenticated']['lastname'] = $user_info[0]['lastname'];
         $_SESSION['authenticated']['email'] = $user_info[0]['email'];
