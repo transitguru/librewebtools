@@ -46,6 +46,21 @@ function lwt_install($request){
       echo "Should be doing install stuff<pre>";
       var_dump($_POST);
       echo "</pre>";
+      // Create database information
+      $conn = new mysqli('localhost', $_POST['root_db_user'], $_POST['root_db_pass']);
+      $sql = "CREATE SCHEMA `{$_POST['lwt_db_name']}` DEFAULT CHARACTER SET utf8";
+      $conn->real_query($sql);
+      $sql = "CREATE USER '{$_POST['lwt_db_user']}'@'localhost' IDENTIFIED BY '{$_POST['lwt_db_pass']}'";
+      $conn->real_query($sql);
+      $sql = "GRANT ALL PRIVILEGES ON `{$_POST['lwt_db_name']}`.*  TO'{$_POST['lwt_db_user']}'@'localhost'";
+      $conn->real_query($sql);
+      $sql = "FLUSH PRIVILEGES";
+      $conn->real_query($sql);
+      
+      // Import database
+      exec("cd '" . $_SERVER['DOCUMENT_ROOT'] . "/includes/sql'");
+      exec("mysql -u {$_POST['root_db_user']} -p'{$_POST['root_db_pass']}' {$_POST['lwt_db_name']} < core.sql");
+      
       exit;
     }
     else{

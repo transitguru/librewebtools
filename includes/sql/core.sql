@@ -6,15 +6,6 @@
  */
 
 
--- Build Schema
-
-DROP SCHEMA IF EXISTS `librewebtools`;
-
-CREATE SCHEMA IF NOT EXISTS `librewebtools` DEFAULT CHARACTER SET utf8;
-
-USE `librewebtools`;
-
-
 -- -----------------------------------------------------
 -- Table `roles` 
 -- -----------------------------------------------------
