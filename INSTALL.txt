@@ -1,0 +1,36 @@
+INSTALLING LibreWebTools
+========================
+
+Here are a few simple steps for installing LibreWebTools
+
+ 0. Please note that these instructions are subject to change as this toolset
+    is the result of about 12 hours of work combining code from various
+    projects and making them into a toolset. See the RELEASE.txt file for 
+    release notes.
+    
+ 1. In the examples, I am assuming your webroot is /var/www/librewebtools/, so 
+    make sure to replace this with the actual webroot where you install your
+    files. All paths are relative to the webroot. I am also assuming that you
+    set up your apache virtual hosts using the file in examples/apache.conf 
+    (which is a very basic set-up, but make sure have AllowOverride All enabled
+    for your directory as this site relies on .htaccess files.
+    
+ 2. Edit the file in includes/sql/database.sql to your specifications, 
+    especially paying attention to changing the password. DO NOT USE the default
+    password on a production system!
+    
+ 3. Change directory to your webroot, then type the following commands in your
+    commandline (assuming you keep database name as librewebtools),
+    
+    cd includes/sql
+    mysql -u root -p < database.sql
+    
+ 4. Type the following commands in your command line, replacing 'librewebtools'
+    with the database name that you entered in line 14 in database.sql
+    
+    mysql -u root -p librewebtools < core.sql
+    mysql -u root -p librewebtools < data.sql
+    
+ 5. Visit your website and Set up your administrative account when it prompts
+    you to do so. Once that is set up, you are on your way to using the site.
+  

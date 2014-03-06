@@ -21,9 +21,9 @@ function lwt_auth_authenticate_user($username,$password){
   //cleanse input
   $user = trim(strtolower($username));
   $pass = trim($password);
-  $user_info = lwt_database_fetch_simple('librewebtools', 'users', array('id'), array('login' => $user));
+  $user_info = lwt_database_fetch_simple(DB_NAME, 'users', array('id'), array('login' => $user));
   if (count($user_info)>0){
-    $pwd_info = lwt_database_fetch_simple('librewebtools', 'passwords', NULL, array('user_id' => $user_info[0]['id']), NULL, array('valid_date'));
+    $pwd_info = lwt_database_fetch_simple(DB_NAME, 'passwords', NULL, array('user_id' => $user_info[0]['id']), NULL, array('valid_date'));
     //Check for password
     foreach ($pwd_info as $pwd){
       $hash = $pwd['hash'];
@@ -35,7 +35,7 @@ function lwt_auth_authenticate_user($username,$password){
       $hashed = crypt($pass, '$2a$07$'.$key.'$');
       if ($hash == $hashed){
         //Fetching user info
-        $user_info = lwt_database_fetch_simple('librewebtools', 'users', NULL, array('login' => $user));
+        $user_info = lwt_database_fetch_simple(DB_NAME, 'users', NULL, array('login' => $user));
         $_SESSION['authenticated']['company'] = $company_id = $user_info[0]['id'];
         $_SESSION['authenticated']['user'] = $user_info[0]['login'];
         $_SESSION['authenticated']['firstname'] = $user_info[0]['firstname'];
@@ -48,7 +48,7 @@ function lwt_auth_authenticate_user($username,$password){
 
         //fetching company info
         echo $c;
-        $company_info = lwt_database_fetch_simple('librewebtools', 'companies', NULL, array('id' => $company_id));
+        $company_info = lwt_database_fetch_simple(DB_NAME, 'companies', NULL, array('id' => $company_id));
         $_SESSION['authenticated']['company_name'] = $company_info[0]['company_name'];
         if (!is_null($logo)){
             $_SESSION['authenticated']['logo'] = $company_info[0]['logo'];
@@ -70,10 +70,10 @@ function lwt_auth_authenticate_user($username,$password){
 }
 
 function lwt_auth_session_resetpassword($email){
-  $result = lwt_database_fetch_simple('librewebtools', 'users', NULL, array('email' => $email));
+  $result = lwt_database_fetch_simple(DB_NAME, 'users', NULL, array('email' => $email));
   if (count($result) > 0){
     $user = $result[0]['user_id'];
-    $passwords = lwt_database_fetch_simple('librewebtools', 'passwords', array('user_id', 'valid_date'), array('user_id' => $result[0]['id']), NULL, array('valid_date'));
+    $passwords = lwt_database_fetch_simple(DB_NAME, 'passwords', array('user_id', 'valid_date'), array('user_id' => $result[0]['id']), NULL, array('valid_date'));
     foreach ($passwords as $data){
       $user_id = $data['user_id'];
       $valid_date = $data['valid_date'];
@@ -87,7 +87,7 @@ function lwt_auth_session_resetpassword($email){
         $num = rand(0,$len-1);
         $reset_code .= substr($chars, $num, 1);
       }
-      $test = lwt_database_fetch_simple('librewebtools', 'passwords', array('reset_code'), array('reset_code' => $reset_code));
+      $test = lwt_database_fetch_simple(DB_NAME, 'passwords', array('reset_code'), array('reset_code' => $reset_code));
       if (count($test) == 0){
         $loop = FALSE;
       }
@@ -96,7 +96,7 @@ function lwt_auth_session_resetpassword($email){
     $user_id = $conn->real_escape_string($user_id);
     $valid_date = $conn->real_escape_string($valid_date);
     $sql = "UPDATE `Password` SET `reset` = 1 , `reset_code`='".$reset_code."' WHERE `user_id` = '".$user_id."' and `valid_date` = '".$valid_date."'";
-    $success = lwt_database_write_raw('librewebtools',$sql);
+    $success = lwt_database_write_raw(DB_NAME,$sql);
     if (!$success){
       echo $conn->error;
       echo "Fail!\n";
@@ -134,7 +134,7 @@ function lwt_auth_session_setpassword($user_id, $pass){
   date_default_timezone_set('UTC');
   $current_date = date("Y-m-d H:i:s");
   $sql = "INSERT INTO `passwords` (`user_id`, `valid_date`, `hash`, `key`) VALUES ('".$user_id."', '".$current_date."', '".$hashed."', '".$key."')";
-  $success = lwt_database_write_raw('librewebtools',$sql);
+  $success = lwt_database_write_raw(DB_NAME,$sql);
   return $success;
 }
 

@@ -15,6 +15,7 @@
 $begin = microtime(TRUE);
 $debug = TRUE;
 
+
 // Load all modules
 $PATH = $_SERVER['DOCUMENT_ROOT'] . '/includes/modules';
 $modules = scandir($PATH);
@@ -28,6 +29,8 @@ foreach ($modules as $module){
     }
   }
 }
+
+lwt_settings_load();
 
 $request = $_SERVER['REQUEST_URI']; /**< Request URI from user */
 // Check to see if the database has been installed yet

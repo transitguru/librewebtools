@@ -16,11 +16,12 @@
 
 function lwt_database_get_credentials($database){
   $creds = array();
-  if ($database == 'librewebtools'){
-    $creds['user'] = 'lwt';
-    $creds['pass'] = 'LibreW38t00ls';
+  if ($database == DB_NAME){
+    $creds['user'] = DB_USER;
+    $creds['pass'] = DB_PASS;
   }
   else{
+    // Eventually grab other db creds from the main database!
     $creds = FALSE;
   }
   return $creds;

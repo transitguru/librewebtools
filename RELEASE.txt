@@ -1,0 +1,7 @@
+RELEASE NOTES
+=============
+
+The dates below show release notes
+
+2014-03-06 17:45 -- This is very unstable and not recommended to be used yet! 
+                    Feel free to look at the code though!
