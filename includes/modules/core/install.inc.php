@@ -12,14 +12,14 @@
  */
 
 
-
+/**
+ * Checks to see if the database and settings are defined
+ * 
+ * @return Request URI if no install needed
+ */
+ 
 function lwt_install($request){
   $install = FALSE;
-  // Check if settings file exists
-  $success = file_exists($_SERVER['DOCUMENT_ROOT'] . '/includes/modules/core/settings.inc.php');
-  if (!$success){
-    $install = TRUE;
-  }
   
   // Check to see if lwt can log in
   $creds = lwt_database_get_credentials(DB_NAME);

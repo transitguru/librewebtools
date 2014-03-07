@@ -14,8 +14,9 @@ DROP TABLE IF EXISTS `roles` ;
 
 CREATE TABLE IF NOT EXISTS `roles` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `sortorder`   INT(11) NOT NULL ,
+  `sortorder`   INT(11) NOT NULL DEFAULT 0 ,
   `name`  VARCHAR(255) NOT NULL ,
+  `desc` TEXT NULL ,
   PRIMARY KEY (`id`),
   UNIQUE KEY (`name` ASC)
 )
@@ -23,22 +24,13 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `companies` 
+-- Table `groups` 
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `companies` ;
+DROP TABLE IF EXISTS `groups` ;
 
-CREATE TABLE IF NOT EXISTS `companies` (
+CREATE TABLE IF NOT EXISTS `groups` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(100) NOT NULL,
-  `license_key` VARCHAR(20) NOT NULL,
-  `license_users` INT(11) NOT NULL,
-  `license_date` DATETIME NOT NULL,
-  `nation_code` VARCHAR(3) NULL,
-  `state_code` VARCHAR(4) NULL,
-  `postal_code` VARCHAR(10) NULL,
-  `city` VARCHAR(100) NULL,
-  `addr1` VARCHAR(100) NULL,
-  `addr2` VARCHAR(100) DEFAULT NULL,
   `desc` TEXT,
   PRIMARY KEY (`id`),
   UNIQUE KEY (`name` ASC)
@@ -51,19 +43,51 @@ DROP TABLE IF EXISTS `users` ;
 
 CREATE TABLE IF NOT EXISTS `users` (
   `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `company_id` INT UNSIGNED NOT NULL ,
   `login`  VARCHAR(40) NOT NULL ,
   `firstname`  VARCHAR(100) NOT NULL ,
   `lastname`  VARCHAR(100) NOT NULL ,
   `email`  VARCHAR(255) NOT NULL ,
-  `notes`  TEXT NULL ,
-  PRIMARY KEY (`id`) ,
-  FOREIGN KEY (`company_id`) 
-    REFERENCES `companies` (`id`) 
-    ON DELETE NO ACTION 
+  `desc`  TEXT NULL ,
+  PRIMARY KEY (`id`)
+)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `group_hierarchy`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `group_hierarchy` ;
+
+CREATE TABLE IF NOT EXISTS `group_hierarchy` (
+  `parent_id` INT UNSIGNED NOT NULL DEFAULT 0,
+  `group_id`  INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`parent_id`, `group_id`) ,
+  FOREIGN KEY (`group_id`)
+    REFERENCES `groups` (`id`)
+    ON DELETE CASCADE
     ON UPDATE CASCADE
 )
 ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `user_groups`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `user_groups` ;
+
+CREATE TABLE IF NOT EXISTS `user_groups` (
+  `user_id` INT UNSIGNED NOT NULL ,
+  `group_id` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`group_id`, `user_id`) ,
+  FOREIGN KEY (`user_id`) 
+    REFERENCES `users` (`id`) 
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE,
+  FOREIGN KEY (`group_id`) 
+    REFERENCES `groups` (`id`) 
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
+
 
 -- -----------------------------------------------------
 -- Table `user_roles` 
@@ -115,7 +139,8 @@ DROP TABLE IF EXISTS `content` ;
 
 CREATE TABLE IF NOT EXISTS `content` (
   `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(100) NOT NULL ,
+  `title` VARCHAR(255) NOT NULL ,
+  `function_call` VARCHAR(255) NULL ,
   `summary` LONGTEXT NULL ,
   `content` LONGTEXT NULL ,
   PRIMARY KEY (`id`)
@@ -160,7 +185,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `menu_links` ;
 
-CREATE TABLE IF NOT EXISTS `menus_links` (
+CREATE TABLE IF NOT EXISTS `menu_links` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `menu_id` INT UNSIGNED NOT NULL ,
   `content_id` INT UNSIGNED NOT NULL ,
@@ -180,6 +205,24 @@ CREATE TABLE IF NOT EXISTS `menus_links` (
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
+-- Table `menulink_hierarchy`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `menulink_hierarchy` ;
+
+CREATE TABLE IF NOT EXISTS `menulink_hierarchy` (
+  `parent_id` INT UNSIGNED NOT NULL DEFAULT 0,
+  `menulink_id`  INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`parent_id`, `menulink_id`) ,
+  FOREIGN KEY (`menulink_id`)
+    REFERENCES `menu_links` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
+
+
+
+-- -----------------------------------------------------
 -- Table `role_access`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `role_access` ;
@@ -192,6 +235,28 @@ CREATE TABLE IF NOT EXISTS `role_access` (
   PRIMARY KEY (`role_id`, `content_id`),
   FOREIGN KEY (`role_id`)
     REFERENCES `roles` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (`content_id`)
+    REFERENCES `content` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `group_access`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `group_access` ;
+
+CREATE TABLE IF NOT EXISTS `group_access` (
+  `group_id` INT UNSIGNED NOT NULL ,
+  `content_id` INT UNSIGNED NOT NULL ,
+  `view` TINYINT NOT NULL DEFAULT 1,
+  `edit` TINYINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`group_id`, `content_id`),
+  FOREIGN KEY (`group_id`)
+    REFERENCES `groups` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   FOREIGN KEY (`content_id`)

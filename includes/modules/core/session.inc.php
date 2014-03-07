@@ -36,22 +36,23 @@ function lwt_auth_authenticate_user($username,$password){
       if ($hash == $hashed){
         //Fetching user info
         $user_info = lwt_database_fetch_simple(DB_NAME, 'users', NULL, array('login' => $user));
-        $_SESSION['authenticated']['company'] = $company_id = $user_info[0]['id'];
+        $_SESSION['authenticated']['id'] = $user_info[0]['id'];
         $_SESSION['authenticated']['user'] = $user_info[0]['login'];
         $_SESSION['authenticated']['firstname'] = $user_info[0]['firstname'];
         $_SESSION['authenticated']['lastname'] = $user_info[0]['lastname'];
         $_SESSION['authenticated']['email'] = $user_info[0]['email'];
-        $_SESSION['authenticated']['role'] = $user_info[0]['role'];
-        if (!is_null($user_info[0]['image'])){
-            $_SESSION['authenticated']['image'] = $user_info[0]['image'];
+        $_SESSION['authenticated']['desc'] = $user_info[0]['desc'];
+        
+        //fetching roles and groups
+        $_SESSION['authenticated']['groups'] = array();
+        $_SESSION['authenticated']['roles'] = array();
+        $groups = lwt_database_fetch_simple(DB_NAME, 'user_groups', NULL, array('user_id' => $_SESSION['authenticated']['id']));
+        foreach ($groups as $group){
+          $_SESSION['authenticated']['groups'][] = $group['group_id'];
         }
-
-        //fetching company info
-        echo $c;
-        $company_info = lwt_database_fetch_simple(DB_NAME, 'companies', NULL, array('id' => $company_id));
-        $_SESSION['authenticated']['company_name'] = $company_info[0]['company_name'];
-        if (!is_null($logo)){
-            $_SESSION['authenticated']['logo'] = $company_info[0]['logo'];
+        $roles = lwt_database_fetch_simple(DB_NAME, 'user_roles', NULL, array('user_id' => $_SESSION['authenticated']['id']));
+        foreach ($roles as $role){
+          $_SESSION['authenticated']['roles'][] = $role['role_id'];
         }
         $_SESSION['start'] = time();
         return true;
@@ -138,7 +139,15 @@ function lwt_auth_session_setpassword($user_id, $pass){
   return $success;
 }
 
-
+/**
+ * Website gatekeeper (makes sure you are authenticated and didn't time out)
+ * 
+ * @param string $request Request URI
+ * @param boolean $mainetenance Set to true if maintenance mode is on
+ * 
+ * @return string Request if successfully passed the gate
+ * 
+ */
 function lwt_auth_session_gatekeeper($request, $maintenance = false){
   session_start();
     
