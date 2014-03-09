@@ -46,30 +46,42 @@ function lwt_process_authentication(){
 function lwt_process_url($request){
   // Switchboard
   if ($request == '/'){
+    //@todo have some way to put main homepage into database
     return lwt_render_home();
   }
-  elseif ($request == '/login/'){
-    return lwt_render_login();
+  $path = explode("/",$request);
+  $i = 0;
+  foreach ($path as $url_code){
+    if ($i == 0){
+      $i ++;
+      $parent_id = 0;
+      continue;
+    }
+    if($url_code != ''){
+      $info = lwt_database_fetch_simple(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
+      if (count($info)>0){
+        $parent_id = $info[0]['content_id'];
+      }
+      else{
+        echo '<p>The URL in the address bar may be in error, please return <a href="/">home</a>.</p>';
+        return TRUE;
+      }
+    }
   }
-  elseif ($request == '/register/'){
-    return lwt_render_register();
-  }
-  elseif ($request == '/password/'){
-    return lwt_render_password();
-  }
-  elseif (fnmatch("/forgot/*",$request)){
-    return lwt_render_forgot();
-  }
-  elseif ($request == '/profile/'){
-    return lwt_render_profile();
-  }
-  elseif ($request == '/maintenance/'){
-    echo '<p>This site is under maintenance, please check again soon</p>';
-    return TRUE;
-  }
-  else{
-    echo '<p>The URL in the address bar may be in error, please return <a href="/">home</a>.</p>';
-    return TRUE;
+  $info = lwt_database_fetch_simple(DB_NAME, 'content', NULL, array('id' => $parent_id));
+  if (count($info)>0){
+    $fn = $info[0]['function_call'];
+    $content = $info[0]['content'];
+    if (!is_null($fn) && function_exists($fn)){
+      $success = $fn();
+    }
+    else{
+      $success = TRUE;
+    }
+    if (!is_null($content)){
+      echo $content;
+    }
+    return $success;
   }
 }
 
@@ -81,29 +93,31 @@ function lwt_process_url($request){
  */
 function lwt_process_title($request){
   if ($request == '/'){
-    return 'Home';
+    //@todo have some way to put main homepage into database
+    return "Main Home Page";
   }
-  elseif ($request == '/login/'){
-    return 'Login';
+  $path = explode("/",$request);
+  $i = 0;
+  foreach ($path as $url_code){
+    if ($i == 0){
+      $i ++;
+      $parent_id = 0;
+      continue;
+    }
+    if($url_code != ''){
+      $info = lwt_database_fetch_simple(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
+      if (count($info)>0){
+        $parent_id = $info[0]['content_id'];
+      }
+      else{
+        header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
+        return 'Not Found';
+      }
+    }
   }
-  elseif ($request == '/register/'){
-    return 'Register';
-  }
-  elseif ($request == '/password/'){
-    return 'Update Password';
-  }
-  elseif (fnmatch("/forgot/*",$request)){
-    return 'Forgot Password';
-  }
-  elseif ($request == '/profile/'){
-    return 'Profile';
-  }
-  elseif ($request == '/maintenance/'){
-    return 'Maintenance';
-  }
-  else{
-	header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
-    return 'Not Found';
+  $info = lwt_database_fetch_simple(DB_NAME, 'content', array('title'), array('id' => $parent_id));
+  if (count($info)>0){
+    return $info[0]['title'];
   }
 }
 
