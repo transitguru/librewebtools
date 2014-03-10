@@ -45,10 +45,6 @@ function lwt_process_authentication(){
  */
 function lwt_process_url($request){
   // Switchboard
-  if ($request == '/'){
-    //@todo have some way to put main homepage into database
-    return lwt_render_home();
-  }
   $path = explode("/",$request);
   $i = 0;
   foreach ($path as $url_code){
@@ -57,7 +53,7 @@ function lwt_process_url($request){
       $parent_id = 0;
       continue;
     }
-    if($url_code != ''){
+    if($url_code != '' || $parent_id == 0){
       $info = lwt_database_fetch_simple(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
       if (count($info)>0){
         $parent_id = $info[0]['content_id'];
@@ -92,10 +88,6 @@ function lwt_process_url($request){
  * @return string Title to place in Title tags
  */
 function lwt_process_title($request){
-  if ($request == '/'){
-    //@todo have some way to put main homepage into database
-    return "Main Home Page";
-  }
   $path = explode("/",$request);
   $i = 0;
   foreach ($path as $url_code){
@@ -104,7 +96,7 @@ function lwt_process_title($request){
       $parent_id = 0;
       continue;
     }
-    if($url_code != ''){
+    if($url_code != '' || $parent_id == 0){
       $info = lwt_database_fetch_simple(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
       if (count($info)>0){
         $parent_id = $info[0]['content_id'];

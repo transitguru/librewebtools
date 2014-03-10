@@ -30,11 +30,13 @@ INSERT INTO `passwords` (`user_id`, `valid_date`, `hash`, `key`) VALUES
 -- Adding required content to enable site to run
 
 INSERT INTO `content` (`title`,`function_call`,`content`) VALUES
+  ('Home in Database','lwt_render_home',NULL),
   ('Login', 'lwt_render_login',NULL),
   ('Logout', 'lwt_process_logout', NULL),
   ('Test Page',NULL,'<p>This is a Test Page<br />Making sure it shows up</p>');
 
 INSERT INTO `content_hierarchy` (`parent_id`,`content_id`,`url_code`) VALUES
+  (0,(SELECT `id` FROM `content` WHERE `title`='Home in Database'),''),
   (0, (SELECT `id` FROM `content` WHERE `title`='Login'), 'login'),
   (0, (SELECT `id` FROM `content` WHERE `title`='Logout'), 'logout'),
   (0, (SELECT `id` FROM `content` WHERE `title`='Test Page'), 'test');
