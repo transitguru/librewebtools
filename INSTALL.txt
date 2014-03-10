@@ -28,9 +28,12 @@ Here are a few simple steps for installing LibreWebTools
  4. Type the following commands in your command line, replacing 'librewebtools'
     with the database name that you entered in line 14 in database.sql
     
-    mysql -u root -p librewebtools < core.sql
-    mysql -u root -p librewebtools < data.sql
+    mysql -u root -p librewebtools < schema.sql
+    mysql -u root -p librewebtools < content.sql
     
- 5. Visit your website and Set up your administrative account when it prompts
+ 5. Replace values in includes/modules/core/settings.inc.php to match the
+    changes made in includes/sql/database.sql
+    
+ 6. Visit your website and Set up your administrative account when it prompts
     you to do so. Once that is set up, you are on your way to using the site.
   
