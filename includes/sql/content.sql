@@ -9,13 +9,17 @@
 
 INSERT INTO `groups` (`name`) VALUES 
   ('Everyone'),
+  ('Unauthenticated'),
+  ('Authenticated'),
   ('Internal'), 
   ('External');
   
 INSERT INTO `group_hierarchy` (`parent_id`,`group_id`) VALUES 
-  (0, (SELECT `id` FROM `groups` WHERE `name`='Everyone')), 
-  ((SELECT `id` FROM `groups` WHERE `name`='Everyone'), (SELECT `id` FROM `groups` WHERE `name`='Internal')),
-  ((SELECT `id` FROM `groups` WHERE `name`='Everyone'), (SELECT `id` FROM `groups` WHERE `name`='External'));
+  (0,(SELECT `id` FROM `groups` WHERE `name`='Everyone')),
+  ((SELECT `id` FROM `groups` WHERE `name`='Everyone'), (SELECT `id` FROM `groups` WHERE `name`='Unauthenticated')),
+  ((SELECT `id` FROM `groups` WHERE `name`='Everyone'), (SELECT `id` FROM `groups` WHERE `name`='Authenticated')), 
+  ((SELECT `id` FROM `groups` WHERE `name`='Authenticated'), (SELECT `id` FROM `groups` WHERE `name`='Internal')),
+  ((SELECT `id` FROM `groups` WHERE `name`='Authenticated'), (SELECT `id` FROM `groups` WHERE `name`='External'));
   
 INSERT INTO `roles` (`name`, `desc`) VALUES 
   ('Administrator','Administers website'),
@@ -41,4 +45,10 @@ INSERT INTO `content_hierarchy` (`parent_id`,`content_id`,`url_code`) VALUES
   (0, (SELECT `id` FROM `content` WHERE `title`='Logout'), 'logout'),
   (0, (SELECT `id` FROM `content` WHERE `title`='Test Page'), 'test');
   
--- Now adding some dummy content
+-- Now applying permissions
+INSERT INTO `group_access` (`content_id`,`group_id`) VALUES
+  ((SELECT `id` FROM `content` WHERE `title`='Home in Database'),1),
+  ((SELECT `id` FROM `content` WHERE `title`='Login'), 1),
+  ((SELECT `id` FROM `content` WHERE `title`='Logout'), 1),
+  ((SELECT `id` FROM `content` WHERE `title`='Test Page'), (SELECT `id` FROM `groups` WHERE `name`='Internal'));
+  
