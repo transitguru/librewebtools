@@ -136,3 +136,78 @@ function lwt_render_password(){
 }
 
 
+/**
+ * Renders the forgotten password page
+ * 
+ * @return boolean Successful completion
+ */
+function lwt_render_forgot(){
+  if($_SERVER['REQUEST_URI'] == $_SESSION['ROOT']){
+    if ($_POST['submit'] == 'Reset Password'){
+      $email = $_POST["email"];
+      lwt_auth_session_resetpassword($email);
+      $message = '<span class="warning">The information has been submitted. You should receive password reset instructions in your email.</span>';
+    }
+?>
+      <?php echo $message; ?><br />
+      <form action='' method='post' name='update_profile' id='update_profile'>
+        <label for="email">Email Address: </label><input type="text" name="email" id="email" />&nbsp;&nbsp;<input type="submit" name="submit" id="cancel" value="Reset Password" /><br />
+      </form>
+<?php
+  }
+  else{
+    $chars = strlen($_SESSION['ROOT']);
+    $reset_request = trim(substr($_SERVER['REQUEST_URI'],$chars),"/ ");
+    $result = lwt_database_fetch_simple(DB_NAME, 'passwords', array('user_id', 'reset_code'), array('reset_code' => $reset_request));
+    if (count($result) == 0){
+?>
+    <p>The reset code does not match. Please visit the <a href="<?php echo $_SESSION['ROOT']; ?>">Forgot Password</a> page</p>
+<?php
+    }
+    else{
+      $_SESSION['reset_user'] = $result[0]['user_id'];  
+      $submit = 'Update';
+    
+      // Check if _POST is set and process form
+      $message = '';
+      if ($_POST['submit']=='Update'){
+        // Define form fields
+        $inputs['pwd'] = $_POST['pwd'];
+        $inputs['conf_pwd'] = $_POST['conf_pwd'];
+      
+        if ($inputs['pwd'] != $inputs['conf_pwd']){
+          $message = '<span class="error">New Passwords do not match.</span>';
+          $error = true;
+        }
+        if (!$error){
+          $status = lwt_auth_session_setpassword($_SESSION['reset_user'], $inputs['pwd']);
+          if ($status){
+              $_SESSION['message'] = '<span class="success">Password successfully updated.</span>';
+              $_SESSION['requested_page'] = "/";
+              unset($_SESSION['reset_user']);
+              header("Location: /login/");
+          }
+          else{
+              $message = '<span class="error">Error updating password.</span>';
+          }
+        }
+      }
+      if ($_POST['submit']=='Cancel'){
+        $message = '<span class="warning">Password was not changed.</span>';
+      }
+    
+?>
+<?php echo $message; ?><br />
+<h1>Edit your Password</h1>
+<form action='' method='post' name='update_profile' id='update_profile'>
+  <label for="pwd">Password: </label><input name="pwd"  type="password" value="" /><br />
+  <label for="conf_pwd">Confirm Password: </label><input name="conf_pwd"  type="password" value="" /><br />
+  <input type="submit" name="submit" id="submit" value="<?php echo $submit; ?>" />&nbsp;&nbsp;<input type="submit" name="submit" id="cancel" value="Cancel" />
+</form>
+<?php
+    }
+  }
+  return TRUE;
+  
+}
+

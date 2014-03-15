@@ -52,7 +52,6 @@ function lwt_process_url($request){
     if ($i == 0){
       $i ++;
       $parent_id = 0;
-      $_SESSION['ROOT'] = '/';
       continue;
     }
     if(($url_code != '' || $parent_id == 0) && $app_root == 0){
@@ -60,7 +59,6 @@ function lwt_process_url($request){
       if (count($info)>0){
         $parent_id = $info[0]['content_id'];
         $app_root = $info[0]['app_root'];
-        $_SESSION['ROOT'] .=  $url_code . '/';
       }
       else{
         echo '<p>The URL in the address bar may be in error, please return <a href="/">home</a>.</p>';
@@ -99,6 +97,7 @@ function lwt_process_title($request){
     if ($i == 0){
       $i ++;
       $parent_id = 0;
+      $_SESSION['ROOT'] = '';
       continue;
     }
     if(($url_code != '' || $parent_id == 0) && $app_root == 0){
@@ -106,12 +105,16 @@ function lwt_process_title($request){
       if (count($info)>0){
         $parent_id = $info[0]['content_id'];
         $app_root = $info[0]['app_root'];
+        $_SESSION['ROOT'] .= '/' . $url_code;
       }
       else{
         header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
         return 'Not Found';
       }
     }
+  }
+  if ($_SESSION['ROOT'] != '/'){
+    $_SESSION['ROOT'] .= '/';
   }
   $info = lwt_database_fetch_simple(DB_NAME, 'content', array('title'), array('id' => $parent_id));
   if (count($info)>0){

@@ -76,7 +76,6 @@ else{
 
 if ($debug){
   lwt_test_array_print($_SESSION); 
-  lwt_test_array_print($_POST,'bar'); 
   
   $end = microtime(TRUE);
   lwt_test_showtime($begin, $end);

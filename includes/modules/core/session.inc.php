@@ -73,7 +73,7 @@ function lwt_auth_authenticate_user($username,$password){
 function lwt_auth_session_resetpassword($email){
   $result = lwt_database_fetch_simple(DB_NAME, 'users', NULL, array('email' => $email));
   if (count($result) > 0){
-    $user = $result[0]['user_id'];
+    $user = $result[0]['id'];
     $passwords = lwt_database_fetch_simple(DB_NAME, 'passwords', array('user_id', 'valid_date'), array('user_id' => $result[0]['id']), NULL, array('valid_date'));
     foreach ($passwords as $data){
       $user_id = $data['user_id'];
@@ -93,17 +93,13 @@ function lwt_auth_session_resetpassword($email){
         $loop = FALSE;
       }
     }
-    $reset_code = $conn->real_escape_string($reset_code);
-    $user_id = $conn->real_escape_string($user_id);
-    $valid_date = $conn->real_escape_string($valid_date);
-    $sql = "UPDATE `Password` SET `reset` = 1 , `reset_code`='".$reset_code."' WHERE `user_id` = '".$user_id."' and `valid_date` = '".$valid_date."'";
+    $sql = "UPDATE `passwords` SET `reset` = 1 , `reset_code`='{$reset_code}' WHERE `user_id` = {$user_id} and `valid_date` = '{$valid_date}'";
     $success = lwt_database_write_raw(DB_NAME,$sql);
     if (!$success){
       echo $conn->error;
       echo "Fail!\n";
     }
-    echo $reset_code;
-    $headers = "From: Data Tools <noreply@transitguru.info>\r\n";
+    $headers = "From: LibreWebTools <noreply@transitguru.info>\r\n";
     $headers .= "Content-Type: text/plain; charset=utf-8";
     mail($email, "Password Reset", "Username: ".$user_id."\r\nPlease visit the following url to reset your password:\r\nhttp://transitguru.info/forgot/".$reset_code."/", $headers);
   }
