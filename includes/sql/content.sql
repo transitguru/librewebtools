@@ -38,7 +38,7 @@ INSERT INTO `roles` (`name`, `desc`) VALUES
   ('Authenticated User', 'Basic user');
   
 -- Add the admin user
-INSERT INTO `users` (`login`, `firstname`, `lastname`, `desc`) VALUES ('admin', 'Site', 'Adminstrator', 'Site administrator');
+INSERT INTO `users` (`login`, `firstname`, `lastname`, `email`, `desc`) VALUES ('admin', 'Site', 'Adminstrator', 'dev@null.systems', 'Site administrator');
 INSERT INTO `user_roles` (`role_id`, `user_id`) VALUES ((SELECT `id` FROM `roles` WHERE `name`='Administrator'), (SELECT `id` FROM `users` WHERE `login`='admin'));
 INSERT INTO `user_groups` (`group_id`, `user_id`) VALUES ((SELECT `id` FROM `groups` WHERE `name`='Everyone'), (SELECT `id` FROM `users` WHERE `login`='admin'));
 INSERT INTO `passwords` (`user_id`, `valid_date`, `hash`, `key`) VALUES 
@@ -53,18 +53,28 @@ ALTER TABLE `content` AUTO_INCREMENT=1;
 INSERT INTO `content` (`title`,`function_call`,`content`) VALUES
   ('Login', 'lwt_render_login',NULL),
   ('Logout', 'lwt_process_logout', NULL),
+  ('Profile', 'lwt_render_profile', NULL),
+  ('Reset Password', 'lwt_render_password', NULL),
+  ('Forgot Password', 'lwt_render_forgot', NULL),
   ('Test Page',NULL,'<p>This is a Test Page<br />Making sure it shows up</p>');
 
 -- Place the required content in a hierarchy
-INSERT INTO `content_hierarchy` (`parent_id`,`content_id`,`url_code`) VALUES
-  (0,(SELECT `id` FROM `content` WHERE `title`='Home in Database'),''),
-  (0, (SELECT `id` FROM `content` WHERE `title`='Login'), 'login'),
-  (0, (SELECT `id` FROM `content` WHERE `title`='Logout'), 'logout'),
-  (0, (SELECT `id` FROM `content` WHERE `title`='Test Page'), 'test');
+INSERT INTO `content_hierarchy` (`parent_id`,`content_id`,`url_code`, `app_root`) VALUES
+  (0,(SELECT `id` FROM `content` WHERE `title`='Home in Database'),'',0),
+  (0, (SELECT `id` FROM `content` WHERE `title`='Login'), 'login',0),
+  (0, (SELECT `id` FROM `content` WHERE `title`='Logout'), 'logout',0),
+  (0, (SELECT `id` FROM `content` WHERE `title`='Test Page'), 'test',0),
+  (0, (SELECT `id` FROM `content` WHERE `title`='Profile'), 'profile',0),
+  (0, (SELECT `id` FROM `content` WHERE `title`='Reset Password'), 'password',0),
+  (0, (SELECT `id` FROM `content` WHERE `title`='Forgot Password'), 'forgot',1);
   
 -- Now applying permissions
 INSERT INTO `group_access` (`content_id`,`group_id`) VALUES
   ((SELECT `id` FROM `content` WHERE `title`='Home in Database'),0),
   ((SELECT `id` FROM `content` WHERE `title`='Login'), 0),
   ((SELECT `id` FROM `content` WHERE `title`='Logout'), 0),
-  ((SELECT `id` FROM `content` WHERE `title`='Test Page'), (SELECT `id` FROM `groups` WHERE `name`='Internal'));
+  ((SELECT `id` FROM `content` WHERE `title`='Forgot Password'), 0),
+  ((SELECT `id` FROM `content` WHERE `title`='Test Page'), (SELECT `id` FROM `groups` WHERE `name`='Internal')),
+  ((SELECT `id` FROM `content` WHERE `title`='Profile'), (SELECT `id` FROM `groups` WHERE `name`='Internal')),
+  ((SELECT `id` FROM `content` WHERE `title`='Reset Password'), (SELECT `id` FROM `groups` WHERE `name`='Internal'));
+  

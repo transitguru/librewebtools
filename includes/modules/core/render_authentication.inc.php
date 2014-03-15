@@ -29,7 +29,110 @@ function lwt_render_login(){
   return TRUE;
 }
 
+/**
+ * Renders a user profile editing page
+ * 
+ * @return boolean Successful completion
+ */
+function lwt_render_profile(){
+  $result = lwt_database_fetch_simple(DB_NAME,'users',NULL,array('id' => $_SESSION['authenticated']['id']));
+  $profile = $result[0]; /**< Array of profile information */
+  $submit = 'Update'; /**< Submit button value */
+
+  // Check if _POST is set and process form
+  $message = '';
+  if (isset($_POST['submit']) && $_POST['submit']=='Update'){
+    $message = '<span class="success"></span>';
+    $error = false;
+    if ($_SESSION['authenticated']['user'] != $_POST['login']){
+      $result = lwt_database_fetch_simple(DB_NAME,'users',NULL,array('login' => $_POST['login']));
+      if (count($result > 0)){
+        $message = '<span class="error">Username already exists</span>';
+        $error = TRUE;
+      }
+    }
+    if (!$error){
+      $inputs = array();
+      $inputs['login'] = $_POST['login'];
+      $inputs['firstname'] = $_POST['firstname'];
+      $inputs['lastname'] = $_POST['lastname'];
+      $inputs['email'] = $_POST['email'];
+      $status = lwt_database_write(DB_NAME, 'users', $inputs, array('id' => $_SESSION['authenticated']['id']));
+      $error = $status['error'];
+      $message = $status['message'];
+      $result = lwt_database_fetch_simple(DB_NAME,'users',NULL,array('id' => $_SESSION['authenticated']['id']));
+      $profile = $result[0]; 
+    }
+  }
+  elseif (isset($_POST['submit']) && $_POST['submit']=='Cancel'){
+    $message = '<span class="warning">Profile was not changed.</span>';
+    $result = lwt_database_fetch_simple(DB_NAME,'users',NULL,array('id' => $_SESSION['authenticated']['id']));
+    $profile = $result[0];
+  }
+    
+?>
+<?php echo $message; ?><br />
+      <h1>Edit your Profile</h1>
+      <form action="" method="post" name="update_profile" id="update_profile">
+        <label for="login">Username</label><input name="login" value="<?php echo $profile['login']; ?>" /><br />
+        <label for="firstname">First Name</label><input name="firstname" value="<?php echo $profile['firstname']; ?>" /><br />
+        <label for="lastname">Last Name</label><input name="lastname" value="<?php echo $profile['lastname']; ?>" /><br />
+        <label for="email">Email</label><input name="email" value="<?php echo $profile['email']; ?>" /><br />
+        <input type="submit" name="submit" value="Update" /><input type="submit" name="submit" value="Cancel" />
+      </form>
+<?php
+}
 
 
+/**
+ * Renders a password change form (for those already logged in)
+ * 
+ * @return boolean Successful completion
+ */
+
+function lwt_render_password(){
+  $submit = 'Update';
+
+
+  // Check if _POST is set and process form
+  $message = '';
+  if (isset($_POST['submit']) && $_POST['submit']=='Update'){
+  $message = '<span class="success">Data submitted correctly</span>';
+  $error = false;
+    if (!lwt_auth_authenticate_user($_SESSION['authenticated']['user'], $_POST['current_pwd'])){
+      $message = '<span class="error">Existing password is not valid, please re-enter it.</span>';
+      $error = true;
+    }
+    elseif ($_POST['pwd'] != $_POST['conf_pwd']){
+      $message = '<span class="error">New Passwords do not match.</span>';
+      $error = true;
+    }
+    if (!$error){
+      $status = lwt_auth_session_setpassword($_SESSION['authenticated']['id'], $_POST['pwd']);
+      if ($status){
+        $message = '<span class="success">Password successfully updated.</span>';
+        $passes['current_pwd']['string'] = $passes['pwd']['string'] = $passes['conf_pwd']['string'] = '';
+      }
+      else{
+        $message = '<span class="error">Error updating password.</span>';
+      }
+    }
+  }
+  if (isset($_POST['submit']) && $_POST['submit']=='Cancel'){
+    $message = '<span class="warning">Password was not changed.</span>';
+  }
+    
+?>
+<?php echo $message; ?><br />
+<form action='' method='post' name='update_profile' id='update_profile'>
+
+        <label for="current_pwd">Current Password</label><input name="current_pwd" type="password" /><br />
+        <label for="pwd">New Password</label><input name="pwd" type="password" /><br />
+        <label for="conf_pwd">Confirm Password</label><input name="conf_pwd" type="password" /><br />
+        <input type="submit" name="submit" id="submit" value="<?php echo $submit; ?>" />&nbsp;&nbsp;<input type="submit" name="submit" id="cancel" value="Cancel" />
+      </form>
+<?php
+  return TRUE;
+}
 
 

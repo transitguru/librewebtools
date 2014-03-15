@@ -18,7 +18,7 @@ function lwt_process_authentication(){
   else{
     $redirect = $_SESSION['requested_page'];
   }
-  if (isset($_POST['login'])) {
+  if (isset($_POST['login']) && $_POST['login'] == 'Log In') {
      // strip whitespace from user input
     $username = trim($_POST['username']);
     $password = trim($_POST['pwd']);
@@ -47,16 +47,20 @@ function lwt_process_url($request){
   // Switchboard
   $path = explode("/",$request);
   $i = 0;
+  $app_root = 0;
   foreach ($path as $url_code){
     if ($i == 0){
       $i ++;
       $parent_id = 0;
+      $_SESSION['ROOT'] = '/';
       continue;
     }
-    if($url_code != '' || $parent_id == 0){
+    if(($url_code != '' || $parent_id == 0) && $app_root == 0){
       $info = lwt_database_fetch_simple(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
       if (count($info)>0){
         $parent_id = $info[0]['content_id'];
+        $app_root = $info[0]['app_root'];
+        $_SESSION['ROOT'] .=  $url_code . '/';
       }
       else{
         echo '<p>The URL in the address bar may be in error, please return <a href="/">home</a>.</p>';
@@ -90,16 +94,18 @@ function lwt_process_url($request){
 function lwt_process_title($request){
   $path = explode("/",$request);
   $i = 0;
+  $app_root = 0;
   foreach ($path as $url_code){
     if ($i == 0){
       $i ++;
       $parent_id = 0;
       continue;
     }
-    if($url_code != '' || $parent_id == 0){
+    if(($url_code != '' || $parent_id == 0) && $app_root == 0){
       $info = lwt_database_fetch_simple(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
       if (count($info)>0){
         $parent_id = $info[0]['content_id'];
+        $app_root = $info[0]['app_root'];
       }
       else{
         header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");

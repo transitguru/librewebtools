@@ -156,6 +156,7 @@ CREATE TABLE IF NOT EXISTS `content_hierarchy` (
   `parent_id` INT UNSIGNED NOT NULL DEFAULT 0,
   `content_id`  INT UNSIGNED NOT NULL,
   `url_code` VARCHAR(100) NOT NULL ,
+  `app_root` TINYINT NOT NULL DEFAULT 0 ,
   PRIMARY KEY (`parent_id`, `content_id`) ,
   UNIQUE KEY (`parent_id`,`url_code`) ,
   FOREIGN KEY (`content_id`)

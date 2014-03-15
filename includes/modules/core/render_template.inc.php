@@ -221,7 +221,7 @@ function lwt_render_wrapper($request){
     <script src="/js/core.js"></script>
         
   </head>
-  <body onload="loadmap();" >
+  <body>
     <div class="container">
       <div class="banner">
         <svg width="1200" height="100">
@@ -301,6 +301,7 @@ function lwt_render_menu(){
                 <ul>
                   <li><a href="/logout/">Logout</a></li>
                   <li><a href="/profile/">Profile</a></li>
+                  <li><a href="/password/">Reset Password</a></li>
                 </ul>
               </li>
             </ul>        
@@ -335,3 +336,4 @@ function lwt_render_buttons(){
 <?php
   return TRUE;
 }
+

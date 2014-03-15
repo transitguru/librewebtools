@@ -23,7 +23,7 @@ function lwt_install($request){
   
   // Check to see if lwt can log in
   $creds = lwt_database_get_credentials(DB_NAME);
-  $conn = mysqli_connect('localhost', $creds['user'], $creds['pass'], 'librewebtools');
+  $conn = mysqli_connect('localhost', $creds['user'], $creds['pass'], DB_NAME);
   if (!$conn){
     $install = TRUE;
   }
