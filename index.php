@@ -33,10 +33,10 @@ foreach ($modules as $module){
 // Load settings so that database can connect
 lwt_settings_load();
 
+$request = $_SERVER['REQUEST_URI']; /**< Request URI from user */
+
 // Check to see if the database has been installed yet
 lwt_install($request);
-
-$request = $_SERVER['REQUEST_URI']; /**< Request URI from user */
 
 
 $maintenance = FALSE; /**< Set maintenance mode */

@@ -15,12 +15,12 @@
 function lwt_render_css(){
   $body_color = "#222222";
   $bg_color = "#222222";
-  $content = "#dddddd";
-  $heading = "#005596";
-  $font = "arial";
+  $content = "#eeeeee";
+  $heading = "#003300";
+  $font = "Liberation Sans";
   $primary = "#666666";
-  $secondary = "#6c9c3e";
-  $accent = "#002d55";
+  $secondary = "#006600";
+  $accent = "#aaaa00";
   $a_content = $accent;
   $a_hover = $primary;
   $nav_a = "#ffffff";
@@ -29,8 +29,60 @@ function lwt_render_css(){
   $foot_text = $primary;
 ?>
     <style type="text/css">
+      /* Importing Fonts for the site */
+      @font-face {
+        font-family: "Liberation Sans";
+        src: url("/fonts/LiberationSans-Regular.ttf");
+        font-weight: normal;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "Liberation Sans";
+        src: url("/fonts/LiberationSans-Bold.ttf");
+        font-weight: bold;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "Liberation Sans";
+        src: url("/fonts/LiberationSans-Italic.ttf");
+        font-weight: normal;
+        font-style: italic
+      }
+      @font-face {
+        font-family: "Liberation Sans";
+        src: url("/fonts/LiberationSans-BoldItalic.ttf");
+        font-weight: bold;
+        font-style: italic
+      }
+      
+      @font-face {
+        font-family: "Liberation Sans Narrow";
+        src: url("/fonts/LiberationSansNarrow-Regular.ttf");
+        font-weight: normal;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "Liberation Sans Narrow";
+        src: url("/fonts/LiberationSansNarrow-Bold.ttf");
+        font-weight: bold;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "Liberation Sans Narrow";
+        src: url("/fonts/LiberationSansNarrow-Italic.ttf");
+        font-weight: normal;
+        font-style: italic
+      }
+      @font-face {
+        font-family: "Liberation Sans Narrow";
+        src: url("/fonts/LiberationSansNarrow-BoldItalic.ttf");
+        font-weight: bold;
+        font-style: italic
+      }
+      
+      
       /* Setting up background */
-        body { background-color: <?php echo $body_color;?>; font-family: <?php echo $font;?>}
+        body { background-color: <?php echo $body_color;?>; font-family: "<?php echo $font;?>"}
 
         /* anchor links */
         .page_content a {text-decoration:none; color: <?php echo $a_content;?>; font-weight:bold}
@@ -38,7 +90,7 @@ function lwt_render_css(){
 
 
         /* h tags */
-        h1, h2, h3, h4, h5, h6 {font-family: sans-serif; color: <?php echo $heading;?>}
+        h1, h2, h3, h4, h5, h6 {color: <?php echo $heading;?>;}
         
         
         /* layout of divs [Note, the whitespace shows how divs are "nested" ] */
@@ -54,7 +106,7 @@ function lwt_render_css(){
                     .top ul {display: table-row; font-size:14px;}
                         .top ul li{width:120px;}
                 .page_content {background-color:<?php echo $content;?>;min-height:400px;padding:10px}
-                .foot {width:100%; background-color:<?php echo $primary;?>;}
+                .foot {width:100%; font-family: "Liberation Sans Narrow"; background-color:<?php echo $primary;?>;}
                     .foot ul{display: table-row; font-size:10px}
             .right {float:left;}
           .bottom {clear: both;color: <?php echo $foot_text;?>; background-color: <?php echo $bg_color;?>;}
@@ -173,7 +225,7 @@ function lwt_render_wrapper($request){
     <div class="container">
       <div class="banner">
         <svg width="1200" height="100">
-          <rect x="40" y="40" width="400" height="20" style="fill: #005599;" />
+          <rect x="40" y="40" width="400" height="20" style="fill: #003300;" />
         </svg>
       </div>
       <div class="main_zone">
@@ -277,17 +329,9 @@ function lwt_render_menu(){
  * @return string HMTL
  */
 function lwt_render_buttons(){
+  //does nothing right now!
 ?>
-          <ul class="nav">
-            <li><button><svg width="20" height="20"><circle cx="10" cy="10" r="8" style="fill: #ff0000;" /></svg></button></li>
-            <li><button><svg width="20" height="20"><circle cx="10" cy="10" r="8" style="fill: #00ff00;" /></svg></button></li>
-            <li><button><svg width="20" height="20"><circle cx="10" cy="10" r="8" style="fill: #ff00ff;" /></svg></button></li>
-            <li><button><svg width="20" height="20"><circle cx="10" cy="10" r="8" style="fill: #0000ff;" /></svg></button></li>
-            <li><button><svg width="20" height="20"><circle cx="10" cy="10" r="8" style="fill: #ff0000;" /></svg></button></li>
-            <li><button><svg width="20" height="20"><circle cx="10" cy="10" r="8" style="fill: #00ff00;" /></svg></button></li>
-            <li><button><svg width="20" height="20"><circle cx="10" cy="10" r="8" style="fill: #ff00ff;" /></svg></button></li>
-            <li><button><svg width="20" height="20"><circle cx="10" cy="10" r="8" style="fill: #0000ff;" /></svg></button></li>            
-          </ul>
+  &nbsp;
 <?php
   return TRUE;
 }
