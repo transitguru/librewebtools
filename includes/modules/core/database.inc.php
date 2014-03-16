@@ -163,11 +163,11 @@ function lwt_database_write($database, $table, $inputs, $where = NULL){
         $values[$field] = $value;
         $fields[] = $field;
       }
-      elseif ($type == 'string'){
-        $values[$field] = "'" . str_replace("'", "\\'", $value) . "'";
+      elseif ($type == 'string' && $value !== ''){
+        $values[$field] = "'" . str_replace("'", "\\'",str_replace("\\", "\\\\", $value)) . "'";
         $fields[] = $field;
       }
-      elseif ($type == 'null' || $value == NULL || $value = 'null'){
+      elseif ($type == 'null' || $value == NULL || $value === ''){
         $values[$field] = 'NULL';
         $fields[] = $field;
       }
@@ -202,7 +202,7 @@ function lwt_database_write($database, $table, $inputs, $where = NULL){
         if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
         }
         elseif ($type == 'string' && $value !== ''){
-          $value = "'" . str_replace("'", "\\'", $value) . "'";
+          $value = "'" . str_replace("'", "\\'",str_replace("\\", "\\\\", $value)) . "'";
         }
         elseif ($type == 'null' || $value == NULL || $value === ''){
           $value = 'NULL';
