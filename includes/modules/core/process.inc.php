@@ -97,7 +97,7 @@ function lwt_process_title($request){
     if ($i == 0){
       $i ++;
       $parent_id = 0;
-      $_SESSION['ROOT'] = '';
+      $ROOT = '';
       continue;
     }
     if(($url_code != '' || $parent_id == 0) && $app_root == 0){
@@ -105,7 +105,7 @@ function lwt_process_title($request){
       if (count($info)>0){
         $parent_id = $info[0]['content_id'];
         $app_root = $info[0]['app_root'];
-        $_SESSION['ROOT'] .= '/' . $url_code;
+        $ROOT .= '/' . $url_code;
       }
       else{
         header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
@@ -113,9 +113,10 @@ function lwt_process_title($request){
       }
     }
   }
-  if ($_SESSION['ROOT'] != '/'){
-    $_SESSION['ROOT'] .= '/';
+  if ($ROOT != '/'){
+    $ROOT .= '/';
   }
+  define('APP_ROOT', $ROOT);
   $info = lwt_database_fetch_simple(DB_NAME, 'content', array('title'), array('id' => $parent_id));
   if (count($info)>0){
     return $info[0]['title'];

@@ -142,7 +142,7 @@ function lwt_render_password(){
  * @return boolean Successful completion
  */
 function lwt_render_forgot(){
-  if($_SERVER['REQUEST_URI'] == $_SESSION['ROOT']){
+  if($_SERVER['REQUEST_URI'] == APP_ROOT){
     if ($_POST['submit'] == 'Reset Password'){
       $email = $_POST["email"];
       lwt_auth_session_resetpassword($email);
@@ -156,12 +156,12 @@ function lwt_render_forgot(){
 <?php
   }
   else{
-    $chars = strlen($_SESSION['ROOT']);
+    $chars = strlen(APP_ROOT);
     $reset_request = trim(substr($_SERVER['REQUEST_URI'],$chars),"/ ");
     $result = lwt_database_fetch_simple(DB_NAME, 'passwords', array('user_id', 'reset_code'), array('reset_code' => $reset_request));
     if (count($result) == 0){
 ?>
-    <p>The reset code does not match. Please visit the <a href="<?php echo $_SESSION['ROOT']; ?>">Forgot Password</a> page</p>
+    <p>The reset code does not match. Please visit the <a href="<?php echo APP_ROOT; ?>">Forgot Password</a> page</p>
 <?php
     }
     else{
