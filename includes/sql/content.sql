@@ -50,13 +50,13 @@ UPDATE `content` SET `id`=0;
 ALTER TABLE `content` AUTO_INCREMENT=1;
 
 -- Adding required content to enable site to run
-INSERT INTO `content` (`title`,`function_call`,`content`) VALUES
-  ('Login', 'lwt_render_login',NULL),
-  ('Logout', 'lwt_process_logout', NULL),
-  ('Profile', 'lwt_render_profile', NULL),
-  ('Reset Password', 'lwt_render_password', NULL),
-  ('Forgot Password', 'lwt_render_forgot', NULL),
-  ('Test Page',NULL,'<p>This is a Test Page<br />Making sure it shows up</p>');
+INSERT INTO `content` (`title`,`preprocess_call`,`function_call`,`content`) VALUES
+  ('Login','lwt_process_authentication', 'lwt_render_login',NULL),
+  ('Logout','lwt_process_logout', NULL, NULL),
+  ('Profile',NULL, 'lwt_render_profile', NULL),
+  ('Reset Password',NULL, 'lwt_render_password', NULL),
+  ('Forgot Password',NULL, 'lwt_render_forgot', NULL),
+  ('Test Page',NULL,NULL,'<p>This is a Test Page<br />Making sure it shows up</p>');
 
 -- Place the required content in a hierarchy
 INSERT INTO `content_hierarchy` (`parent_id`,`content_id`,`url_code`, `app_root`) VALUES

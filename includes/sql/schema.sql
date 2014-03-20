@@ -139,6 +139,7 @@ DROP TABLE IF EXISTS `content` ;
 
 CREATE TABLE IF NOT EXISTS `content` (
   `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `preprocess_call` VARCHAR(255) NULL ,
   `title` VARCHAR(255) NOT NULL ,
   `function_call` VARCHAR(255) NULL ,
   `summary` LONGTEXT NULL ,

@@ -84,7 +84,7 @@ function lwt_process_url($request){
 }
 
 /**
- * Provides a title for a given request URI
+ * Provides a title for a given request URI and runs any preprocess calls
  * 
  * @param string $request Request URI
  * @return string Title to place in Title tags
@@ -119,7 +119,12 @@ function lwt_process_title($request){
   define('APP_ROOT', $ROOT);
   $info = lwt_database_fetch_simple(DB_NAME, 'content', array('title'), array('id' => $parent_id));
   if (count($info)>0){
-    return $info[0]['title'];
+    $fn = $info[0]['preprocess_call'];
+    $title = $info[0]['title'];
+    if (!is_null($fn) && function_exists($fn)){
+      $fn();
+    }
+    return $title;
   }
 }
 
