@@ -38,6 +38,51 @@ function lwt_process_authentication(){
 }
 
 /**
+ * Provides a title for a given request URI and runs any preprocess calls
+ * 
+ * @param string $request Request URI
+ * @return string Title to place in Title tags
+ */
+function lwt_process_title($request){
+  $path = explode("/",$request);
+  $i = 0;
+  $app_root = 0;
+  foreach ($path as $url_code){
+    if ($i == 0){
+      $i ++;
+      $parent_id = 0;
+      $ROOT = '';
+      continue;
+    }
+    if(($url_code != '' || $parent_id == 0) && $app_root == 0){
+      $info = lwt_database_fetch_simple(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
+      if (count($info)>0){
+        $parent_id = $info[0]['content_id'];
+        $app_root = $info[0]['app_root'];
+        $ROOT .= '/' . $url_code;
+      }
+      else{
+        header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
+        return 'Not Found';
+      }
+    }
+  }
+  if ($ROOT != '/'){
+    $ROOT .= '/';
+  }
+  define('APP_ROOT', $ROOT);
+  $info = lwt_database_fetch_simple(DB_NAME, 'content', array('title'), array('id' => $parent_id));
+  if (count($info)>0){
+    $fn = $info[0]['preprocess_call'];
+    $title = $info[0]['title'];
+    if (!is_null($fn) && function_exists($fn)){
+      $fn();
+    }
+    return $title;
+  }
+}
+
+/**
  * Provides markup for the page_content div
  * 
  * @param string $request Request URI
@@ -83,50 +128,6 @@ function lwt_process_url($request){
   }
 }
 
-/**
- * Provides a title for a given request URI and runs any preprocess calls
- * 
- * @param string $request Request URI
- * @return string Title to place in Title tags
- */
-function lwt_process_title($request){
-  $path = explode("/",$request);
-  $i = 0;
-  $app_root = 0;
-  foreach ($path as $url_code){
-    if ($i == 0){
-      $i ++;
-      $parent_id = 0;
-      $ROOT = '';
-      continue;
-    }
-    if(($url_code != '' || $parent_id == 0) && $app_root == 0){
-      $info = lwt_database_fetch_simple(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
-      if (count($info)>0){
-        $parent_id = $info[0]['content_id'];
-        $app_root = $info[0]['app_root'];
-        $ROOT .= '/' . $url_code;
-      }
-      else{
-        header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
-        return 'Not Found';
-      }
-    }
-  }
-  if ($ROOT != '/'){
-    $ROOT .= '/';
-  }
-  define('APP_ROOT', $ROOT);
-  $info = lwt_database_fetch_simple(DB_NAME, 'content', array('title'), array('id' => $parent_id));
-  if (count($info)>0){
-    $fn = $info[0]['preprocess_call'];
-    $title = $info[0]['title'];
-    if (!is_null($fn) && function_exists($fn)){
-      $fn();
-    }
-    return $title;
-  }
-}
 
 /**
  * Processes AJAX Requests
