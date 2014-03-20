@@ -9,7 +9,12 @@
  * @todo put the lookup information into the core database
  */
 
-
+/**
+ * Processes Login on login page (must be tied to a content item in the database)
+ * 
+ * @return void
+ * 
+ */
 
 function lwt_process_authentication(){
   if (!isset($_SESSION['requested_page']) || $_SESSION['requested_page'] =='/login/'){
@@ -38,7 +43,25 @@ function lwt_process_authentication(){
 }
 
 /**
+ * Processes Logout on logout page (must be tied to a content item in the database)
+ * 
+ * @return void
+ * 
+ */
+
+function lwt_process_logout(){
+  if (isset($_COOKIE[session_name()])){
+    setcookie(session_name(), '', time()-86400, '/');
+  }
+  // end session and redirect
+  session_destroy();
+  header("Location: /");
+  exit;
+}
+
+/**
  * Provides a title for a given request URI and runs any preprocess calls
+ * @todo migrate gatekeeper logic here and use permissions database values
  * 
  * @param string $request Request URI
  * @return string Title to place in Title tags
@@ -71,7 +94,7 @@ function lwt_process_title($request){
     $ROOT .= '/';
   }
   define('APP_ROOT', $ROOT);
-  $info = lwt_database_fetch_simple(DB_NAME, 'content', array('title'), array('id' => $parent_id));
+  $info = lwt_database_fetch_simple(DB_NAME, 'content', array('title','preprocess_call'), array('id' => $parent_id));
   if (count($info)>0){
     $fn = $info[0]['preprocess_call'];
     $title = $info[0]['title'];

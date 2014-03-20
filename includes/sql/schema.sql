@@ -61,6 +61,10 @@ CREATE TABLE IF NOT EXISTS `group_hierarchy` (
   `parent_id` INT UNSIGNED NOT NULL DEFAULT 0,
   `group_id`  INT UNSIGNED NOT NULL,
   PRIMARY KEY (`parent_id`, `group_id`) ,
+  FOREIGN KEY (`parent_id`)
+    REFERENCES `groups` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   FOREIGN KEY (`group_id`)
     REFERENCES `groups` (`id`)
     ON DELETE CASCADE
@@ -160,6 +164,10 @@ CREATE TABLE IF NOT EXISTS `content_hierarchy` (
   `app_root` TINYINT NOT NULL DEFAULT 0 ,
   PRIMARY KEY (`parent_id`, `content_id`) ,
   UNIQUE KEY (`parent_id`,`url_code`) ,
+  FOREIGN KEY (`parent_id`)
+    REFERENCES `content` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   FOREIGN KEY (`content_id`)
     REFERENCES `content` (`id`)
     ON DELETE CASCADE

@@ -158,24 +158,13 @@ function lwt_auth_session_gatekeeper($request, $maintenance = false){
     "/register/",
     "/forgot/",
     "/maintenance/",
+    "/login/",
+    "/logout/",
   );
 
   $redirect = '/login/'; /**< URI to redirect if rejected */
   
-  // Determine if you are asking to logout
-  if ($request == "/logout/"){
-    if (isset($_COOKIE[session_name()])){
-      setcookie(session_name(), '', time()-86400, '/');
-    }
-    // end session and redirect
-    session_destroy();
-    header("Location: /");
-    exit;
-  }
-  elseif ($request == "/register/"){
-    $_SESSION['message'] = "Please register using the access key that you were provided.";
-  }
-  elseif (fnmatch("/forgot/*",$request)){
+  if (fnmatch("/forgot/*",$request)){
     return $request;
   }
   elseif ($request != $redirect){
@@ -203,8 +192,7 @@ function lwt_auth_session_gatekeeper($request, $maintenance = false){
   else{
     $_SESSION['message'] = "Please logon to access tools!";
   }
-  
-  lwt_process_authentication();
+
   
   // Now route the request
   if (!$maintenance){
@@ -224,9 +212,6 @@ function lwt_auth_session_gatekeeper($request, $maintenance = false){
       exit;
     }
     // add slashes if not a file
-    elseif (fnmatch('/grapher/*',$request)){
-      return $request;
-    }
     elseif (substr($request,-1)!="/"){
       $request .= "/";
       header("location: $request");
