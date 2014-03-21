@@ -150,33 +150,14 @@ function lwt_auth_session_gatekeeper($request, $maintenance = false){
   $timelimit = 60 * 60; /**< time limit in seconds */
   $now = time(); /**< current time */
   
-  /** URIs available without login */
-  $public_uris = array(
-    "/",
-    "/contact/",
-    "/sitemap/",
-    "/register/",
-    "/forgot/",
-    "/maintenance/",
-    "/login/",
-    "/logout/",
-  );
-
-  $redirect = '/login/'; /**< URI to redirect if rejected */
   
-  if (fnmatch("/forgot/*",$request)){
-    return $request;
-  }
-  elseif ($request != $redirect){
+  $redirect = '/'; /**< URI to redirect if timeout */
+  
+  if ($request != $redirect){
     $_SESSION['requested_page'] = $request;
 
-    if (!isset($_SESSION['authenticated'])){
-      $_SESSION['message'] = "Please logon to access tools!";
-      header("Location: $redirect");
-      exit;
-    }
-    elseif ($now > $_SESSION['start'] + $timelimit  && !in_array($request,$public_uris)){
-      // if timelimit has expired, destroy authenticated session and redirect
+    if ($now > $_SESSION['start'] + $timelimit  && isset($_SESSION['authenticated'])){
+      // if timelimit has expired, destroy authenticated session
       unset($_SESSION['authenticated']);
       $_SESSION['start'] = time() - 86400;
       $_SESSION['message'] = "Your session has expired, please logon.";
@@ -189,30 +170,10 @@ function lwt_auth_session_gatekeeper($request, $maintenance = false){
       $_SESSION['message'] = "Welcome {$_SESSION['authenticated']['user']}!";
     }
   }
-  else{
-    $_SESSION['message'] = "Please logon to access tools!";
-  }
-
   
   // Now route the request
   if (!$maintenance){
-
-    // handle files
-    if (substr($request,-1)!="/" and fnmatch('/file/*',$request)){
-      $file = $_SERVER['DOCUMENT_ROOT']."/FILES/".$request;
-      $simple = true;
-      $size = filesize($file);
-      $type = finfo_file($finfo, $file, FILEINFO_MIME_TYPE);
-      header('Pragma: ');         // leave blank to avoid IE errors
-      header('Cache-Control: ');  // leave blank to avoid IE errors
-      header('Content-Length: ' . $size);
-      header('Content-Type: ' .$type);
-      sleep(0); // gives browser a second to digest headers
-      readfile($file);
-      exit;
-    }
-    // add slashes if not a file
-    elseif (substr($request,-1)!="/"){
+    if (substr($request,-1)!="/"){
       $request .= "/";
       header("location: $request");
       exit;

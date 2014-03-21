@@ -17,7 +17,7 @@ function lwt_render_home(){
         <?php echo $_SESSION['message']; ?><br />
 
 <?php
-    if (is_array($_SESSION['authenticated']) && isset($_SESSION['authenticated']['user'])){
+    if (isset($_SESSION['authenticated']) && isset($_SESSION['authenticated']['user'])){
 ?>
             <p><a href="/logout/">Logout</a></p>
 <?php      
@@ -33,6 +33,17 @@ function lwt_render_home(){
   return TRUE;
 }
 
+/**
+ * Renders the 404 Not Found page
+ * 
+ * @return boolean Successful completion
+ */
+function lwt_render_404(){
+  $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
+?>
+  <p>Page not found. Please go <a href="/">Home</a> or try <a href="/login/">Logging on</a>.</p>
+<?php
+}
 /**
  * Renders the contact us form
  * 

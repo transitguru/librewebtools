@@ -207,13 +207,13 @@ function lwt_render_css(){
  * @return boolean  Successful completion
  */
 function lwt_render_wrapper($request){
-  $title = lwt_process_title($request);
+  $output = lwt_process_title($request);
 ?>
 <!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <title>LibreWebTools - <?php echo $title; ?></title>
+    <title>LibreWebTools - <?php echo $output['title']; ?></title>
     <!-- Stylesheets -->
 <?php lwt_render_css(); ?>
     
@@ -237,8 +237,15 @@ function lwt_render_wrapper($request){
 <?php lwt_render_menu(); ?>
           </div>
           <div class="page_content">
-            <h1><?php echo $title; ?></h1>
-<?php lwt_process_url($request); ?>
+            <h1><?php echo $output['title']; ?></h1>
+<?php 
+  if ($output['access']){
+    lwt_process_url($request);
+  }
+  else{
+    lwt_render_404();
+  }
+?>
             <div class="hide" id="tooltip"></div>
           </div>
           <div class="foot">
