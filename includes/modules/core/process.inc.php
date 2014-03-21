@@ -101,11 +101,15 @@ function lwt_process_title($request){
   }
   define('APP_ROOT', $ROOT);
   $output = array();
-  $groups = array(0);
+  $groups = array();
   if (isset($_SESSION['authenticated']['groups']) && count($_SESSION['authenticated']['groups'])>0){
     foreach ($_SESSION['authenticated']['groups'] as $group){
       $groups = lwt_process_grouptree($group, $groups);
     }
+  }
+  else{
+    $group = 1; /**< Maps to the unauthenticated user*/
+    $groups = lwt_process_grouptree($group, $groups);
   }
   $output['access'] = lwt_process_permissions($parent_id, $groups);
   if ($output['access']){
@@ -172,6 +176,7 @@ function lwt_process_grouptree($group, $groups){
     $record = lwt_database_fetch_simple(DB_NAME, 'group_hierarchy', NULL, array('group_id' => $group));
     if ($record[0]['parent_id'] == 0){
       $loop = false;
+      $groups[0] = 0;
     }
     else{
       $groups[$search] = $search = $record[0]['parent_id'];
