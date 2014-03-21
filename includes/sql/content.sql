@@ -56,6 +56,8 @@ INSERT INTO `content` (`title`,`preprocess_call`,`function_call`,`content`) VALU
   ('Profile',NULL, 'lwt_render_profile', NULL),
   ('Reset Password',NULL, 'lwt_render_password', NULL),
   ('Forgot Password',NULL, 'lwt_render_forgot', NULL),
+  ('Manage Users','lwt_ajax_admin_users', 'lwt_render_admin_users', NULL),
+  ('Manage Content','lwt_ajax_admin_content', 'lwt_render_admin_content', NULL),
   ('Test Page',NULL,NULL,'<p>This is a Test Page<br />Making sure it shows up</p>');
 
 -- Place the required content in a hierarchy
@@ -66,6 +68,8 @@ INSERT INTO `content_hierarchy` (`parent_id`,`content_id`,`url_code`, `app_root`
   (0, (SELECT `id` FROM `content` WHERE `title`='Test Page'), 'test',0),
   (0, (SELECT `id` FROM `content` WHERE `title`='Profile'), 'profile',0),
   (0, (SELECT `id` FROM `content` WHERE `title`='Reset Password'), 'password',0),
+  (0, (SELECT `id` FROM `content` WHERE `title`='Manage Users'), 'users',1),
+  (0, (SELECT `id` FROM `content` WHERE `title`='Manage Content'), 'content',1),
   (0, (SELECT `id` FROM `content` WHERE `title`='Forgot Password'), 'forgot',1);
   
 -- Now applying permissions
@@ -77,4 +81,9 @@ INSERT INTO `group_access` (`content_id`,`group_id`) VALUES
   ((SELECT `id` FROM `content` WHERE `title`='Test Page'), (SELECT `id` FROM `groups` WHERE `name`='Internal')),
   ((SELECT `id` FROM `content` WHERE `title`='Profile'), (SELECT `id` FROM `groups` WHERE `name`='Internal')),
   ((SELECT `id` FROM `content` WHERE `title`='Reset Password'), (SELECT `id` FROM `groups` WHERE `name`='Internal'));
+  
+-- Applying Admin only access to certain areas
+INSERT INTO `role_access` (`content_id`, `role_id`) VALUES
+  ((SELECT `id` FROM `content` WHERE `title`='Manage Users'),(SELECT `id` FROM `roles` WHERE `name`='Administrator')),
+  ((SELECT `id` FROM `content` WHERE `title`='Manage Content'),(SELECT `id` FROM `roles` WHERE `name`='Administrator'));
   

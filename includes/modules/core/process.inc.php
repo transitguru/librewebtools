@@ -102,6 +102,7 @@ function lwt_process_title($request){
   define('APP_ROOT', $ROOT);
   $output = array();
   $groups = array();
+  $roles = $_SESSION['authenticated']['roles'];
   if (isset($_SESSION['authenticated']['groups']) && count($_SESSION['authenticated']['groups'])>0){
     foreach ($_SESSION['authenticated']['groups'] as $group){
       $groups = lwt_process_grouptree($group, $groups);
@@ -111,7 +112,7 @@ function lwt_process_title($request){
     $group = 1; /**< Maps to the unauthenticated user*/
     $groups = lwt_process_grouptree($group, $groups);
   }
-  $output['access'] = lwt_process_permissions($parent_id, $groups);
+  $output['access'] = lwt_process_permissions($parent_id, $groups, $roles);
   if ($output['access']){
     $info = lwt_database_fetch_simple(DB_NAME, 'content', array('title','preprocess_call'), array('id' => $parent_id));
     if (count($info)>0){
@@ -140,14 +141,33 @@ function lwt_process_title($request){
  * @return boolean Access to content
  */
  
-function lwt_process_permissions($content_id, $groups){
+function lwt_process_permissions($content_id, $groups, $roles){
+  //First, never ever lockout THE Admin user (currently disabled to test permissions!!!)
+//  if (isset($_SESSION['authenticated']['user_id']) &&  $_SESSION['authenticated']['user_id'] == 1){
+//    return TRUE;
+//  }
+  
   //Assume no access
   $access = FALSE;
   
   $content_access = lwt_database_fetch_simple(DB_NAME, 'group_access', NULL, array('content_id' => $content_id));
-  foreach ($content_access as $record){
-    if (in_array($record['group_id'],$groups)){
-      $access = TRUE;
+  if (count($content_access)>0){
+    foreach ($content_access as $record){
+      if (in_array($record['group_id'],$groups)){
+        $access = TRUE;
+      }
+    }
+  }
+  
+  // Check for Role overrides (if unset, means everyone can access!)
+  $role_access = lwt_database_fetch_simple(DB_NAME, 'role_access', NULL, array('content_id' => $content_id));
+  if (count($role_access)>0){
+    //Reset access to false
+    $access = FALSE;
+    foreach ($role_access as $record){
+      if (in_array($record['role_id'],$roles)){
+        $access = TRUE;
+      }
     }
   }
   
