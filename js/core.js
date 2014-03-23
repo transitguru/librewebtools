@@ -6,6 +6,170 @@
  */
 "use strict";
 
+/***************************************
+ * AJAX helper functions               *
+ ***************************************/
+
+/**
+ * Activates a hidden field to submit an AJAX request
+ * This is useful when buttons are used to activate a variable and there is a 
+ * chance that buttons would have been the same name. 
+ * 
+ * This function works best if all buttons call this function and there is one 
+ * hidden input that would be edited as a result of this function. Using
+ * many hidden inputs could cause names to stick and confuse the server
+ * AJAX page. It is best NOT to define the button as a type="submit", however
+ * some web browsers would also submit the form a second time when using 
+ * buttons. Stylized anchor links work the best on ensuring the invisible
+ * submit button is "clicked" and the form is submitted only once.
+ * 
+ * @param {string} button_id ID of a hidden input that will have its name changed
+ * @param {string} name Name of input (preferred to be hidden) that the button would have been named
+ * @param {string} value Value of the input that the button would have taken
+ * @param {string} submit_id ID of a submit button (can be hidden or shown) so that the form is submitted
+ * @param {string} submit_value Value of submit button (to allow for control of AJAX div id update)
+ * 
+ * @returns {void}
+ */
+function click_a_button(button_id, name, value, submit_id, submit_value, validate){
+  document.getElementById(button_id).setAttribute('name',name);
+  document.getElementById(button_id).setAttribute('value',value);
+  document.getElementById(submit_id).setAttribute('value',submit_value);
+  document.getElementById(submit_id).click();
+}
+
+//AJAX Functions
+/**
+ * This is the engine of the client side request to the server.
+ * 
+ * Note: Buttons that have same name will inherit the name of one of the
+ * buttons which may or may not be the one clicked. It is best to use the 
+ * click_a_button() function to populate a hidden input with a name and value
+ * for this to work as intended. 
+ * 
+ * @param {string} formobject Object instance of form that the javascript will send to server
+ * @param {string} responsediv ID of div (or other element) that will update when server responds
+ * @param {string} responsemsg Markup to place within responsediv while waiting for the server
+ * 
+ * @returns {void}
+ */
+function ajaxPost(formobject,responsediv,responsemsg) {
+  var xmlHttpReq = false;
+  var strURL = formobject.action;
+  
+  
+  // Webkit(Chrome/Safari), Gecko(Mozilla), IE >= 7
+  if (window.XMLHttpRequest) {
+    xmlHttpReq = new XMLHttpRequest();
+  }
+  // IE < 7 (who uses that anyway...)
+  else if (window.ActiveXObject) {
+    xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  xmlHttpReq.open('post', strURL, true);
+  
+  try{
+    var dataSend = new FormData(formobject);
+    xmlHttpReq.send(dataSend);
+  }
+  catch (e){
+    xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xmlHttpReq.send(getquerystring(formobject));
+  }
+  
+  xmlHttpReq.onreadystatechange = function() {
+    if (xmlHttpReq.readyState == 4) {
+      // Show response when server responds
+      document.getElementById(responsediv).innerHTML = xmlHttpReq.responseText;
+    }
+    else{
+      // While waiting for response, display waiting message
+      document.getElementById(responsediv).innerHTML = responsemsg;
+    }
+  }
+}
+
+/**
+ * This function provides a fallback method of creating Form Data 
+ * for older version of IE. 
+ * 
+ * @param {object} form Form object that contains elements
+ * @returns {String} Stringified contents of form elements for use in XMLHttpReq
+ */
+function getquerystring(form) {
+  var qstr = "";
+
+  function GetElemValue(name, value) {
+    qstr += (qstr.length > 0 ? "&" : "") + escape(name).replace(/\+/g, "%2B") + "=" + escape(value ? value : "").replace(/\+/g, "%2B");
+  }
+  var elemArray = form.elements;
+  for (var i = 0; i < elemArray.length; i++) {
+    var element = elemArray[i];
+    var elemType = element.type.toUpperCase();
+    var elemName = element.name;
+    if (elemName) {
+      if (elemType == "TEXT" || elemType == "TEXTAREA" || elemType == "PASSWORD" || elemType == "BUTTON" || elemType == "RESET" || elemType == "SUBMIT" || elemType == "FILE" || elemType == "IMAGE" || elemType == "HIDDEN"){
+          GetElemValue(elemName, element.value);
+      }
+      else if (elemType == "CHECKBOX" && element.checked){
+        GetElemValue(elemName, element.value ? element.value : "On");
+      }
+      else if (elemType == "RADIO" && element.checked){
+        GetElemValue(elemName, element.value);
+      }
+      else if (elemType.indexOf("SELECT") != -1){
+        for (var j = 0; j < element.options.length; j++) {
+          var option = element.options[j];
+          if (option.selected){
+            GetElemValue(elemName, option.value ? option.value : option.text);
+          }
+        }
+      }
+    }
+  }
+  return qstr;
+}
+
+/**
+ * A simpler way to handle AJAX data where only a small portion of the
+ * page is updated. 
+ * 
+ * @param {string} data Stringified post inputs data
+ * @param {string} action URL for where to handle POST data
+ * @param {string} responsediv ID of div (or other element) that will update when server responds
+ * @param {string} responsemsg Markup to place within responsediv while waiting for the server
+ * @returns {void}
+ */
+function ajaxPostLite(data, action, responsediv,responsemsg){
+  var xmlHttpReq = false;
+  var strURL = action;
+  
+  
+  // Webkit(Chrome/Safari), Gecko(Mozilla), IE >= 7
+  if (window.XMLHttpRequest) {
+    xmlHttpReq = new XMLHttpRequest();
+  }
+  // IE < 7 (who uses that anyway...)
+  else if (window.ActiveXObject) {
+    xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  xmlHttpReq.open('post', strURL, true);
+  xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xmlHttpReq.send('write_lite=1&' + data);
+  
+  xmlHttpReq.onreadystatechange = function() {
+    if (xmlHttpReq.readyState == 4) {
+      // Show response when server responds
+      document.getElementById(responsediv).innerHTML = xmlHttpReq.responseText;
+    }
+    else{
+      // While waiting for response, display waiting message
+      document.getElementById(responsediv).innerHTML = responsemsg;
+    }
+  }
+}
+
+
 /**
  * Toggle the hiding or showing of an element
  * 
