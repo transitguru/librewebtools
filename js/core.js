@@ -229,7 +229,7 @@ function toggle_checkbox(id){
  * @param {object} evt
  * @returns {void}
  */
-function ShowTooltip(evt, text){
+function showTooltip(evt, text){
 //Enter user inputs here
   var xOffset = 5;
   var yOffset = -30;
@@ -262,7 +262,7 @@ function ShowTooltip(evt, text){
  * @param {object} evt
  * @returns {void}
  */
-function HideTooltip(evt){
+function hideTooltip(evt){
   var tooltip = document.getElementById('tooltip');
   tooltip.setAttribute("class","hide");
 }

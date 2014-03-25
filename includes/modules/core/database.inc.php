@@ -34,7 +34,7 @@ function lwt_database_get_credentials($database){
  * @param string $table Table where info is coming from
  * @param array $fields Fields that are needed from database (if null, all)
  * @param array $where Optional associative array of WHERE ids/values to filter info
- * @param array $sortby Optional GROUP BY variables
+ * @param array $groupby Optional GROUP BY variables
  * @param array $sortby Optional SORT BY variables
  * @param string $id Optional field to use as index instead of numeric index
  * 
