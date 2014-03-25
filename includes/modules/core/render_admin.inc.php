@@ -7,6 +7,38 @@
  * Renders pages that are usually only seen by an admin
  */
 
+/**
+ * Renders checklist "Tree" of groups
+ * 
+ * @param int $parent_id ID of parent group
+ * 
+ * @return void
+ */
+
+function lwt_admin_render_grouptree($parent_id, $user_groups){
+  $groups = lwt_database_fetch_simple(DB_NAME, 'group_hierarchy', NULL, array('parent_id' => $parent_id));
+  if (count($groups)>0){
+?>
+  <ul>
+<?php
+    foreach ($groups as $group){
+      if ($group['group_id']>0){
+        $info = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, array('id' => $group['group_id']));
+?>
+    <li><input type="checkbox" id="group_<?php echo $info[0]['id']; ?>" name="user[groups][]" value="<?php echo $info[0]['id']; ?>" <?php if(array_key_exists($info[0]['id'], $user_groups)){echo 'checked';} ?> /><span class="hand" onclick="document.getElementById('group_<?php echo $info[0]['id'];?>').click();" ><?php echo $info[0]['name'];?></span>
+<?php
+        lwt_admin_render_grouptree($info[0]['id'], $user_groups);
+      }
+?>
+    </li>
+<?php
+    }
+?>
+  </ul>
+<?php
+  }
+  return;
+}
 
 /**
  * Processes any AJAX request for the Admin application
@@ -17,7 +49,9 @@
  * 
  */
 function lwt_ajax_admin_users($wrapper = false){
-  header('Cache-Control: no-cache');
+  if (!$wrapper){
+    header('Cache-Control: no-cache');
+  }
   if (isset($_POST['ajax']) && $_POST['ajax'] == 1){
     
     //Define Navigation levels if navigating
@@ -151,7 +185,25 @@ function lwt_ajax_admin_users($wrapper = false){
         <label for="user[email]">Email</label><input type="text" name="user[email]" value="<?php echo $user['email']; ?>" /><br />
         <label for="user[desc]">Description</label><textarea name="user[desc]"><?php echo htmlentities($user['desc']); ?></textarea><br class="clear" />
         <h2>Roles</h2>
+<?php
+        $roles = lwt_database_fetch_simple(DB_NAME, 'roles', NULL, NULL, NULL, array('sortorder', 'id'));
+        $user_roles = lwt_database_fetch_simple(DB_NAME, 'user_roles', NULL, array('user_id' => $user['id']), NULL, NULL, 'role_id');
+        foreach ($roles as $role){
+?>
+        <input type="checkbox" id="role_<?php echo $role['id'];?>" name="user[roles][]" value="<?php echo $role['id']; ?>" <?php if(array_key_exists($role['id'], $user_roles)){echo 'checked';} ?> /><span class="hand" onclick="document.getElementById('role_<?php echo $role['id'];?>').click();" ><?php echo $role['name']; ?></span><br />
+<?php
+        }
+?>
         <h2>Groups</h2>
+        <ul>
+<?php
+        $user_groups = lwt_database_fetch_simple(DB_NAME, 'user_groups', NULL, array('user_id' => $user['id']), NULL, NULL, 'group_id');
+        $info = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, array('id' => 0));
+?>
+          <li><input type="checkbox" id="group_<?php echo $info[0]['id']; ?>" name="user[groups][]" value="<?php echo $info[0]['id']; ?>" <?php if(array_key_exists($info[0]['id'], $user_groups)){echo 'checked';} ?> /><span class="hand" onclick="document.getElementById('group_<?php echo $info[0]['id'];?>').click();" ><?php echo $info[0]['name'];?></span>
+        <?php lwt_admin_render_grouptree(0, $user_groups); ?>
+          </li>
+        </ul>
         <input type="submit" name="submit" value="Update" />
       </form>
       <button onclick="event.preventDefault();ajaxPostLite('command=view&id=<?php echo $user['id']; ?>&ajax=1','','adminarea','');">Reset form</button>
