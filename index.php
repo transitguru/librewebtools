@@ -16,8 +16,22 @@ $begin = microtime(TRUE);
 $debug = TRUE;
 
 
-// Load all modules
+// Load all core modules
 $PATH = $_SERVER['DOCUMENT_ROOT'] . '/includes/modules';
+$modules = scandir($PATH);
+foreach ($modules as $module){
+  if (is_dir($PATH . '/' . $module) && $module != '.' && $module != '..'){
+    $DIR = scandir($PATH . '/' . $module);
+    foreach ($DIR as $include){
+      if (is_file($PATH . '/' . $module . '/' . $include) && fnmatch("*.php", $include)){
+        include ($PATH . '/' . $module . '/' . $include);
+      }
+    }
+  }
+}
+
+// Load other "vendor Modules
+$PATH = $_SERVER['DOCUMENT_ROOT'] . '/includes/vendor';
 $modules = scandir($PATH);
 foreach ($modules as $module){
   if (is_dir($PATH . '/' . $module) && $module != '.' && $module != '..'){
