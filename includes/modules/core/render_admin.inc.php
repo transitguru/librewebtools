@@ -89,7 +89,68 @@ function lwt_ajax_admin_users($wrapper = false){
         if ($result['error']){
           $_POST['id'] = $_POST['user']['id'];
         }
+        else{
+          $user_info = lwt_database_fetch_simple(DB_NAME, 'users', NULL, array('login' => $inputs['login']));
+          $id = $user_info[0]['id'];
+        }
+        
+        $user_roles = lwt_database_fetch_simple(DB_NAME, 'user_roles', NULL, array('user_id' => $id), NULL, NULL, 'role_id');
+        $chosen_roles = $_POST['user']['roles'];
+        $roles = lwt_database_fetch_simple(DB_NAME, 'roles');
+        foreach ($roles as $role){
+          // Add new
+          if (in_array($role['id'],$chosen_roles) && !array_key_exists($role['id'],$user_roles)){
+            $sql = "INSERT INTO `user_roles` (`user_id`,`role_id`) VALUES ({$id},{$role['id']})";
+            $result = lwt_database_write_raw(DB_NAME, $sql);
+          }
+          // Delete old
+          elseif(!in_array($role['id'],$chosen_roles) && array_key_exists($role['id'],$user_roles)){
+            $sql = "DELETE FROM `user_roles` WHERE `user_id`={$id} AND `role_id`={$role['id']}";
+            $result = lwt_database_write_raw(DB_NAME, $sql);
+          }
+          
+          if ($result['error']){
+            $message = $result['message'];
+          }
+        }
 
+        //Add groups
+        $user_groups = lwt_database_fetch_simple(DB_NAME, 'user_groups', NULL, array('user_id' => $id), NULL, NULL, 'group_id');
+        $chosen_groups = $_POST['user']['groups'];
+        $groups = lwt_database_fetch_simple(DB_NAME, 'groups');
+        foreach ($groups as $group){
+          // Add new
+          if (in_array($group['id'],$chosen_groups) && !array_key_exists($group['id'],$user_groups)){
+            $sql = "INSERT INTO `user_groups` (`user_id`,`group_id`) VALUES ({$id},{$role['id']})";
+            $result = lwt_database_write_raw(DB_NAME, $sql);
+          }
+          // Delete old
+          elseif(!in_array($group['id'],$chosen_groups) && array_key_exists($group['id'],$user_groups)){
+            $sql = "DELETE FROM `user_groups` WHERE `user_id`={$id} AND `group_id`={$group['id']}";
+            $result = lwt_database_write_raw(DB_NAME, $sql);
+          }
+          
+          if ($result['error']){
+            $message = $result['message'];
+          }
+        }
+        
+        //Set random password for new user
+        if ($_POST['id'] == -1){
+          $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+          $len = strlen($chars);
+          $pass = "";
+          for ($i = 0; $i<12; $i++){
+            $num = rand(0,$len-1);
+            $pass .= substr($chars, $num, 1);
+          }
+          lwt_auth_session_setpassword($id, $pass);
+        }
+        
+        //Reset password
+        if (isset($_POST['users']['reset']) && $_POST['users']['reset'] == 1 && !$result['error']){
+          lwt_auth_session_resetpassword($inputs['email']);
+        }
       }
     }
     
@@ -185,15 +246,17 @@ function lwt_ajax_admin_users($wrapper = false){
         <label for="user[email]">Email</label><input type="text" name="user[email]" value="<?php echo $user['email']; ?>" /><br />
         <label for="user[desc]">Description</label><textarea name="user[desc]"><?php echo htmlentities($user['desc']); ?></textarea><br class="clear" />
         <h2>Roles</h2>
+        <ul>
 <?php
         $roles = lwt_database_fetch_simple(DB_NAME, 'roles', NULL, NULL, NULL, array('sortorder', 'id'));
         $user_roles = lwt_database_fetch_simple(DB_NAME, 'user_roles', NULL, array('user_id' => $user['id']), NULL, NULL, 'role_id');
         foreach ($roles as $role){
 ?>
-        <input type="checkbox" id="role_<?php echo $role['id'];?>" name="user[roles][]" value="<?php echo $role['id']; ?>" <?php if(array_key_exists($role['id'], $user_roles)){echo 'checked';} ?> /><span class="hand" onclick="document.getElementById('role_<?php echo $role['id'];?>').click();" ><?php echo $role['name']; ?></span><br />
+          <li><input type="checkbox" id="role_<?php echo $role['id'];?>" name="user[roles][]" value="<?php echo $role['id']; ?>" <?php if(array_key_exists($role['id'], $user_roles)){echo 'checked';} ?> /><span class="hand" onclick="document.getElementById('role_<?php echo $role['id'];?>').click();" ><?php echo $role['name']; ?></span></li>
 <?php
         }
 ?>
+        </ul>
         <h2>Groups</h2>
         <ul>
 <?php
@@ -204,6 +267,7 @@ function lwt_ajax_admin_users($wrapper = false){
         <?php lwt_admin_render_grouptree(0, $user_groups); ?>
           </li>
         </ul>
+        <input type="checkbox" name="users[reset]" value="1" <?php if ($user['id'] == -1){ echo 'checked';} ?> />Reset User's password (will email user reset information)<br /> 
         <input type="submit" name="submit" value="Update" />
       </form>
       <button onclick="event.preventDefault();ajaxPostLite('command=view&id=<?php echo $user['id']; ?>&ajax=1','','adminarea','');">Reset form</button>

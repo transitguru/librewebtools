@@ -58,6 +58,7 @@ INSERT INTO `content` (`title`,`preprocess_call`,`function_call`,`content`) VALU
   ('Forgot Password',NULL, 'lwt_render_forgot', NULL),
   ('Manage Users','lwt_ajax_admin_users', 'lwt_render_admin_users', NULL),
   ('Manage Content','lwt_ajax_admin_content', 'lwt_render_admin_content', NULL),
+  ('Register',NULL, NULL, '<p>User self-registration is currently not enabled</p>'),
   ('Test Page',NULL,NULL,'<p>This is a Test Page<br />Making sure it shows up</p>');
 
 -- Place the required content in a hierarchy
@@ -70,6 +71,7 @@ INSERT INTO `content_hierarchy` (`parent_id`,`content_id`,`url_code`, `app_root`
   (0, (SELECT `id` FROM `content` WHERE `title`='Reset Password'), 'password',0),
   (0, (SELECT `id` FROM `content` WHERE `title`='Manage Users'), 'users',1),
   (0, (SELECT `id` FROM `content` WHERE `title`='Manage Content'), 'content',1),
+  (0, (SELECT `id` FROM `content` WHERE `title`='Register'), 'register',1),
   (0, (SELECT `id` FROM `content` WHERE `title`='Forgot Password'), 'forgot',1);
   
 -- Now applying permissions
@@ -78,6 +80,7 @@ INSERT INTO `group_access` (`content_id`,`group_id`) VALUES
   ((SELECT `id` FROM `content` WHERE `title`='Login'), 0),
   ((SELECT `id` FROM `content` WHERE `title`='Logout'), 0),
   ((SELECT `id` FROM `content` WHERE `title`='Forgot Password'), 0),
+  ((SELECT `id` FROM `content` WHERE `title`='Register'), 0),
   ((SELECT `id` FROM `content` WHERE `title`='Test Page'), (SELECT `id` FROM `groups` WHERE `name`='Internal')),
   ((SELECT `id` FROM `content` WHERE `title`='Profile'), (SELECT `id` FROM `groups` WHERE `name`='Internal')),
   ((SELECT `id` FROM `content` WHERE `title`='Reset Password'), (SELECT `id` FROM `groups` WHERE `name`='Internal'));

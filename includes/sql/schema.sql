@@ -48,7 +48,9 @@ CREATE TABLE IF NOT EXISTS `users` (
   `lastname`  VARCHAR(100) NOT NULL ,
   `email`  VARCHAR(255) NOT NULL ,
   `desc`  TEXT NULL ,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`login`),
+  UNIQUE KEY (`email`)
 )
 ENGINE = InnoDB;
 
