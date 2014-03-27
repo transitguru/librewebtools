@@ -13,7 +13,7 @@
  */
 
 $begin = microtime(TRUE);
-$debug = TRUE;
+$debug = FALSE;
 
 
 // Load all core modules
@@ -57,7 +57,6 @@ $maintenance = FALSE; /**< Set maintenance mode */
 $request = lwt_auth_session_gatekeeper($request, $maintenance);
 
 // Go ahead and process request
-$debug = TRUE;
 if (fnmatch('/ajax/*',$request)){
   // Process AJAX
   header('Cache-Control: no-cache');
