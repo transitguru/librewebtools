@@ -142,10 +142,10 @@ function lwt_process_title($request){
  */
  
 function lwt_process_permissions($content_id, $groups, $roles){
-  //First, never ever lockout THE Admin user (currently disabled to test permissions!!!)
-//  if (isset($_SESSION['authenticated']['user_id']) &&  $_SESSION['authenticated']['user_id'] == 1){
-//    return TRUE;
-//  }
+  //First, never ever lockout THE Admin user
+  if (isset($_SESSION['authenticated']['user_id']) &&  $_SESSION['authenticated']['user_id'] == 1){
+    return TRUE;
+  }
   
   //Assume no access
   $access = FALSE;
