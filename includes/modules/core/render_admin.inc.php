@@ -11,11 +11,12 @@
  * Renders checklist "Tree" of groups
  * 
  * @param int $parent_id ID of parent group
+ * @param array $user_groups groups that are already selected
  * 
  * @return void
  */
 
-function lwt_admin_render_grouptree($parent_id, $user_groups){
+function lwt_admin_render_groupcheckbox($parent_id, $user_groups){
   $groups = lwt_database_fetch_simple(DB_NAME, 'group_hierarchy', NULL, array('parent_id' => $parent_id));
   if (count($groups)>0){
 ?>
@@ -27,7 +28,7 @@ function lwt_admin_render_grouptree($parent_id, $user_groups){
 ?>
     <li><input type="checkbox" id="group_<?php echo $info[0]['id']; ?>" name="user[groups][]" value="<?php echo $info[0]['id']; ?>" <?php if(array_key_exists($info[0]['id'], $user_groups)){echo 'checked';} ?> /><span class="hand" onclick="document.getElementById('group_<?php echo $info[0]['id'];?>').click();" ><?php echo $info[0]['name'];?></span>
 <?php
-        lwt_admin_render_grouptree($info[0]['id'], $user_groups);
+        lwt_admin_render_groupcheckbox($info[0]['id'], $user_groups);
       }
 ?>
     </li>
@@ -40,6 +41,72 @@ function lwt_admin_render_grouptree($parent_id, $user_groups){
   return;
 }
 
+/**
+ * Renders radio "Tree" of groups
+ * 
+ * @param int $parent_id ID of parent group
+ * @param int $selected ID of selected Parent ID
+ * @param array $children Simple array of children of group that is being checked
+ * 
+ * @return void
+ */
+
+function lwt_admin_render_groupradio($parent_id, $selected, $children){
+  $groups = lwt_database_fetch_simple(DB_NAME, 'group_hierarchy', NULL, array('parent_id' => $parent_id));
+  if (count($groups)>0){
+?>
+  <ul>
+<?php
+    foreach ($groups as $group){
+      if ($group['group_id']>0){
+        $info = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, array('id' => $group['group_id']));
+?>
+    <li><input type="radio" id="group_<?php echo $info[0]['id']; ?>" name="group[parent_id]" value="<?php echo $info[0]['id']; ?>" <?php if($info[0]['id'] == $selected){echo 'checked';} ?> <?php if(in_array($info[0]['id'], $children)){echo 'disabled';} ?> /><span class="hand<?php if(in_array($info[0]['id'], $children)){echo ' disabled';} ?>" onclick="document.getElementById('group_<?php echo $info[0]['id'];?>').click();" ><?php echo $info[0]['name'];?></span>
+<?php
+        lwt_admin_render_groupradio($info[0]['id'], $selected, $children);
+      }
+?>
+    </li>
+<?php
+    }
+?>
+  </ul>
+<?php
+  }
+  return;
+}
+
+
+/**
+ * Renders "Tree" structure of groups for understanding of relationships of groups
+ * 
+ * 
+ * 
+ */
+function lwt_admin_render_grouplinks($parent_id){
+  $groups = lwt_database_fetch_simple(DB_NAME, 'group_hierarchy', NULL, array('parent_id' => $parent_id));
+  if (count($groups)>0){
+?>
+  <ul>
+<?php
+    foreach ($groups as $group){
+      if ($group['group_id']>0){
+        $info = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, array('id' => $group['group_id']));
+?>
+    <li><a href="javascript:;" onclick="ajaxPostLite('command=view&id=<?php echo $info[0]['id']; ?>&ajax=1','','adminarea','');" ><?php echo $info[0]['name'];?></a>
+<?php
+        lwt_admin_render_grouplinks($info[0]['id'], $user_groups);
+      }
+?>
+    </li>
+<?php
+    }
+?>
+  </ul>
+<?php
+  }
+  return;  
+}
 /**
  * Processes any AJAX request for the Admin application
  * 
@@ -194,6 +261,24 @@ function lwt_ajax_admin_users($wrapper = false){
           $group_info = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, array('name' => $inputs['name']));
           $id = $group_info[0]['id'];
         }
+        // Apply group hierarchy
+        if ($_POST['group']['id'] == -1){
+          $hierarchy = array(
+            'group_id' => $id,
+            'parent_id' => $_POST['group']['parent_id'],
+          );
+          lwt_database_write(DB_NAME, 'group_hierarchy', $hierarchy, NULL);
+        }
+        else{
+          $parent_id = $_POST['group']['parent_id'];
+          $children = array();
+          $children = lwt_process_get_children($id,$children);
+          $parent = lwt_database_fetch_simple(DB_NAME, 'group_hierarchy', NULL, array('group_id' => $group['id']));
+          $selected = $parent[0]['parent_id'];
+          if (!in_array($parent_id, $children) && $parent_id != $selected){
+            $result = lwt_database_write(DB_NAME, 'group_hierarchy', array('parent_id' => $parent_id), array('group_id' => $id));
+          }
+        }
       }
     }
     
@@ -293,14 +378,15 @@ function lwt_ajax_admin_users($wrapper = false){
       if (isset($_SESSION['admin']['navigate'][0]) && $_SESSION['admin']['navigate'][0] === 'groups'){
 ?>
           <ul>
+<?php
+$info = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, array('id' => 0));
+?>
+            <li><a href="javascript:;" onclick="ajaxPostLite('command=view&id=<?php echo $info[0]['id']; ?>&ajax=1','','adminarea','');" ><?php echo $info[0]['name'];?></a>
+<?php
+        lwt_admin_render_grouplinks(0);
+?>
+            </li>
             <li><a href="javascript:;" onclick="hideTooltip(event);ajaxPostLite('command=view&id=-1&ajax=1','','adminarea','');" onmousemove="showTooltip(event,'Add Group');" onmouseout="hideTooltip(event);">[+]</a></li>
-<?php
-        foreach ($groups as $group){
-?>
-            <li><a href="javascript:;" onclick="ajaxPostLite('command=view&id=<?php echo $group['id']; ?>&ajax=1','','adminarea','');"><?php echo $group['name']; ?></a></li>
-<?php
-        }
-?>
           </ul>
 <?php
       }
@@ -374,7 +460,7 @@ function lwt_ajax_admin_users($wrapper = false){
         $info = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, array('id' => 0));
 ?>
           <li><input type="checkbox" id="group_<?php echo $info[0]['id']; ?>" name="user[groups][]" value="<?php echo $info[0]['id']; ?>" <?php if(array_key_exists($info[0]['id'], $user_groups)){echo 'checked';} ?> /><span class="hand" onclick="document.getElementById('group_<?php echo $info[0]['id'];?>').click();" ><?php echo $info[0]['name'];?></span>
-        <?php lwt_admin_render_grouptree(0, $user_groups); ?>
+        <?php lwt_admin_render_groupcheckbox(0, $user_groups); ?>
           </li>
         </ul>
         <input type="checkbox" name="users[reset]" value="1" <?php if ($user['id'] == -1){ echo 'checked';} ?> />Reset User's password (will email user reset information)<br /> 
@@ -469,6 +555,20 @@ function lwt_ajax_admin_users($wrapper = false){
         <input type="hidden" name="group[id]" value="<?php echo $group['id']; ?>" />
         <label for="group[name]">Group</label><input type="text" name="group[name]" value="<?php echo $group['name']; ?>" /><br />
         <label for="group[desc]">Description</label><textarea name="group[desc]"><?php echo htmlentities($group['desc']); ?></textarea><br class="clear" />
+        <label for="group[parent]"]>Select Parent</label><br class="clear" />
+<?php
+        $children = array();
+        $children = lwt_process_get_children($group['id'],$children);
+        $parent = lwt_database_fetch_simple(DB_NAME, 'group_hierarchy', NULL, array('group_id' => $group['id']));
+        $selected = $parent[0]['parent_id'];
+        $info = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, array('id' => $group['group_id']));
+?>
+        <ul>
+        <li><input type="radio" id="group_<?php echo $info[0]['id']; ?>" name="group[parent_id]" value="<?php echo $info[0]['id']; ?>" <?php if($info[0]['id'] == $selected){echo 'checked';} ?> <?php if(in_array($info[0]['id'], $children)){echo 'disabled';} ?> /><span class="hand<?php if(in_array($info[0]['id'], $children)){echo ' disabled';} ?>" onclick="document.getElementById('group_<?php echo $info[0]['id'];?>').click();" ><?php echo $info[0]['name'];?></span>
+<?php
+        lwt_admin_render_groupradio(0, $selected, $children);
+?>
+        </ul>
         <input type="submit" name="submit" value="Update" />
       </form>
       <button onclick="event.preventDefault();ajaxPostLite('command=view&id=<?php echo $group['id']; ?>&ajax=1','','adminarea','');">Reset form</button>

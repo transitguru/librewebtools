@@ -126,6 +126,7 @@ function lwt_render_css(){
         td {text-align: left; background-color: #ffffff;}
         .hand {cursor: pointer}
         .checked {background-color:#ffff00;}
+        .disabled {color: #aaaaaa;}
         .clear {clear:both;}
 
         /* nav elements for dropdowns */
