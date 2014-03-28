@@ -263,9 +263,13 @@ function lwt_ajax_admin_users($wrapper = false){
         }
         // Apply group hierarchy
         if ($_POST['group']['id'] == -1){
+          $parent_id = 0;
+          if (isset($_POST['group']['parent_id']) && $_POST['group']['parent_id'] != ''){
+            $parent_id = $_POST['group']['parent_id'];
+          }
           $hierarchy = array(
             'group_id' => $id,
-            'parent_id' => $_POST['group']['parent_id'],
+            'parent_id' => $parent_id,
           );
           lwt_database_write(DB_NAME, 'group_hierarchy', $hierarchy, NULL);
         }
@@ -312,8 +316,16 @@ function lwt_ajax_admin_users($wrapper = false){
       }
       if (isset($_POST['group']) && count($_POST['group'])>0){
         if ($_POST['group']['id']>0){
-          $sql = "DELETE FROM `groups` WHERE `id`={$_POST['group']['id']}";
-          $result = lwt_database_write_raw(DB_NAME, $sql);
+          $children = array();
+          $children = lwt_process_get_children($_POST['group']['id'],$children);
+          if (count($children)>1){
+            $result['error'] = true;
+            $result['message'] = '<span class="error">You cannot remove a group with nested groups!</span>';
+          }
+          else{
+            $sql = "DELETE FROM `groups` WHERE `id`={$_POST['group']['id']}";
+            $result = lwt_database_write_raw(DB_NAME, $sql);
+          }
         }
         else{
           $result['error'] = true;
