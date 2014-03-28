@@ -252,6 +252,7 @@ function lwt_ajax_admin_users($wrapper = false){
 <?php
       }
 ?>
+        </li>
       </ul>
 <?php
     }
@@ -333,9 +334,6 @@ function lwt_ajax_admin_users($wrapper = false){
       <button class="right" onclick="event.preventDefault();ajaxPostLite('command=delete&user[id]=<?php echo $user['id']; ?>&ajax=1','','adminarea','');">Delete</button>
 <?php
         }
-?>
-      
-<?php
       }
       // Role editing area
       if (isset($_SESSION['admin']['navigate'][0]) && $_SESSION['admin']['navigate'][0] === 'roles'){
@@ -348,10 +346,10 @@ function lwt_ajax_admin_users($wrapper = false){
           );
         }
         elseif($_POST['id'] == -1){
-          $user['id'] = $_POST['id'];
-          $user['name'] = $inputs['name'];
-          $user['sortorder'] = $inputs['sortorder'];
-          $user['desc'] = $inputs['desc'];
+          $role['id'] = $_POST['id'];
+          $role['name'] = $inputs['name'];
+          $role['sortorder'] = $inputs['sortorder'];
+          $role['desc'] = $inputs['desc'];
         }
         else{
           $roles = lwt_database_fetch_simple(DB_NAME, 'roles', NULL, array('id' => $_POST['id']));
@@ -383,11 +381,51 @@ function lwt_ajax_admin_users($wrapper = false){
       <button class="right" onclick="event.preventDefault();ajaxPostLite('command=delete&role[id]=<?php echo $role['id']; ?>&ajax=1','','adminarea','');">Delete</button>
 <?php
         }
-?>
-      
-<?php
       }
-      
+      // Group editing area
+      if (isset($_SESSION['admin']['navigate'][0]) && $_SESSION['admin']['navigate'][0] === 'groups'){
+        if ($_POST['id'] == -1 && !isset($inputs)){
+          $group = array(
+            'id' => -1,
+            'name' => '',
+            'desc' => '',
+          );
+        }
+        elseif($_POST['id'] == -1){
+          $group['id'] = $_POST['id'];
+          $group['name'] = $inputs['name'];
+          $group['desc'] = $inputs['desc'];
+        }
+        else{
+          $groups = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, array('id' => $_POST['id']));
+          $role = $groups[0];
+        }
+        if ($result['error']){
+          $message = $result['message'];
+        }
+        else{
+          $message = '<span class="warning">Please enter data in the form</span>';
+        }
+        echo $message;
+?>
+      <form action="" enctype="multipart/form-data" method="post" id="poster" onsubmit="event.preventDefault(); ajaxPost(this,'adminarea','');">
+        <h2>General Information</h2>
+        <input type="hidden" name="command" value="write" />
+        <input type="hidden" name="ajax" value="1" />
+        <input type="hidden" name="role[id]" value="<?php echo $role['id']; ?>" />
+        <label for="group[name]">Role</label><input type="text" name="group[name]" value="<?php echo $group['name']; ?>" /><br />
+        <label for="group[desc]">Description</label><textarea name="group[desc]"><?php echo htmlentities($group['desc']); ?></textarea><br class="clear" />
+        <input type="submit" name="submit" value="Update" />
+      </form>
+      <button onclick="event.preventDefault();ajaxPostLite('command=view&id=<?php echo $group['id']; ?>&ajax=1','','adminarea','');">Reset form</button>
+      <button onclick="event.preventDefault();ajaxPostLite('command=navigate&navigate[0]=groups&ajax=1','','adminarea','');">Cancel</button>
+<?php
+        if ($group['id'] > 0){
+?>
+      <button class="right" onclick="event.preventDefault();ajaxPostLite('command=delete&group[id]=<?php echo $group['id']; ?>&ajax=1','','adminarea','');">Delete</button>
+<?php
+        }
+      }
     }
     
     //exit if this was not a wrapper function
