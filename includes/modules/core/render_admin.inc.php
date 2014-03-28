@@ -173,7 +173,27 @@ function lwt_ajax_admin_users($wrapper = false){
           $role_info = lwt_database_fetch_simple(DB_NAME, 'roles', NULL, array('name' => $inputs['name']));
           $id = $role_info[0]['id'];
         }
+      }
+      if (isset($_POST['group']) && count($_POST['group'])>0){
+        $inputs = array();
+        if ($_POST['group']['id'] == -1){
+          $where = NULL;
+        }
+        else{
+          $where = array('id' => $_POST['group']['id']);
+        }
+        $inputs['name'] = $_POST['group']['name'];
+        $inputs['desc'] = $_POST['group']['desc'];
         
+        $result = lwt_database_write(DB_NAME, 'groups', $inputs, $where);
+        if ($result['error']){
+          $_POST['id'] = $_POST['group']['id'];
+          $message = $result['message'];
+        }
+        else{
+          $group_info = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, array('name' => $inputs['name']));
+          $id = $group_info[0]['id'];
+        }
       }
     }
     
@@ -203,6 +223,19 @@ function lwt_ajax_admin_users($wrapper = false){
         }
         if ($result['error']){
           $_POST['id'] = $_POST['role']['id'];
+        }
+      }
+      if (isset($_POST['group']) && count($_POST['group'])>0){
+        if ($_POST['group']['id']>0){
+          $sql = "DELETE FROM `groups` WHERE `id`={$_POST['group']['id']}";
+          $result = lwt_database_write_raw(DB_NAME, $sql);
+        }
+        else{
+          $result['error'] = true;
+          $result['message'] = '<span class="error">You cannot remove the root group!</span>';
+        }
+        if ($result['error']){
+          $_POST['id'] = $_POST['group']['id'];
         }
       }
       $_POST['command'] = 'write';
@@ -251,9 +284,30 @@ function lwt_ajax_admin_users($wrapper = false){
           </ul>
 <?php
       }
+      $groups = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, NULL, NULL, array('name'));
+      $num = count($groups);
+?>
+        </li>
+        <li><a href="javascript:;" onclick="ajaxPostLite('command=navigate&navigate[0]=groups&ajax=1','','adminarea','');">Groups (<?php echo $num; ?>)</a>
+<?php
+      if (isset($_SESSION['admin']['navigate'][0]) && $_SESSION['admin']['navigate'][0] === 'groups'){
+?>
+          <ul>
+            <li><a href="javascript:;" onclick="hideTooltip(event);ajaxPostLite('command=view&id=-1&ajax=1','','adminarea','');" onmousemove="showTooltip(event,'Add Group');" onmouseout="hideTooltip(event);">[+]</a></li>
+<?php
+        foreach ($groups as $group){
+?>
+            <li><a href="javascript:;" onclick="ajaxPostLite('command=view&id=<?php echo $group['id']; ?>&ajax=1','','adminarea','');"><?php echo $group['name']; ?></a></li>
+<?php
+        }
+?>
+          </ul>
+<?php
+      }
 ?>
         </li>
       </ul>
+      
 <?php
     }
     
@@ -398,7 +452,7 @@ function lwt_ajax_admin_users($wrapper = false){
         }
         else{
           $groups = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, array('id' => $_POST['id']));
-          $role = $groups[0];
+          $group = $groups[0];
         }
         if ($result['error']){
           $message = $result['message'];
@@ -412,8 +466,8 @@ function lwt_ajax_admin_users($wrapper = false){
         <h2>General Information</h2>
         <input type="hidden" name="command" value="write" />
         <input type="hidden" name="ajax" value="1" />
-        <input type="hidden" name="role[id]" value="<?php echo $role['id']; ?>" />
-        <label for="group[name]">Role</label><input type="text" name="group[name]" value="<?php echo $group['name']; ?>" /><br />
+        <input type="hidden" name="group[id]" value="<?php echo $group['id']; ?>" />
+        <label for="group[name]">Group</label><input type="text" name="group[name]" value="<?php echo $group['name']; ?>" /><br />
         <label for="group[desc]">Description</label><textarea name="group[desc]"><?php echo htmlentities($group['desc']); ?></textarea><br class="clear" />
         <input type="submit" name="submit" value="Update" />
       </form>
