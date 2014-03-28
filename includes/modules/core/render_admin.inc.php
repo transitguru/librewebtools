@@ -152,6 +152,29 @@ function lwt_ajax_admin_users($wrapper = false){
           lwt_auth_session_resetpassword($inputs['email']);
         }
       }
+      if (isset($_POST['role']) && count($_POST['role'])>0){
+        $inputs = array();
+        if ($_POST['role']['id'] == -1){
+          $where = NULL;
+        }
+        else{
+          $where = array('id' => $_POST['role']['id']);
+        }
+        $inputs['name'] = $_POST['role']['name'];
+        $inputs['sortorder'] = $_POST['role']['sortorder'];
+        $inputs['desc'] = $_POST['role']['desc'];
+        
+        $result = lwt_database_write(DB_NAME, 'roles', $inputs, $where);
+        if ($result['error']){
+          $_POST['id'] = $_POST['role']['id'];
+          $message = $result['message'];
+        }
+        else{
+          $role_info = lwt_database_fetch_simple(DB_NAME, 'roles', NULL, array('name' => $inputs['name']));
+          $id = $role_info[0]['id'];
+        }
+        
+      }
     }
     
     //Process delete events
@@ -167,6 +190,19 @@ function lwt_ajax_admin_users($wrapper = false){
         }
         if ($result['error']){
           $_POST['id'] = $_POST['user']['id'];
+        }
+      }
+      if (isset($_POST['role']) && count($_POST['role'])>0){
+        if ($_POST['role']['id']>1){
+          $sql = "DELETE FROM `roles` WHERE `id`={$_POST['role']['id']}";
+          $result = lwt_database_write_raw(DB_NAME, $sql);
+        }
+        else{
+          $result['error'] = true;
+          $result['message'] = '<span class="error">You cannot remove the administrator or unauthenticated roles!</span>';
+        }
+        if ($result['error']){
+          $_POST['id'] = $_POST['role']['id'];
         }
       }
       $_POST['command'] = 'write';
@@ -195,8 +231,27 @@ function lwt_ajax_admin_users($wrapper = false){
           </ul>
 <?php
       }
+      $roles = lwt_database_fetch_simple(DB_NAME, 'roles', NULL, NULL, NULL, array('sortorder', 'name'));
+      $num = count($roles);
 ?>
         </li>
+        <li><a href="javascript:;" onclick="ajaxPostLite('command=navigate&navigate[0]=roles&ajax=1','','adminarea','');">Roles (<?php echo $num; ?>)</a>
+<?php
+      if (isset($_SESSION['admin']['navigate'][0]) && $_SESSION['admin']['navigate'][0] === 'roles'){
+?>
+          <ul>
+            <li><a href="javascript:;" onclick="hideTooltip(event);ajaxPostLite('command=view&id=-1&ajax=1','','adminarea','');" onmousemove="showTooltip(event,'Add Role');" onmouseout="hideTooltip(event);">[+]</a></li>
+<?php
+        foreach ($roles as $role){
+?>
+            <li><a href="javascript:;" onclick="ajaxPostLite('command=view&id=<?php echo $role['id']; ?>&ajax=1','','adminarea','');"><?php echo $role['name']; ?></a></li>
+<?php
+        }
+?>
+          </ul>
+<?php
+      }
+?>
       </ul>
 <?php
     }
@@ -282,6 +337,57 @@ function lwt_ajax_admin_users($wrapper = false){
       
 <?php
       }
+      // Role editing area
+      if (isset($_SESSION['admin']['navigate'][0]) && $_SESSION['admin']['navigate'][0] === 'roles'){
+        if ($_POST['id'] == -1 && !isset($inputs)){
+          $role = array(
+            'id' => -1,
+            'name' => '',
+            'sortorder' => '0',
+            'desc' => '',
+          );
+        }
+        elseif($_POST['id'] == -1){
+          $user['id'] = $_POST['id'];
+          $user['name'] = $inputs['name'];
+          $user['sortorder'] = $inputs['sortorder'];
+          $user['desc'] = $inputs['desc'];
+        }
+        else{
+          $roles = lwt_database_fetch_simple(DB_NAME, 'roles', NULL, array('id' => $_POST['id']));
+          $role = $roles[0];
+        }
+        if ($result['error']){
+          $message = $result['message'];
+        }
+        else{
+          $message = '<span class="warning">Please enter data in the form</span>';
+        }
+        echo $message;
+?>
+      <form action="" enctype="multipart/form-data" method="post" id="poster" onsubmit="event.preventDefault(); ajaxPost(this,'adminarea','');">
+        <h2>General Information</h2>
+        <input type="hidden" name="command" value="write" />
+        <input type="hidden" name="ajax" value="1" />
+        <input type="hidden" name="role[id]" value="<?php echo $role['id']; ?>" />
+        <label for="role[name]">Role</label><input type="text" name="role[name]" value="<?php echo $role['name']; ?>" /><br />
+        <label for="role[sortorder]">Sort Weight</label><input type="text" name="role[sortorder]" value="<?php echo $role['sortorder']; ?>" /><br />
+        <label for="role[desc]">Description</label><textarea name="role[desc]"><?php echo htmlentities($role['desc']); ?></textarea><br class="clear" />
+        <input type="submit" name="submit" value="Update" />
+      </form>
+      <button onclick="event.preventDefault();ajaxPostLite('command=view&id=<?php echo $role['id']; ?>&ajax=1','','adminarea','');">Reset form</button>
+      <button onclick="event.preventDefault();ajaxPostLite('command=navigate&navigate[0]=roles&ajax=1','','adminarea','');">Cancel</button>
+<?php
+        if ($role['id'] > 1){
+?>
+      <button class="right" onclick="event.preventDefault();ajaxPostLite('command=delete&role[id]=<?php echo $role['id']; ?>&ajax=1','','adminarea','');">Delete</button>
+<?php
+        }
+?>
+      
+<?php
+      }
+      
     }
     
     //exit if this was not a wrapper function
