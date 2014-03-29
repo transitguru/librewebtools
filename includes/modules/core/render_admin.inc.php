@@ -29,7 +29,7 @@ function lwt_admin_render_groupcheckbox($parent_id, $user_groups, $prefix = 'use
 ?>
     <li><input type="checkbox" id="group_<?php echo $info[0]['id']; ?>" name="<?php echo $prefix; ?>[groups][]" value="<?php echo $info[0]['id']; ?>" <?php if(array_key_exists($info[0]['id'], $user_groups)){echo 'checked';} ?> /><span class="hand" onclick="document.getElementById('group_<?php echo $info[0]['id'];?>').click();" ><?php echo $info[0]['name'];?></span>
 <?php
-        lwt_admin_render_groupcheckbox($info[0]['id'], $user_groups, , $prefix);
+        lwt_admin_render_groupcheckbox($info[0]['id'], $user_groups, $prefix);
       }
 ?>
     </li>
