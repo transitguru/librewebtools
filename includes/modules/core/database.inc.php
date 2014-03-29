@@ -225,6 +225,7 @@ function lwt_database_write($database, $table, $inputs, $where = NULL){
         $status['message'] = '<span class="success">Records successfully written</span>';
       }
     }
+    $status['insert_id'] = $conn->insert_id;
     $conn->close();
     return $status;
   }
@@ -259,6 +260,7 @@ function lwt_database_write_raw($database, $sql){
       $status['error'] = FALSE;
       $status['message'] = '<span class="success">Records successfully written</span>';
     }
+    $status['insert_id'] = $conn->insert_id;
     $conn->close();
     return $status;
   }

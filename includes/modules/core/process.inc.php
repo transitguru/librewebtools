@@ -226,6 +226,27 @@ function lwt_process_get_children($parent, $groups){
   return $groups;
 }
 
+/**
+ * Finds children to the content IDs for a given parent
+ * 
+ * @param int $parent Parent ID to find the children
+ * @param type $contents Array of content IDs that are available to keep appending
+ * @return array Array of Content IDs (this gets appended to the input)
+ */
+
+function lwt_process_get_contentchildren($parent, $contents){
+  $contents[$parent] = $parent;
+  $children = lwt_database_fetch_simple(DB_NAME, 'content_hierarchy', NULL, array('parent_id' => $parent));
+  if (count($children)>0){
+    foreach ($children as $child){
+      if ($child['content_id'] != 0){
+        $contents = lwt_process_get_contentchildren($child['content_id'],$contents);
+      }
+    }
+  }
+  return $contents;
+}
+
 
 /**
  * Provides markup for the page_content div
