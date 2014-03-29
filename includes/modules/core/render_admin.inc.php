@@ -80,8 +80,9 @@ function lwt_admin_render_groupradio($parent_id, $selected, $children){
 /**
  * Renders "Tree" structure of groups for understanding of relationships of groups
  * 
+ * @param int $parent_id ID of group
  * 
- * 
+ * @return void
  */
 function lwt_admin_render_grouplinks($parent_id){
   $groups = lwt_database_fetch_simple(DB_NAME, 'group_hierarchy', NULL, array('parent_id' => $parent_id));
@@ -344,8 +345,7 @@ function lwt_ajax_admin_users($wrapper = false){
       $users = lwt_database_fetch_simple(DB_NAME, 'users', NULL, NULL, NULL, array('lastname','firstname'));
       $num = count($users);
 ?>    
-      <ul>
-        <li><a href="javascript:;" onclick="ajaxPostLite('command=navigate&navigate[0]=users&ajax=1','','adminarea','');">Users (<?php echo $num; ?>)</a>
+        <h2><a href="javascript:;" onclick="ajaxPostLite('command=navigate&navigate[0]=users&ajax=1','','adminarea','');">Users (<?php echo $num; ?>)</a></h2>
 <?php
       if (isset($_SESSION['admin']['navigate'][0]) && $_SESSION['admin']['navigate'][0] === 'users'){
 ?>
@@ -364,8 +364,7 @@ function lwt_ajax_admin_users($wrapper = false){
       $roles = lwt_database_fetch_simple(DB_NAME, 'roles', NULL, NULL, NULL, array('sortorder', 'name'));
       $num = count($roles);
 ?>
-        </li>
-        <li><a href="javascript:;" onclick="ajaxPostLite('command=navigate&navigate[0]=roles&ajax=1','','adminarea','');">Roles (<?php echo $num; ?>)</a>
+        <h2><a href="javascript:;" onclick="ajaxPostLite('command=navigate&navigate[0]=roles&ajax=1','','adminarea','');">Roles (<?php echo $num; ?>)</a></h2>
 <?php
       if (isset($_SESSION['admin']['navigate'][0]) && $_SESSION['admin']['navigate'][0] === 'roles'){
 ?>
@@ -384,8 +383,7 @@ function lwt_ajax_admin_users($wrapper = false){
       $groups = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, NULL, NULL, array('name'));
       $num = count($groups);
 ?>
-        </li>
-        <li><a href="javascript:;" onclick="ajaxPostLite('command=navigate&navigate[0]=groups&ajax=1','','adminarea','');">Groups (<?php echo $num; ?>)</a>
+        <h2><a href="javascript:;" onclick="ajaxPostLite('command=navigate&navigate[0]=groups&ajax=1','','adminarea','');">Groups (<?php echo $num; ?>)</a></h2>
 <?php
       if (isset($_SESSION['admin']['navigate'][0]) && $_SESSION['admin']['navigate'][0] === 'groups'){
 ?>
@@ -402,11 +400,6 @@ $info = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, array('id' => 0));
           </ul>
 <?php
       }
-?>
-        </li>
-      </ul>
-      
-<?php
     }
     
     //Render editing interfaces if requested or error upon write
