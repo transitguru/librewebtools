@@ -277,7 +277,7 @@ function lwt_ajax_admin_users($wrapper = false){
           $parent_id = $_POST['group']['parent_id'];
           $children = array();
           $children = lwt_process_get_children($id,$children);
-          $parent = lwt_database_fetch_simple(DB_NAME, 'group_hierarchy', NULL, array('group_id' => $group['id']));
+          $parent = lwt_database_fetch_simple(DB_NAME, 'group_hierarchy', NULL, array('group_id' => $id));
           $selected = $parent[0]['parent_id'];
           if (!in_array($parent_id, $children) && $parent_id != $selected){
             $result = lwt_database_write(DB_NAME, 'group_hierarchy', array('parent_id' => $parent_id), array('group_id' => $id));
