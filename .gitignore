@@ -1,2 +1,5 @@
 #Ignore contributed modules`
 /includes/vendor/*/
+
+#Ignore generated files
+/file/
