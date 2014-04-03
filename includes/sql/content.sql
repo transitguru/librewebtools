@@ -52,6 +52,7 @@ ALTER TABLE `content` AUTO_INCREMENT=1;
 -- Adding required content to enable site to run
 INSERT INTO `content` (`title`,`preprocess_call`,`function_call`,`content`) VALUES
   ('Login','lwt_process_authentication', 'lwt_render_login',NULL),
+  ('File Download','lwt_process_download', 'lwt_render_404',NULL),
   ('Logout','lwt_process_logout', NULL, NULL),
   ('Profile',NULL, 'lwt_render_profile', NULL),
   ('Reset Password',NULL, 'lwt_render_password', NULL),
@@ -63,7 +64,8 @@ INSERT INTO `content` (`title`,`preprocess_call`,`function_call`,`content`) VALU
 
 -- Place the required content in a hierarchy
 INSERT INTO `content_hierarchy` (`parent_id`,`content_id`,`url_code`, `app_root`) VALUES
-  (0,(SELECT `id` FROM `content` WHERE `title`='Home in Database'),'',0),
+  (0,(SELECT `id` FROM `content` WHERE `title`='Home'),'',0),
+  (0,(SELECT `id` FROM `content` WHERE `title`='File Download'),'files',1),
   (0, (SELECT `id` FROM `content` WHERE `title`='Login'), 'login',0),
   (0, (SELECT `id` FROM `content` WHERE `title`='Logout'), 'logout',0),
   (0, (SELECT `id` FROM `content` WHERE `title`='Test Page'), 'test',0),
@@ -77,6 +79,7 @@ INSERT INTO `content_hierarchy` (`parent_id`,`content_id`,`url_code`, `app_root`
 -- Now applying permissions
 INSERT INTO `group_access` (`content_id`,`group_id`) VALUES
   ((SELECT `id` FROM `content` WHERE `title`='Home in Database'),0),
+  ((SELECT `id` FROM `content` WHERE `title`='File Download'),0),
   ((SELECT `id` FROM `content` WHERE `title`='Login'), 0),
   ((SELECT `id` FROM `content` WHERE `title`='Logout'), 0),
   ((SELECT `id` FROM `content` WHERE `title`='Forgot Password'), 0),

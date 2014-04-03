@@ -118,6 +118,7 @@ function lwt_process_title($request){
     if (count($info)>0){
       $fn = $info[0]['preprocess_call'];
       $output['title'] = $info[0]['title'];
+      echo $fn;
       if (!is_null($fn) && function_exists($fn)){
         $fn();
       }
@@ -296,14 +297,30 @@ function lwt_process_url($request){
 
 
 /**
- * Processes AJAX Requests
+ * Processes File Downloads
  * 
- * @return boolean 
+ * @return void
  */
-function lwt_process_ajax(){
-  echo 'You are doing some AJAX!<pre>';
-  var_dump($_POST);
-  echo '</pre>';
-  return TRUE;
+function lwt_process_download(){
+  // Process file read
+  ob_clean();
+  // Don't Cache the result
+  header('Cache-Control: no-cache');
+  $chars = strlen(APP_ROOT);
+  $request = trim(substr($_SERVER['REQUEST_URI'],$chars),"/ ");
+  
+  //This is the only information that gets sent back!
+  $included = $_SERVER['DOCUMENT_ROOT']."/files/".$request;
+  $size = filesize($included);
+  $type = mime_content_type($included);
+  header('Pragma: ');         // leave blank to avoid IE errors
+  header('Cache-Control: ');  // leave blank to avoid IE errors
+  header('Content-Length: ' . $size);
+  // This next line forces a download so you don't have to right click...
+  header('Content-Disposition: attachment; filename="'.basename($included).'"');
+  header('Content-Type: ' .$type);
+  sleep(0); // gives browser a second to digest headers
+  readfile($included);
+  exit;
 }
 

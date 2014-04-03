@@ -278,3 +278,65 @@ CREATE TABLE IF NOT EXISTS `group_access` (
 )
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Table `files`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `files` ;
+
+CREATE TABLE IF NOT EXISTS `files` (
+  `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `path` VARCHAR(255) NOT NULL ,
+  `basename` VARCHAR(255) NOT NULL ,
+  `size` BIGINT UNSIGNED NOT NULL DEFAULT 0 ,
+  `mimetype` VARCHAR(255) ,
+  `uploaded` DATETIME NOT NULL ,
+  `title` VARCHAR(255) NULL ,
+  `caption` TEXT NULL ,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX (`path`)
+)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `role_fileaccess`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `role_fileaccess` ;
+
+CREATE TABLE IF NOT EXISTS `role_fileaccess` (
+  `role_id` INT UNSIGNED NOT NULL ,
+  `file_id` INT UNSIGNED NOT NULL ,
+  `view` TINYINT NOT NULL DEFAULT 1,
+  `edit` TINYINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`role_id`, `file_id`),
+  FOREIGN KEY (`role_id`)
+    REFERENCES `roles` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (`file_id`)
+    REFERENCES `files` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `group_fileaccess`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `group_fileaccess` ;
+
+CREATE TABLE IF NOT EXISTS `group_fileaccess` (
+  `group_id` INT UNSIGNED NOT NULL ,
+  `file_id` INT UNSIGNED NOT NULL ,
+  `view` TINYINT NOT NULL DEFAULT 1,
+  `edit` TINYINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`group_id`, `file_id`),
+  FOREIGN KEY (`group_id`)
+    REFERENCES `groups` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (`file_id`)
+    REFERENCES `files` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB;

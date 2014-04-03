@@ -56,36 +56,9 @@ lwt_install($request);
 $maintenance = FALSE; /**< Set maintenance mode */
 $request = lwt_auth_session_gatekeeper($request, $maintenance);
 
-// Go ahead and process request
-if (fnmatch('/ajax/*',$request)){
-  // Process AJAX
-  header('Cache-Control: no-cache');
-  $success = lwt_process_ajax($request); /**< Returns true if function completes! */
-  $debug = FALSE;
-}
-elseif(fnmatch('/file/*',$request)){
-  // Process file read
-  ob_clean();
-  // Don't Cache the result
-  header('Cache-Control: no-cache');
+// Process Page
+$success = lwt_render_wrapper($request); /**< Returns true if function completes! */
 
-  //This is the only information that gets sent back!
-  $included = $_SERVER['DOCUMENT_ROOT']."/FILES/".$request;
-  $size = filesize($included);
-  $type = mime_content_type($included);
-  header('Pragma: ');         // leave blank to avoid IE errors
-  header('Cache-Control: ');  // leave blank to avoid IE errors
-  header('Content-Length: ' . $size);
-  // This next line forces a download so you don't have to right click...
-  header('Content-Disposition: attachment; filename="'.basename($included).'"');
-  header('Content-Type: ' .$type);
-  sleep(0); // gives browser a second to digest headers
-  readfile($included);
-}
-else{
-  // Process Page
-  $success = lwt_render_wrapper($request); /**< Returns true if function completes! */
-}
 
 if ($debug){
   lwt_test_array_print($_SESSION); 
