@@ -17,7 +17,7 @@ $debug = FALSE;
 
 
 // Load all core modules
-$PATH = $_SERVER['DOCUMENT_ROOT'] . '/includes/modules';
+$PATH = $_SERVER['DOCUMENT_ROOT'] . '/INCLUDES/modules';
 $modules = scandir($PATH);
 foreach ($modules as $module){
   if (is_dir($PATH . '/' . $module) && $module != '.' && $module != '..'){
@@ -31,7 +31,7 @@ foreach ($modules as $module){
 }
 
 // Load other "vendor Modules
-$PATH = $_SERVER['DOCUMENT_ROOT'] . '/includes/vendor';
+$PATH = $_SERVER['DOCUMENT_ROOT'] . '/INCLUDES/contrib';
 $modules = scandir($PATH);
 foreach ($modules as $module){
   if (is_dir($PATH . '/' . $module) && $module != '.' && $module != '..'){

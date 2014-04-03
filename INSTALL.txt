@@ -15,7 +15,7 @@ Here are a few simple steps for installing LibreWebTools
     (which is a very basic set-up, but make sure have AllowOverride All enabled
     for your directory as this site relies on .htaccess files.
     
- 2. Edit the file in includes/sql/database.sql to your specifications, 
+ 2. Edit the file in INCLUDES/sql/database.sql to your specifications, 
     especially paying attention to changing the password. DO NOT USE the default
     password on a production system!
     
@@ -31,8 +31,8 @@ Here are a few simple steps for installing LibreWebTools
     mysql -u root -p librewebtools < schema.sql
     mysql -u root -p librewebtools < content.sql
     
- 5. Replace values in includes/modules/core/settings.inc.php to match the
-    changes made in includes/sql/database.sql
+ 5. Replace values in INCLUDES/modules/core/settings.inc.php to match the
+    changes made in INCLUDES/sql/database.sql
     
  6. Visit your website and Set up your administrative account when it prompts
     you to do so. Once that is set up, you are on your way to using the site.

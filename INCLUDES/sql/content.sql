@@ -45,7 +45,7 @@ INSERT INTO `passwords` (`user_id`, `valid_date`, `hash`, `key`) VALUES
   ((SELECT `id` FROM `users` WHERE `login`='admin'),'2014-01-01', '$2a$07$FrwVLqsQApBQ6bWD3NgE9u37SeiH9QwANXKt0EopNTHkq3Ly9l1.C', 'FrwVLqsQApBQ6bWD3NgE94');
 
 -- Add the root homepage at id=0
-INSERT INTO `content` (`title`,`function_call`,`content`) VALUES ('Home in Database','lwt_render_home',NULL);
+INSERT INTO `content` (`title`,`content`) VALUES ('Home','<p>LibreWebTools is a lightweight content management and web-application development framework. It is currently under development and you may find some breakage. Feel free to go to the <a href="https://github.com/transitguru/librewebtools">GitHub</a> for the source code and instructions on how to set this up.</p>');
 UPDATE `content` SET `id`=0;
 ALTER TABLE `content` AUTO_INCREMENT=1;
 
@@ -78,7 +78,7 @@ INSERT INTO `content_hierarchy` (`parent_id`,`content_id`,`url_code`, `app_root`
   
 -- Now applying permissions
 INSERT INTO `group_access` (`content_id`,`group_id`) VALUES
-  ((SELECT `id` FROM `content` WHERE `title`='Home in Database'),0),
+  ((SELECT `id` FROM `content` WHERE `title`='Home'),0),
   ((SELECT `id` FROM `content` WHERE `title`='File Download'),0),
   ((SELECT `id` FROM `content` WHERE `title`='Login'), 0),
   ((SELECT `id` FROM `content` WHERE `title`='Logout'), 0),

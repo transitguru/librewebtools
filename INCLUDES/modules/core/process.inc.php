@@ -118,7 +118,6 @@ function lwt_process_title($request){
     if (count($info)>0){
       $fn = $info[0]['preprocess_call'];
       $output['title'] = $info[0]['title'];
-      echo $fn;
       if (!is_null($fn) && function_exists($fn)){
         $fn();
       }
@@ -302,15 +301,16 @@ function lwt_process_url($request){
  * @return void
  */
 function lwt_process_download(){
-  // Process file read
+  // Stop output buffering
   ob_clean();
+  
   // Don't Cache the result
   header('Cache-Control: no-cache');
   $chars = strlen(APP_ROOT);
   $request = trim(substr($_SERVER['REQUEST_URI'],$chars),"/ ");
   
   //This is the only information that gets sent back!
-  $included = $_SERVER['DOCUMENT_ROOT']."/files/".$request;
+  $included = $_SERVER['DOCUMENT_ROOT']."/FILES/".$request;
   $size = filesize($included);
   $type = mime_content_type($included);
   header('Pragma: ');         // leave blank to avoid IE errors

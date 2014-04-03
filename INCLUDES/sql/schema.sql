@@ -62,7 +62,7 @@ DROP TABLE IF EXISTS `group_hierarchy` ;
 CREATE TABLE IF NOT EXISTS `group_hierarchy` (
   `parent_id` INT UNSIGNED NOT NULL DEFAULT 0,
   `group_id`  INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`parent_id`, `group_id`) ,
+  PRIMARY KEY (`group_id`) ,
   FOREIGN KEY (`parent_id`)
     REFERENCES `groups` (`id`)
     ON DELETE CASCADE
@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS `content_hierarchy` (
   `content_id`  INT UNSIGNED NOT NULL,
   `url_code` VARCHAR(100) NOT NULL ,
   `app_root` TINYINT NOT NULL DEFAULT 0 ,
-  PRIMARY KEY (`parent_id`, `content_id`) ,
+  PRIMARY KEY (`content_id`) ,
   UNIQUE KEY (`parent_id`,`url_code`) ,
   FOREIGN KEY (`parent_id`)
     REFERENCES `content` (`id`)
@@ -224,7 +224,7 @@ DROP TABLE IF EXISTS `menulink_hierarchy` ;
 CREATE TABLE IF NOT EXISTS `menulink_hierarchy` (
   `parent_id` INT UNSIGNED NOT NULL DEFAULT 0,
   `menulink_id`  INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`parent_id`, `menulink_id`) ,
+  PRIMARY KEY (`menulink_id`) ,
   FOREIGN KEY (`menulink_id`)
     REFERENCES `menu_links` (`id`)
     ON DELETE CASCADE
