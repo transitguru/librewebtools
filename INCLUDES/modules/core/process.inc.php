@@ -310,7 +310,7 @@ function lwt_process_download(){
   $request = trim(substr($_SERVER['REQUEST_URI'],$chars),"/ ");
   
   //This is the only information that gets sent back!
-  $included = $_SERVER['DOCUMENT_ROOT']."/FILES/".$request;
+  $included = $_SERVER['DOCUMENT_ROOT']."/FILES/core/".$request;
   $size = filesize($included);
   $type = mime_content_type($included);
   header('Pragma: ');         // leave blank to avoid IE errors

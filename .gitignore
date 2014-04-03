@@ -2,4 +2,4 @@
 /INCLUDES/contrib/*/
 
 #Ignore generated files
-/FILES/
+/FILES/*/

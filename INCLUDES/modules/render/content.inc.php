@@ -195,6 +195,15 @@ $info = lwt_database_fetch_simple(DB_NAME, 'content', array('id','title'), array
           </ul>
 <?php
       }
+?>
+        <h2><a href="javascript:;" onclick="ajaxPostLite('command=navigate&navigate[0]=files&ajax=1','','adminarea','');">Files</a></h2>
+<?php
+      if (isset($_SESSION['admin']['navigate'][0]) && $_SESSION['admin']['navigate'][0] === 'files'){
+        if (!is_dir($_SERVER['DOCUMENT_ROOT'] . '/FILES/core')){
+          mkdir($_SERVER['DOCUMENT_ROOT'] . '/FILES/core');
+        }
+        lwt_admin_render_filetree($_SERVER['DOCUMENT_ROOT'] . '/FILES/core');
+      }
     }
     
     //Render editing interfaces if requested or error upon write

@@ -178,3 +178,57 @@ function lwt_admin_render_contentlinks($parent_id){
   return;  
 }
 
+/**
+ * Renders a file tree
+ * 
+ * @param string $path Path to files
+ * @param boolean $recursive If true, the function would recurse into directories
+ * 
+ * @return void
+ */
+function lwt_admin_render_filetree($path, $recursive=false){
+  $list = scandir($path);
+  if (count($list>0)){
+?>
+    <ul>
+<?php
+    //Separate directories and files
+    $directories = array();
+    $files = array();
+    foreach ($list as $item){
+      if (is_dir($path . '/' . $item) && $item != '.' && $item != '..'){
+        $directories[] = $item;
+      }
+      elseif (is_file($path . '/' . $item)){
+        $files[] = $item;
+      }
+    }
+    
+    //Process directories
+    if (count($directories)>0){
+      foreach ($directories as $directory){
+?>
+      <li><span class="dir" onclick="ajaxPostLite('command=navigate&navigate[1]=<?php echo $path . '/' . $directory; ?>&ajax=1','','adminarea','');"><?php echo $directory; ?></span>
+<?php
+        if ($recursive || fnmatch($path . '/' . $directory . '*',$_SESSION['admin']['navigate'][1])){
+          lwt_admin_render_filetree($path . '/' . $directory, $recursive);
+        }
+?>
+      </li>
+<?php
+      }
+    }
+    
+    //Process files
+    if (count($files)>0){
+      foreach ($files as $file){
+?>
+        <li><span class="file"><?php echo $file; ?></span></li>
+<?php
+      }
+    }
+?>
+    </ul>
+<?php
+  }
+}
