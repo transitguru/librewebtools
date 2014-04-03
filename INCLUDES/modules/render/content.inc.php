@@ -144,6 +144,28 @@ function lwt_ajax_admin_content($wrapper = false){
         }
         
       }
+      if (isset($_POST['file']) && count($_POST['file'])>0){
+        if ($_POST['file']['type'] == 'folder'){
+          $path = $_SERVER['DOCUMENT_ROOT'] . '/FILES/core' . $_POST['file']['path'];
+          $folder = $_POST['file']['folder'];
+          $success = mkdir($path . '/' . $folder);
+          if (!$success){
+            $message = '<span class="error">Failed to create a new directory.</span>';
+          }
+          
+        }
+        elseif($_POST['file']['type'] == 'file'){
+          if (count($_FILES)>0){
+            $path = $_SERVER['DOCUMENT_ROOT'] . '/FILES/core' . $_POST['file']['path'];
+            foreach ($_FILES['upload']['name'] as $id => $name){
+              $success = move_uploaded_file($_FILES['upload']['tmp_name'][$id],$path . '/' . $name);
+              if (!$success){
+                $message = '<span class="error">Failed to upload one or more files.</span>';
+              }
+            }
+          }
+        }
+      }
     }
     
     //Process delete events
@@ -167,6 +189,26 @@ function lwt_ajax_admin_content($wrapper = false){
         }
         if ($result['error']){
           $_POST['id'] = $_POST['content']['id'];
+        }
+      }
+      if (isset($_POST['file']) && count($_POST['file'])>0){
+        $file = $_SERVER['DOCUMENT_ROOT'] . '/FILES/core' . $_POST['file']['filename'];
+        $path = $_SERVER['DOCUMENT_ROOT'] . '/FILES/core/*';
+        if (fnmatch($path, realpath($file))){
+          if (is_file($file)){
+            $success = unlink($file);
+          }
+          elseif (is_dir($file)){
+            if (count(scandir($file))>2){
+              $message = '<span class="error">You cannot remove a folder with files inside of it!</span>';
+            }
+            else{
+              $success = rmdir($file);
+            }
+          }
+        }
+        if (!$success){
+          $message = '<span class="error">Failed to remove directory or file.</span>';
         }
       }
       $_POST['command'] = 'write';
@@ -199,10 +241,13 @@ $info = lwt_database_fetch_simple(DB_NAME, 'content', array('id','title'), array
         <h2><a href="javascript:;" onclick="ajaxPostLite('command=navigate&navigate[0]=files&ajax=1','','adminarea','');">Files</a></h2>
 <?php
       if (isset($_SESSION['admin']['navigate'][0]) && $_SESSION['admin']['navigate'][0] === 'files'){
+?>
+          <p><?php echo $message; ?></p>
+<?php
         if (!is_dir($_SERVER['DOCUMENT_ROOT'] . '/FILES/core')){
           mkdir($_SERVER['DOCUMENT_ROOT'] . '/FILES/core');
         }
-        lwt_admin_render_filetree($_SERVER['DOCUMENT_ROOT'] . '/FILES/core');
+        lwt_admin_render_filetree('');
       }
     }
     
@@ -293,9 +338,9 @@ $info = lwt_database_fetch_simple(DB_NAME, 'content', array('id','title'), array
       <button onclick="event.preventDefault();ajaxPostLite('command=view&id=<?php echo $content['id']; ?>&ajax=1','','adminarea','');">Reset form</button>
       <button onclick="event.preventDefault();ajaxPostLite('command=navigate&navigate[0]=contents&ajax=1','','adminarea','');">Cancel</button>
 <?php
-        if ($group['id'] > 0){
+        if ($content['id'] > 0){
 ?>
-      <button class="right" onclick="event.preventDefault();ajaxPostLite('command=delete&content[id]=<?php echo $content['id']; ?>&ajax=1','','adminarea','');">Delete</button>
+      <button class="right" onclick="showDialogue('Deleting Content');confirmDelete('<?php echo $content['title']; ?>','command=delete&content[id]=<?php echo $content['id']; ?>&ajax=1','adminarea');">Delete...</button>
 <?php
         }
       }

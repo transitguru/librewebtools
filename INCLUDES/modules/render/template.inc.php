@@ -198,7 +198,35 @@ function lwt_render_css(){
         .report th, .report td {background-color:#ffffff; font-size:10px;}
         .rotate {display:block;width:10px;padding-top:5px;padding-bottom:5px;padding-right:1px;padding-left:1px;margin:0px;text-align:left; vertical-align:middle; white-space:nowrap;-webkit-transform: rotate(-90deg); -moz-transform: rotate(-90deg); -o-transform: rotate(-90deg);}
         .tall {height: 200px; vertical-align:bottom;}
-
+        
+        /* Dialogue boxes*/
+        .inner  {padding: 10px}
+        .dialogue {
+          z-index: 9;
+          position:fixed;
+          top: 10%;
+          min-width:200px;
+          min-height:200px;
+          margin-left:auto;
+          margin-right:auto;
+          border-radius: 10px;
+          background-color: #ffffff;
+          max-width:90% !important;
+          max-height:80%  !important;
+          overflow: auto;
+          opacity: 1;
+          border: #000000 solid 1px;
+        }
+        .dialoguebg{
+          z-index: 8;
+          position:fixed;
+          top: 0px;
+          left: 0px;
+          min-height: 100%;
+          min-width: 100%;
+          opacity: 0.5;
+          background-color: #777777;
+        }
  
     </style>
 <?php
@@ -252,6 +280,12 @@ function lwt_render_wrapper($request){
   }
 ?>
             <div class="hide" id="tooltip"></div>
+            <div class="hide" id="dialoguebg"></div>
+            <div class="hide" id="dialogue">
+              <div class="right" style="background-color: #cccccc;text-align: center; font-weight:normal; border-top-right-radius: 10px; cursor: pointer; border: #000000 solid 1px; width: 30px; height: 20px" onclick="hideDialogue();">x</div>
+              <div class="inner bold" id="dialogue-title">Title</div>
+              <div class="inner" id="dialogue-content"></div>
+            </div>
           </div>
           <div class="foot">
             <ul class="nav">

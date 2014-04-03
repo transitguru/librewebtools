@@ -187,7 +187,8 @@ function lwt_admin_render_contentlinks($parent_id){
  * @return void
  */
 function lwt_admin_render_filetree($path, $recursive=false){
-  $list = scandir($path);
+  $PATH = $_SERVER['DOCUMENT_ROOT'] . '/FILES/core' . $path;
+  $list = scandir($PATH);
   if (count($list>0)){
 ?>
     <ul>
@@ -196,10 +197,10 @@ function lwt_admin_render_filetree($path, $recursive=false){
     $directories = array();
     $files = array();
     foreach ($list as $item){
-      if (is_dir($path . '/' . $item) && $item != '.' && $item != '..'){
+      if (is_dir($PATH . '/' . $item) && $item != '.' && $item != '..'){
         $directories[] = $item;
       }
-      elseif (is_file($path . '/' . $item)){
+      elseif (is_file($PATH . '/' . $item)){
         $files[] = $item;
       }
     }
@@ -208,7 +209,9 @@ function lwt_admin_render_filetree($path, $recursive=false){
     if (count($directories)>0){
       foreach ($directories as $directory){
 ?>
-      <li><span class="dir" onclick="ajaxPostLite('command=navigate&navigate[1]=<?php echo $path . '/' . $directory; ?>&ajax=1','','adminarea','');"><?php echo $directory; ?></span>
+      <li>
+        <span class="dir" onclick="ajaxPostLite('command=navigate&navigate[1]=<?php echo $path . '/' . $directory; ?>&ajax=1','','adminarea','');"><?php echo $directory; ?></span>
+        <a href="javascript:;" onclick="showDialogue('Deleting a Folder');confirmDelete('<?php echo $directory; ?>','command=delete&file[filename]=<?php echo htmlentities($path . '/' . $directory); ?>&ajax=1','adminarea');">Delete...</a>
 <?php
         if ($recursive || fnmatch($path . '/' . $directory . '*',$_SESSION['admin']['navigate'][1])){
           lwt_admin_render_filetree($path . '/' . $directory, $recursive);
@@ -223,11 +226,16 @@ function lwt_admin_render_filetree($path, $recursive=false){
     if (count($files)>0){
       foreach ($files as $file){
 ?>
-        <li><span class="file"><?php echo $file; ?></span></li>
+        <li>
+          <span class="file"><?php echo $file; ?></span>
+          <a href="javascript:;" onclick="showDialogue('Deleting a File');confirmDelete('<?php echo $file; ?>','command=delete&file[filename]=<?php echo htmlentities($path . '/' . $file); ?>&ajax=1','adminarea');">Delete...</a>
+        </li>
 <?php
       }
     }
 ?>
+      <li><a href="javascript:;" onclick="showDialogue('Add a File');uploadFile('<?php echo $path; ?>');">New File</a></li>
+      <li><a href="javascript:;" onclick="showDialogue('Add a Folder');makeDir('<?php echo $path; ?>');">New Folder</a></li>
     </ul>
 <?php
   }

@@ -268,14 +268,6 @@ function hideTooltip(evt){
 }
 
 
-function userAlertDialogue(id, command){
-  if (id == -1){
-    xmlhttpPostLite('command=write&alert_show=-1&newalert_reveal=Project', '/ajax/', 'dialogue-content','<p>Please Wait</p>');
-  }
-  else{
-    xmlhttpPostLite('command=' + command + '&alert_show=' + id, '/ajax/', 'dialogue-content','<p>Please Wait</p>');
-  }
-}
 function showDialogue(title){
   document.getElementById('dialogue').setAttribute('class', 'dialogue');
   document.getElementById('dialoguebg').setAttribute('class', 'dialoguebg');
@@ -293,6 +285,27 @@ function hideDialogue(){
   document.getElementById('dialogue-title').innerHTML = '';
   document.getElementById('dialogue-content').innerHTML = '';
 }
+
+
+function confirmDelete(name, postdata, responsediv){
+  var text = '<p>Are you sure you want to delete <strong>' + name + '</strong></p><p><button onclick="event.preventDefault();hideDialogue();ajaxPostLite(\'' + postdata + '\',\'\',\'' + responsediv + '\',\'\');">Delete</button><button onclick="event.preventDefault();hideDialogue();">cancel</button></p>';
+  document.getElementById('dialogue-content').innerHTML = text;  
+}
+
+function uploadFile(path){
+  var text = '<form action="" enctype="multipart/form-data" method="post" id="poster" onsubmit="event.preventDefault(); ajaxPost(this,\'adminarea\',\'\');hideDialogue();">';
+  text = text + '<input type="hidden" name="command" value="write" /><input type="hidden" name="ajax" value="1" /><input type="hidden" name="file[type]" value="file" /><input type="hidden" name="file[path]" value="' + path + '" />';
+  text = text + '<input type="file" name="upload[]" multiple />';
+  text = text + '<input type="submit" name="submit" value="Submit" /></form>';
+  document.getElementById('dialogue-content').innerHTML = text;
+}
+
+function makeDir(path){
+  var text = '<label for="file[folder]">Folder Name</label><input id="foldername" name="file[folder]" /><br />';
+  text =  text + '<button onclick="event.preventDefault();var folder=getElementById(\'foldername\').value;hideDialogue();ajaxPostLite(\'ajax=1&command=write&file[type]=folder&file[path]=' + path + '&file[folder]=\' + folder ,\'\',\'adminarea\',\'\');">Create</button><button onclick="event.preventDefault();hideDialogue();">cancel</button></p><br />';
+  document.getElementById('dialogue-content').innerHTML = text;
+}
+
 
 /**
  * Pads characters to the left of a string if shorter than length
