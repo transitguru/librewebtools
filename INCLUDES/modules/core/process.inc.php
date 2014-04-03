@@ -20,7 +20,7 @@ function lwt_process_authentication(){
   if (isset($_SESSION['redirect']) && $_SESSION['redirect'] != ''){
     $redirect = $_SESSION['redirect'];
   }
-  elseif (!isset($_SESSION['requested_page']) || $_SESSION['requested_page'] =='/login/'){
+  elseif (!isset($_SESSION['requested_page']) || $_SESSION['requested_page'] == APP_ROOT){
     $redirect = "/";
   }
   else{
