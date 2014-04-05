@@ -249,6 +249,29 @@ $info = lwt_database_fetch_simple(DB_NAME, 'content', array('id','title'), array
         }
         lwt_admin_render_filetree('');
       }
+?>
+        <h2><a href="javascript:;" onclick="ajaxPostLite('command=navigate&navigate[0]=menus&ajax=1','','adminarea','');">Link Menus</a></h2>
+<?php
+      if (isset($_SESSION['admin']['navigate'][0]) && $_SESSION['admin']['navigate'][0] === 'menus'){
+        $menus = lwt_database_fetch_simple(DB_NAME, 'menus', NULL, NULL, NULL, array('name'));
+        if (count($menus)>0){
+?>
+          <ul>
+<?php
+          foreach ($menus as $menu){
+?>
+            <li><a href="javascript:;" onclick="ajaxPostLite('command=navigate&navigate[1]=<?php echo $menu['id']; ?>&ajax=1','','adminarea','');" ><?php echo $menu['name']; ?></a></li>
+<?php
+            if (isset($_SESSION['admin']['navigate'][1]) && $_SESSION['admin']['navigate'][1] === $menu['id']){
+              
+            }
+          }
+?>
+          </ul>
+<?php
+        }
+        
+      }
     }
     
     //Render editing interfaces if requested or error upon write
