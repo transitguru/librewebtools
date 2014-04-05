@@ -42,6 +42,6 @@ Here are a few simple steps for installing LibreWebTools
     sudo chown www-data FILES
     
  7. Visit your website and log in as the username admin with password Admin. 
-    Make sure to go to Account > Password and change your password. Once that 
-    is set up, you are on your way to using the site.
+    Make sure to go to Account > Reset Password and change your password. Once 
+    that is set up, you are on your way to using the site.
   

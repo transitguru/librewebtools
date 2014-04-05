@@ -55,6 +55,7 @@ function lwt_auth_authenticate_user($username,$password){
           $_SESSION['authenticated']['roles'][] = $role['role_id'];
         }
         $_SESSION['start'] = time();
+        $_SESSION['message'] = '<span class="success">You have successfully logged in.</span>';
         return true;
       }
       else {
