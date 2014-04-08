@@ -89,10 +89,10 @@ function lwt_test_validation($inputs, $error=0){
 function lwt_test_runvalidation(){
   $types = array('preg','memo','text','date','num');
   $formats = array(
-    'preg' => array('/[0-9a-zA-Z]/'),
+    'preg' => array('/[0-9a-zA-Z]*/','/[0-9a-z]*/','/[a-z][0-9a-z]*/' ),
     'memo' => array('all', 'noscript', 'somehtml', 'nohtml', 'htmlencode'),
     'text' => array('password','oneline','email','nowacky','multiline'),
-    'date' => array('Y-m-d h:i:s', 'm/d/Y h:i'),
+    'date' => array('Y-m-d H:i:s', 'm/d/Y H:i'),
     'num' => array('int','dec'),
   );
   $ranges = array( 
@@ -127,9 +127,15 @@ function lwt_test_runvalidation(){
     array(array('Ab', 'preg', $formats['preg'][0],  true, 12),0),
     array(array('This', 'memo', $formats['memo'][0],  true, 12),0),
     array(array('Text', 'text', $formats['text'][0],  true, 12),0),
-    array(array('2013-01-01 00:00:00', 'date', $formats['date'][0],  true, 12),0),
+    array(array('2013-01-01 00:00:00', 'date', $formats['date'][0],  true, 22),0),
     array(array('23', 'num', $formats['num'][0],  true, 12),0),
     array(array('4.5', 'num', $formats['num'][1],  true, 12),0),
+    array(array('Abdsfasdgfsdagadgd', 'preg', $formats['preg'][0],  true, 12),12),
+    array(array('This is a Lot of text!!!!', 'memo', $formats['memo'][0],  true, 12),12),
+    array(array('Text is a Lot of text', 'text', $formats['text'][0],  true, 12),12),
+    array(array('2013-01-01 00:00:00', 'date', $formats['date'][0],  true, 4),12),
+    array(array('2334543543', 'num', $formats['num'][0],  true, 4),12),
+    array(array('4.54354364564', 'num', $formats['num'][1],  true, 4),12),
   );
   $num = count($tests);
   foreach ($tests as $test){
@@ -138,5 +144,30 @@ function lwt_test_runvalidation(){
     $error += $result['error'];
   }
   echo "Tests ran with {$error}/{$num} errors.\n";
+  
+  echo "Testing 20 series errors\n\n";
+  $error = 0;
+  $tests = array(
+    array(array('The_', 'preg', $formats['preg'][0]),21),
+    array(array('foo', 'preg', $formats['preg'][0]),0),
+    array(array('The&', 'preg', $formats['preg'][0]),21),
+    array(array('2356.', 'preg', $formats['preg'][0]),0),
+    array(array('Tjkhaeh', 'preg', $formats['preg'][0]),0),
+    array(array('iwhekjdjfkj5t', 'preg', $formats['preg'][0]),0),
+    array(array('iwhekjdjfkj5t', 'preg', $formats['preg'][1]),0),
+    array(array('TheCaps32', 'preg', $formats['preg'][1]),21),
+    array(array('thecaps32', 'preg', $formats['preg'][1]),0),
+    array(array('a909098', 'preg', $formats['preg'][2]),0),
+    array(array('A909098', 'preg', $formats['preg'][2]),21),
+    array(array('9adfs09098', 'preg', $formats['preg'][2]),21),
+  );
+  $num = count($tests);
+  foreach ($tests as $test){
+    $result = call_user_func_array('lwt_test_validation',$test);
+    echo $result['message'] . "\n";
+    $error += $result['error'];
+  }
+  echo "Tests ran with {$error}/{$num} errors.\n";
+  
   
 }

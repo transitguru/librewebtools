@@ -73,7 +73,7 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
   if ($type=='preg'){
     // Do regular expression
     preg_match($format, $input, $matches);
-    if ($matches[0]!=$input){
+    if (count($matches)==0 || $matches[0]!=$input){
       $output["error"] = 21;
       $output["value"] = $input;
       $output["message"] = "Invalid: Value does not match the pattern expected.";
@@ -147,8 +147,8 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
   }
   elseif ($type=='date'){
     //Check time against $format (which uses PHP date() format string)
-    if(date_create_from_format($format, $string)){
-      $date = date_create_from_format($format, $string);
+    if(date_create_from_format($format, $input)){
+      $date = date_create_from_format($format, $input);
       $formatted = date_format($date, $format);
       if ($formatted != $input){
         $output["error"] = 52;
@@ -222,7 +222,7 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
       $max = $min;
       $min = $temp;
     }
-    if (($range_flags[0] || $range_flags['min']) && !is_null($min) && $input <= $min){
+    if (((isset($range_flags[0]) && $range_flags[0] == TRUE) || ($range_flags['min']==TRUE && $range_flags['min']==TRUE)) && !is_null($min) && $input <= $min){
       $output["error"] = 63;
       $output["value"] = $input;
       $output["message"] = "Out of Range: Must be greater than {$min}.";
@@ -234,7 +234,7 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
       $output["message"] = "Out of Range: Must be at least {$min}.";
       return $output;
     }
-    if (($range_flags[1] || $range_flags['max']) && !is_null($max) && $input >= $max){
+    if (((isset($range_flags[1]) && $range_flags[1] == TRUE) || ($range_flags['max']==TRUE && $range_flags['max']==TRUE)) && !is_null($max) && $input >= $max){
       $output["error"] = 65;
       $output["value"] = $input;
       $output["message"] = "Out of Range: Must be less than {$max}.";
