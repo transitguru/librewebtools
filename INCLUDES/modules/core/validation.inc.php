@@ -82,23 +82,22 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
   }
   elseif ($type=='memo'){
     if ($format=='all'){
-      //Allow almost anything (including scripts)
+      // Allow everything (this is dangerous, unless this is HTML encoded somewhere else)
       
     }
     elseif($format=='noscript'){
-      //Don't allow javascript tags, allow any other tags
-      
+      // Automatically remove script tags and such
+      $input = lwt_validate_descript($html);
     }
     elseif($format=='somehtml'){
-      //Allow a limited set of HTML tags
+      // First, remove script tags and attributes
+      $input = lwt_validate_descript($html);
       
+      // Then get whitelisted tags, convert remaining to spans?
     }
     elseif($format=='nohtml'){
-      //Don't allow any HTML tags
-      
-    }
-    elseif($format=='htmlencode'){
-      //Encode all html entities for preformatting text
+      // Encode all tags to prevent them from being tags?
+      $input = htmlspecialchars($input);
     }
   }
   elseif ($type=='text'){
@@ -139,10 +138,6 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
         $output["message"] = "Invalid: Special characters exist, please only use numbers, letters, hyphens, and underscores.";
         return $output;
       }      
-    }
-    elseif($format=='multiline'){
-      //Allow multiline text
-      
     }
   }
   elseif ($type=='date'){
@@ -275,3 +270,81 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
   return $output;
 }
 
+
+/**
+ * Gets children nodes from a DOM element (used for validation scripts)
+ * 
+ * @param object $node HTML node in question
+ * @param array $elements Array of elements to continue to collect
+ * 
+ * @return array $elements Array of elements that continue to be appended
+ * 
+ */
+function lwt_validate_dom_children($node, $elements){
+  $children = $node->childNodes;
+  if (count($children)>0){
+    foreach ($children as $child){
+      $elements[] = $child;
+      $elements = get_dom_children($child, $elements);
+    }
+  }
+  return $elements;
+}
+
+/**
+ * Removes scripting from HTML input
+ * 
+ * @param string $html String, expected to be an html document
+ * 
+ * @return string $cleaned Clean HTML that should be safe
+ * 
+ */
+function lwt_validate_descript($html){
+  $dom = new DOMDocument;
+  $dom->loadHTML($html);
+  //Delete Script tags
+  $domNodeList = $dom->getElementsByTagName('script');
+  foreach ( $domNodeList as $domElement ) {
+    $domElemsToRemove[] = $domElement;
+  }
+  foreach( $domElemsToRemove as $domElement ){
+    $domElement->parentNode->removeChild($domElement);
+  }
+  
+  //Delete on* events  
+  $events = array(
+    'onload',
+    'onunload',
+    'onclick',
+    'ondblclick',
+    'onmousedown',
+    'onmouseup',
+    'onmouseover',
+    'onmousemove',
+    'onmouseout',
+    'onfocus',
+    'onblur',
+    'onkeypress',
+    'onkeydown',
+    'onkeyup',
+    'onsubmit',
+    'onreset',
+    'onselect',
+    'onchange',  
+  );
+  $elements = array();
+  $elements = lwt_validate_dom_children($dom,$elements);
+  
+  foreach($elements as $element){
+    if (get_class($element) == 'DOMElement'){
+      foreach ($events as $event){
+        $element->removeAttribute($event);
+      }
+    }
+  }
+  
+  $clean = $dom->saveHTML(); 
+  $clean = substr(stristr($clean, '<body>',FALSE),6);
+  $clean = stristr($clean, '</body>',TRUE);
+  return $clean;
+}
