@@ -285,7 +285,7 @@ function lwt_validate_dom_children($node, $elements){
   if (count($children)>0){
     foreach ($children as $child){
       $elements[] = $child;
-      $elements = get_dom_children($child, $elements);
+      $elements = lwt_validate_dom_children($child, $elements);
     }
   }
   return $elements;
