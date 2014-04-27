@@ -302,6 +302,15 @@ function lwt_validate_dom_children($node, $elements){
 function lwt_validate_descript($html){
   $dom = new DOMDocument;
   $dom->loadHTML($html);
+      
+  //Figure out what was added to later remove again!
+  $compare = $dom->saveHTML();
+  $chars = strlen($html);
+  $tchar = strlen($compare);
+  $ltrim = stristr($compare, $html, true);
+  $lchar = strlen($ltrim);
+  $rtrim = substr($compare,$lchar+$chars);
+
   //Delete Script tags
   $domNodeList = $dom->getElementsByTagName('script');
   foreach ( $domNodeList as $domElement ) {
@@ -344,7 +353,8 @@ function lwt_validate_descript($html){
   }
   
   $clean = $dom->saveHTML(); 
-  $clean = substr(stristr($clean, '<body>',FALSE),6);
-  $clean = stristr($clean, '</body>',TRUE);
+  $clean = substr($clean,$lchar);
+  $clean = stristr($clean, $rtrim,TRUE);
+
   return $clean;
 }
