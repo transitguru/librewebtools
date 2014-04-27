@@ -121,8 +121,8 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
     }
     elseif($format=='email'){
       //Email formatting only
-      preg_match('/([\w\-]+\@[\w\-]+\.[\w\-]+)/',$input, $matches);
-      if ($matches[0] != $input){
+      preg_match('/([\w\-\.%+-]+\@[\w\-]+\.[\w\-]+)/',$input, $matches);
+      if (count($matches)==0 || $matches[0] != $input){
         $output["error"] = 43;
         $output["value"] = $input;
         $output["message"] = "Invalid: Not a valid email address.";
@@ -132,7 +132,7 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
     elseif($format=='nowacky'){
       //No special characters
       preg_match('/[\w-]*/', $input, $matches);
-      if ($matches[0] != $input){
+      if (count($matches)==0 || $matches[0] != $input){
         $output["error"] = 44;
         $output["value"] = $input;
         $output["message"] = "Invalid: Special characters exist, please only use numbers, letters, hyphens, and underscores.";
@@ -164,7 +164,7 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
       //Integer Numbers
       $input = str_replace(",","",$input);
       $input = str_replace(" ","",$input);
-      if (!is_numeric($input) && fmod($input,1) != 0){
+      if (!is_numeric($input) || fmod($input,1) != 0){
         $output["error"] = 61;
         $output["value"] = $input;
         $output["message"] = "Invalid: Value is not an integer.";
@@ -217,7 +217,7 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
       $max = $min;
       $min = $temp;
     }
-    if (((isset($range_flags[0]) && $range_flags[0] == TRUE) || ($range_flags['min']==TRUE && $range_flags['min']==TRUE)) && !is_null($min) && $input <= $min){
+    if (((isset($range_flags[0]) && $range_flags[0] == TRUE) || (isset($range_flags['min']) && $range_flags['min']==TRUE)) && !is_null($min) && $input <= $min){
       $output["error"] = 63;
       $output["value"] = $input;
       $output["message"] = "Out of Range: Must be greater than {$min}.";
@@ -229,7 +229,7 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
       $output["message"] = "Out of Range: Must be at least {$min}.";
       return $output;
     }
-    if (((isset($range_flags[1]) && $range_flags[1] == TRUE) || ($range_flags['max']==TRUE && $range_flags['max']==TRUE)) && !is_null($max) && $input >= $max){
+    if (((isset($range_flags[1]) && $range_flags[1] == TRUE) || (isset($range_flags['max']) && $range_flags['max']==TRUE)) && !is_null($max) && $input >= $max){
       $output["error"] = 65;
       $output["value"] = $input;
       $output["message"] = "Out of Range: Must be less than {$max}.";
@@ -244,7 +244,7 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
     
     //Check for step (or autoround)
     if (!is_null($step)){
-      if (($range_flags[2] || $range_flags['step']) && fmod($input - $min , $step) != 0 && $input != $max){
+      if (((isset($range_flags[2]) && $range_flags[2] == TRUE) || (isset($range_flags['step']) && $range_flags['step'] == TRUE)) && fmod($input - $min , $step) != 0 && $input != $max){
         $output["error"] = 67;
         $output["value"] = $input;
         $output["message"] = "Too precise: Be a value from {$min} every {$step}.";
