@@ -141,13 +141,13 @@ function lwt_database_fetch_raw($database, $query, $id=NULL){
  * @param array $inputs Associative array of Inputs
  * @param array $where Associative array of WHERE clause
  * 
- * @return boolean Success or Failure
+ * @return array $status error number, message, and insert id
  */
 
 function lwt_database_write($database, $table, $inputs, $where = NULL){
   $creds = lwt_database_get_credentials($database);
   if (!$creds){
-    $status['error'] = TRUE;
+    $status['error'] = 9990;
     $status['message'] = '<span class="error">Bad database settings</span>';
     return $status;
   }
@@ -172,7 +172,7 @@ function lwt_database_write($database, $table, $inputs, $where = NULL){
         $fields[] = $field;
       }
       else{
-        $status['error'] = TRUE;
+        $status['error'] = 9999;
         $status['message'] = '<span class="error">Bad input settings</span>';
         return $status;
       }
@@ -183,11 +183,11 @@ function lwt_database_write($database, $table, $inputs, $where = NULL){
       $sql = "INSERT INTO `$table` (`$field_string`) VALUES ($value_string)";
       $conn->real_query($sql);
       if ($conn->errno > 0){
-        $status['error'] = TRUE;
+        $status['error'] = $conn->errno;
         $status['message'] = '<span class="error">Error: '. $conn->errno . '</span>';
       }
       else{
-        $status['error'] = FALSE;
+        $status['error'] = 0;
         $status['message'] = '<span class="success">Records successfully written</span>';
       }
     }
@@ -208,7 +208,7 @@ function lwt_database_write($database, $table, $inputs, $where = NULL){
           $value = 'NULL';
         }
         else{
-          $status['error'] = TRUE;
+          $status['error'] = 9999;
           $status['message'] = '<span class="error">Bad input settings</span>';
           return $status;
         }
@@ -217,11 +217,11 @@ function lwt_database_write($database, $table, $inputs, $where = NULL){
       $sql = "UPDATE `$table` SET " . implode(" , ",$queries) . " WHERE " . implode(" AND ", $wheres);
       $conn->real_query($sql);
       if ($conn->errno > 0){
-        $status['error'] = TRUE;
+        $status['error'] = $conn->errno;
         $status['message'] = '<span class="error">Error: '. $conn->errno . '</span>';
       }
       else{
-        $status['error'] = FALSE;
+        $status['error'] = 0;
         $status['message'] = '<span class="success">Records successfully written</span>';
       }
     }
@@ -237,13 +237,13 @@ function lwt_database_write($database, $table, $inputs, $where = NULL){
  * @param string $database Database name
  * @param string $sql Raw SQL Query
  * 
- * @return boolean Success or Failure
+ * @return array $status error number, message, and insert id
  */
 
 function lwt_database_write_raw($database, $sql){
   $creds = lwt_database_get_credentials($database);
   if (!$creds){
-    $status['error'] = TRUE;
+    $status['error'] = 9990;
     $status['message'] = '<span class="error">Bad database settings</span>';
     return $status;
   }
@@ -253,11 +253,11 @@ function lwt_database_write_raw($database, $sql){
     $conn = new mysqli('localhost', $user, $pass, $database);
     $conn->real_query($sql);
     if ($conn->errno > 0){
-      $status['error'] = TRUE;
+      $status['error'] = $conn->errno;
       $status['message'] = '<span class="error">Error: '. $conn->errno . '</span>';
     }
     else{
-      $status['error'] = FALSE;
+      $status['error'] = 0;
       $status['message'] = '<span class="success">Records successfully written</span>';
     }
     $status['insert_id'] = $conn->insert_id;

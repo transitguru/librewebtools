@@ -251,7 +251,7 @@ function lwt_render_wrapper($request){
 <?php lwt_render_css(); ?>
     
     <!-- Scripts -->
-    <script src="/js/core.js"></script>
+    <script type="text/javascript" src="/js/core.js"></script>
         
   </head>
   <body>

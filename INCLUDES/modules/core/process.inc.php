@@ -40,7 +40,7 @@ function lwt_process_authentication(){
       exit;
     }
     else{
-      header("Location: /login/");
+      header("Location: " . APP_ROOT);
       exit;
     }
   }
