@@ -111,6 +111,7 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
       }
     }
     elseif($format=='oneline'){
+      $input = lwt_validate_descript($html);
       //Allow only one line text, do not allow CR or LF
       if(fnmatch("*\r*",$input) || fnmatch("*\n*",$input)){
         $output["error"] = 42;
@@ -247,7 +248,7 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
       if (((isset($range_flags[2]) && $range_flags[2] == TRUE) || (isset($range_flags['step']) && $range_flags['step'] == TRUE)) && fmod($input - $min , $step) != 0 && $input != $max){
         $output["error"] = 67;
         $output["value"] = $input;
-        $output["message"] = "Too precise: Be a value from {$min} every {$step}.";
+        $output["message"] = "Too precise: Must be a value from {$min} every {$step}.";
         return $output;
       }
       elseif(fmod($input - $min , $step) != 0 && $input != $max){
@@ -313,11 +314,13 @@ function lwt_validate_descript($html){
 
   //Delete Script tags
   $domNodeList = $dom->getElementsByTagName('script');
-  foreach ( $domNodeList as $domElement ) {
-    $domElemsToRemove[] = $domElement;
-  }
-  foreach( $domElemsToRemove as $domElement ){
-    $domElement->parentNode->removeChild($domElement);
+  if (count($domNodeList)>0){
+    foreach ( $domNodeList as $domElement ) {
+      $domElemsToRemove[] = $domElement;
+    }
+    foreach( $domElemsToRemove as $domElement ){
+      $domElement->parentNode->removeChild($domElement);
+    }
   }
   
   //Delete on* events  
