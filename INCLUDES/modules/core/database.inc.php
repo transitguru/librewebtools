@@ -17,8 +17,10 @@
 function lwt_database_get_credentials($database){
   $creds = array();
   if ($database == DB_NAME){
+    $creds['host'] = DB_HOST;
     $creds['user'] = DB_USER;
     $creds['pass'] = DB_PASS;
+    $creds['port'] = DB_PORT;
   }
   else{
     // Eventually grab other db creds from the main database!
@@ -44,9 +46,7 @@ function lwt_database_get_credentials($database){
 function lwt_database_fetch_simple($database, $table, $fields=NULL,  $where=NULL, $groupby=NULL, $sortby=NULL, $id=NULL){
   $db_login = lwt_database_get_credentials($database);
   if ($db_login){
-    $user = $db_login['user'];
-    $pass = $db_login['pass'];
-    $conn = new mysqli('localhost', $user, $pass, $database);
+    $conn = new mysqli($db_login['host'], $db_login['user'], $db_login['pass'], $database, $db_login['port']);
     if (!is_array($fields)){
       $field_string = '*';
     }
@@ -59,7 +59,12 @@ function lwt_database_fetch_simple($database, $table, $fields=NULL,  $where=NULL
     else{
       $where_elements = array();
       foreach ($where as $key => $value){
-        $where_elements[] = "`$key`='$value'";
+        if (is_null($value)){
+          $where_elements[] = "`$key` IS NULL";
+        }
+        else{
+          $where_elements[] = "`$key`='$value'";
+        }
       }
       $where_string = "WHERE " . implode(' AND ', $where_elements);
     }
@@ -109,9 +114,7 @@ function lwt_database_fetch_simple($database, $table, $fields=NULL,  $where=NULL
 function lwt_database_fetch_raw($database, $query, $id=NULL){
   $db_login = lwt_database_get_credentials($database);
   if ($db_login){
-    $user = $db_login['user'];
-    $pass = $db_login['pass'];
-    $conn = new mysqli('localhost', $user, $pass, $database);
+    $conn = new mysqli($db_login['host'], $db_login['user'], $db_login['pass'], $database, $db_login['port']);
     $conn->real_query($query);
     $result = $conn->use_result();
     $output = array();
@@ -145,16 +148,14 @@ function lwt_database_fetch_raw($database, $query, $id=NULL){
  */
 
 function lwt_database_write($database, $table, $inputs, $where = NULL){
-  $creds = lwt_database_get_credentials($database);
-  if (!$creds){
+  $db_login = lwt_database_get_credentials($database);
+  if (!$db_login){
     $status['error'] = 9990;
     $status['message'] = '<span class="error">Bad database settings</span>';
     return $status;
   }
   else{
-    $user = $creds['user'];
-    $pass = $creds['pass'];
-    $conn = new mysqli('localhost', $user, $pass, $database);
+    $conn = new mysqli($db_login['host'], $db_login['user'], $db_login['pass'], $database, $db_login['port']);
     $fields = array();
     $values = array();
     foreach ($inputs as $field => $value){
@@ -226,6 +227,7 @@ function lwt_database_write($database, $table, $inputs, $where = NULL){
       }
     }
     $status['insert_id'] = $conn->insert_id;
+    $status['affected_rows'] = $conn->affected_rows;
     $conn->close();
     return $status;
   }
@@ -241,16 +243,14 @@ function lwt_database_write($database, $table, $inputs, $where = NULL){
  */
 
 function lwt_database_write_raw($database, $sql){
-  $creds = lwt_database_get_credentials($database);
-  if (!$creds){
+  $db_login = lwt_database_get_credentials($database);
+  if (!$db_login){
     $status['error'] = 9990;
     $status['message'] = '<span class="error">Bad database settings</span>';
     return $status;
   }
   else{
-    $user = $creds['user'];
-    $pass = $creds['pass'];
-    $conn = new mysqli('localhost', $user, $pass, $database);
+    $conn = new mysqli($db_login['host'], $db_login['user'], $db_login['pass'], $database, $db_login['port']);
     $conn->real_query($sql);
     if ($conn->errno > 0){
       $status['error'] = $conn->errno;
@@ -261,6 +261,7 @@ function lwt_database_write_raw($database, $sql){
       $status['message'] = '<span class="success">Records successfully written</span>';
     }
     $status['insert_id'] = $conn->insert_id;
+    $status['affected_rows'] = $conn->affected_rows;
     $conn->close();
     return $status;
   }
