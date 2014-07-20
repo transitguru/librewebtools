@@ -6,6 +6,11 @@
   GitHub: transitguru
   Location: Pittsburgh, PA
 
+  Developer & Quality Control: Matthew Grasinger
+  Email: grasingerm@gmail.com                        
+  Twitter: @grasingerm 
+  Location: Pittsburgh, PA
+
 /* SITE */
   Doctype: HTML5
   IDE: Geany
