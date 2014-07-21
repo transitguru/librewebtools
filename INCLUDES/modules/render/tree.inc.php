@@ -130,7 +130,7 @@ function lwt_admin_render_contentradio($parent_id, $selected, $children){
       if ($content['content_id']>0){
         $info = lwt_database_fetch_simple(DB_NAME, 'content', array('id','title'), array('id' => $content['content_id']));
 ?>
-    <li><input type="radio" id="content_<?php echo $info[0]['id']; ?>" name="content[parent_id]" value="<?php echo $info[0]['id']; ?>" <?php if($info[0]['id'] == $selected){echo 'checked';} ?> <?php if(in_array($info[0]['id'], $children)){echo 'disabled';} ?> /><span class="hand<?php if(in_array($info[0]['id'], $children)){echo ' disabled';} ?>" onclick="document.getElementById('content_<?php echo $info[0]['id'];?>').click();" ><?php echo $content['url_code'];?>/ <?php echo $info[0]['name'];?></span>
+    <li><input type="radio" id="content_<?php echo $info[0]['id']; ?>" name="content[parent_id]" value="<?php echo $info[0]['id']; ?>" <?php if($info[0]['id'] == $selected){echo 'checked';} ?> <?php if(in_array($info[0]['id'], $children)){echo 'disabled';} ?> /><span class="hand<?php if(in_array($info[0]['id'], $children) || $content['app_root'] == 1){echo ' disabled';} ?>" onclick="document.getElementById('content_<?php echo $info[0]['id'];?>').click();" ><?php echo $content['url_code'];?>/ <?php echo $info[0]['name'];?></span>
 <?php
         lwt_admin_render_contentradio($info[0]['id'], $selected, $children);
       }
