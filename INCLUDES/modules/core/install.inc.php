@@ -148,7 +148,7 @@ function lwt_install($request){
 }
 
 function lwt_install_schemas(){
-  $file = $_SERVER['DOCUMENT_ROOT'] . '/INCLUDES/sql/schema.sql';
+  $file = $_SERVER['DOCUMENT_ROOT'] . '/includes/sql/schema.sql';
   $pw = str_replace("'", "\\'", str_replace("\\", "\\\\", DB_PASS));
   $db = str_replace("'", "\\'", str_replace("\\", "\\\\", DB_NAME));
   $us = str_replace("'", "\\'", str_replace("\\", "\\\\", DB_USER));

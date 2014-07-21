@@ -12,12 +12,9 @@
  * @todo use settings module to ensure modules are turned on or off
  */
 
-$begin = microtime(TRUE);
-$debug = FALSE;
-
 
 // Load all core modules
-$PATH = $_SERVER['DOCUMENT_ROOT'] . '/INCLUDES/modules';
+$PATH = $_SERVER['DOCUMENT_ROOT'] . '/includes/modules';
 $modules = scandir($PATH);
 foreach ($modules as $module){
   if (is_dir($PATH . '/' . $module) && $module != '.' && $module != '..'){
@@ -31,7 +28,7 @@ foreach ($modules as $module){
 }
 
 // Load other "vendor Modules
-$PATH = $_SERVER['DOCUMENT_ROOT'] . '/INCLUDES/contrib';
+$PATH = $_SERVER['DOCUMENT_ROOT'] . '/includes/contrib';
 $modules = scandir($PATH);
 foreach ($modules as $module){
   if (is_dir($PATH . '/' . $module) && $module != '.' && $module != '..'){
@@ -58,12 +55,4 @@ $request = lwt_auth_session_gatekeeper($request, $maintenance);
 
 // Process Page
 $success = lwt_render_wrapper($request); /**< Returns true if function completes! */
-
-
-if ($debug){
-  lwt_test_array_print($_SESSION); 
-  
-  $end = microtime(TRUE);
-  lwt_test_showtime($begin, $end);
-}
 
