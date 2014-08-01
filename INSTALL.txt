@@ -3,45 +3,19 @@ INSTALLING LibreWebTools
 
 Here are a few simple steps for installing LibreWebTools
 
- 0. Please note that these instructions are subject to change as this toolset
-    is the result of about 12 hours of work combining code from various
-    projects and making them into a toolset. See the RELEASE.txt file for 
-    release notes.
-    
- 1. In the examples, I am assuming your webroot is /var/www/librewebtools/, so 
+ 0. In the examples, I am assuming your webroot is /var/www/librewebtools/, so 
     make sure to replace this with the actual webroot where you install your
     files. All paths are relative to the webroot. I am also assuming that you
     set up your apache virtual hosts using the file in examples/apache.conf 
     (which is a very basic set-up, but make sure have AllowOverride All enabled
     for your directory as this site relies on .htaccess files.
     
- 2. Edit the file in INCLUDES/sql/database.sql to your specifications, 
-    especially paying attention to changing the password. DO NOT USE the default
-    password on a production system!
+ 1. Edit your includes/modules/core/settings.inc.php to your desired database
+    user and password settings. Make sure you use a different password than the
+    one given in the default file.
     
- 3. Change directory to your webroot, then type the following commands in your
-    commandline (assuming you keep database name as librewebtools),
-    
-    cd /var/www/librewebtools/INCLUDES/sql
-    mysql -u root -p < database.sql
-    
- 4. Type the following commands in your command line, replacing 'librewebtools'
-    with the database name that you entered in line 14 in database.sql
-    
-    cd /var/www/librewebtools/INCLUDES/sql
-    mysql -u root -p librewebtools < schema.sql
-    mysql -u root -p librewebtools < content.sql
-    
- 5. Replace values in INCLUDES/modules/core/settings.inc.php to match the
-    changes made in INCLUDES/sql/database.sql
-    
- 6. Change file permissions to the FILES directory to ensure the application
-    will be able to add files and folders
-    
-    cd /var/www/librewebtools/
-    sudo chown www-data FILES
-    
- 7. Visit your website and log in as the username admin with password Admin. 
-    Make sure to go to Account > Reset Password and change your password. Once 
-    that is set up, you are on your way to using the site.
-  
+ 2. Navigate to your website using your web browser. It will do a few checks
+    and it is determined that the database is not installed, a form will appear
+    to collect basic information to build your database based on the 
+    instructions in the includes/modules/core/settings.inc.php and your form
+    data regarding the administrative website user.
