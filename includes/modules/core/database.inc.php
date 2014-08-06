@@ -266,3 +266,38 @@ function lwt_database_write_raw($database, $sql){
     return $status;
   }
 }
+
+/**
+ *
+ * @param string $database Database name
+ * @param string $sql Raw multi-statement SQL Query
+ *
+ * @return array $status error number and message
+ */
+
+function lwt_database_multiquery($database, $sql){
+  $db_login = lwt_database_get_credentials($database);
+   if (!$db_login){
+    $status['error'] = 9990;
+    $status['message'] = '<span class="error">Bad database settings</span>';
+    return $status;
+  }
+  else{
+    $conn = new mysqli($db_login['host'], $db_login['user'], $db_login['pass'], $database, $db_login['port']);
+    $conn->multi_query($sql);
+    if ($conn->errno > 0){
+      $status['error'] = $conn->errno;
+      $status['message'] = '<span class="error">Error: '. $conn->errno . '</span>';
+    }
+    else{
+      $status['error'] = 0;
+      $status['message'] = '<span class="success">Multi-Query done successfully</span>';
+    }
+    while ($conn->next_result()){
+      // Flush the multi queries to prevent issues  
+    }
+    $conn->close();
+    
+    return $status;
+  }
+}
