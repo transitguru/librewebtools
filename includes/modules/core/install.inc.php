@@ -134,7 +134,7 @@ function lwt_install($request){
     <title>Install LibreWebTools</title>
   </head>
   <body>
-    <p>The site appears to not be installed, Please fill out the fields below to begin installing the LibreWebTools. Before you do so, make sure to adjust the site's <strong>/includes/functions/settings.inc.php</strong> file to your desired settings.</p>
+    <p>The site appears to not be installed, Please fill out the fields below to begin installing the LibreWebTools. Before you do so, make sure to adjust the site's <strong>/includes/modules/core/settings.inc.php</strong> file to your desired settings.</p>
     <form action="" method="post" >
       <table>
         <tr><td><label for="db[root_user]">DB Root User</label></td><td><input type="text" name="db[root_user]" /></td></tr>
