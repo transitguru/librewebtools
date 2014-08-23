@@ -4,7 +4,7 @@
  * @file
  * @author Michael Sypolt <msypolt@transitguru.info>
  * 
- * Provides template structure and css rendering functions
+ * Provides template structure and css rendering
  */
 
 /**

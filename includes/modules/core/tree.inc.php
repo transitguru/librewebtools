@@ -4,7 +4,7 @@
  * @file
  * @author Michael Sypolt <msypolt@transitguru.info>
  * 
- * Functions that recursively render trees of some sort
+ * Recursively render trees of some sort
  */
 
 /**
@@ -182,7 +182,7 @@ function lwt_admin_render_contentlinks($parent_id){
  * Renders a file tree
  * 
  * @param string $path Path to files
- * @param boolean $recursive If true, the function would recurse into directories
+ * @param boolean $recursive If true, this would recurse into directories
  * 
  * @return void
  */

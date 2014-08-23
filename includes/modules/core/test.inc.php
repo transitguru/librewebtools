@@ -8,7 +8,7 @@
  */
 
 /**
- * Prints and array into expandable links using the JS function toggle_hide()
+ * Prints and array into expandable links using the JS toggle_hide()
  * 
  * @param array $array Array to be printed
  * @param string $prefix ID prefix to prevent multiple test prints from breaking

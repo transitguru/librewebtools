@@ -4,7 +4,7 @@
  * @file
  * @author Michael Sypolt <msypolt@transiguru.info>
  * 
- * Form validation functions are in this script
+ * Form validation 
  */
 
 /**

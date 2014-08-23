@@ -4,7 +4,7 @@
  * @file
  * @author Michael Sypolt <msypolt@transitguru.info>
  * 
- * Functions for processing requests and finding the right page
+ * Processing requests and finding the right page
  * 
  * @todo put the lookup information into the core database
  */

@@ -4,7 +4,7 @@
  * @file
  * @author Michael Sypolt <msypolt@transitguru.info>
  * 
- * Provides database read and write functions
+ * Provides database read and writes
  */
 
 /**
@@ -103,7 +103,7 @@ function lwt_database_fetch_simple($database, $table, $fields=NULL,  $where=NULL
 }
 
 /**
- * Raw Database fetch function, creating an array of table data
+ * Raw Database fetch: creating an array of table data
  * 
  * @param string $database Database where info is coming from
  * @param string $query raw query to send to the database
@@ -137,7 +137,7 @@ function lwt_database_fetch_raw($database, $query, $id=NULL){
 }
 
 /**
- * Simple database Write function
+ * Simple database Write
  * 
  * @param string $database Database name
  * @param string $table Table name
@@ -234,7 +234,7 @@ function lwt_database_write($database, $table, $inputs, $where = NULL){
 }
 
 /**
- * Raw database Write function
+ * Raw database Write
  * 
  * @param string $database Database name
  * @param string $sql Raw SQL Query

@@ -4,10 +4,9 @@
  * @file
  * @author Michael Sypolt <msypolt@transitguru.info>
  * 
- * Functions to check for installation in the databases, and installs them
+ * Checks for installation in the databases, and installs them
  * if user accepts
  * 
- * @todo create these functions and databases
  * 
  */
 
@@ -112,7 +111,7 @@ function lwt_install($request){
             echo 'Error creating database';
           }
           else{
-            // Install the databases using the database functions
+            // Install the databases using the database.inc.php
             $status = lwt_install_database();
             if ($status == 0){
               header("Location: /");

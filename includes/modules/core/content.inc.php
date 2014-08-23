@@ -369,7 +369,7 @@ $info = lwt_database_fetch_simple(DB_NAME, 'content', array('id','title'), array
       }
     }
     
-    //exit if this was not a wrapper function
+    //exit if this was not a "wrapper"
     if (!$wrapper){
       exit;
     }

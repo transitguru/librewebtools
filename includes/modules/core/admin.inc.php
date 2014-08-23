@@ -487,7 +487,7 @@ $info = lwt_database_fetch_simple(DB_NAME, 'groups', NULL, array('id' => 0));
       }
     }
     
-    //exit if this was not a wrapper function
+    //exit if this was not a "wrapper"
     if (!$wrapper){
       exit;
     }
