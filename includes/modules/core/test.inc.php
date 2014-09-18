@@ -286,9 +286,6 @@ function lwt_test_runvalidation(){
     echo $result['message'] . "\n";
     $error += $result['error'];
   }
-  echo "Tests ran with {$error}/{$num} errors.\n";
-  
-  
-
-  
+  echo "Tests ran with {$error}/{$num} errors.\n";  
 }
+

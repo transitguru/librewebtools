@@ -16,12 +16,11 @@
  * 
  * @return Request URI if no install needed
  */
- 
 function lwt_install($request){
   $install = FALSE;
   
   // Check to see if lwt can log in
-  $creds = lwt_database_get_credentials(DB_NAME);
+  $creds = lwt_db_creds(DB_NAME);
   $conn = mysqli_connect('localhost', $creds['user'], $creds['pass'], DB_NAME, DB_PORT);
   if (!$conn){
     $install = TRUE;
@@ -29,11 +28,11 @@ function lwt_install($request){
   
   // Check for existence of admin user password or homepate
   if (!$install){
-    $users = lwt_database_fetch_simple(DB_NAME, 'passwords', NULL, array('user_id' => 1));
+    $users = lwt_db_fetch(DB_NAME, 'passwords', NULL, array('user_id' => 1));
     if (count($users) == 0){
       $install = TRUE;
     }
-    $content = lwt_database_fetch_simple(DB_NAME, 'content', NULL, array('id' => 0));
+    $content = lwt_db_fetch(DB_NAME, 'content', NULL, array('id' => 0));
     if (count($content) == 0){
       $install = TRUE;
     }
@@ -112,7 +111,7 @@ function lwt_install($request){
           }
           else{
             // Install the databases using the database.inc.php
-            $status = lwt_install_database();
+            $status = lwt_install_db();
             if ($status == 0){
               header("Location: /");
             }
@@ -154,27 +153,33 @@ function lwt_install($request){
   return $request;
 }
 
-function lwt_install_database(){
+/**
+ * Installs the Database for the LWT
+ *
+ * @return int error
+ *
+ */
+function lwt_install_db(){
   $file = $_SERVER['DOCUMENT_ROOT'] . '/includes/sql/schema.sql';
   $sql = file_get_contents($file);
   
-  $status = lwt_database_multiquery(DB_NAME, $sql);
+  $status = lwt_db_multiquery(DB_NAME, $sql);
 
   if ($status['error'] != 0){
     return $status['error'];
   }
   echo "<pre>";
   //Create the group that is "root" (typically no users get assigned this group except the admin)
-  $status = lwt_database_write_raw(DB_NAME, "INSERT INTO `groups` (`name`) VALUES ('Everyone')");
+  $status = lwt_db_write_raw(DB_NAME, "INSERT INTO `groups` (`name`) VALUES ('Everyone')");
   echo $status['error'] . "\n";
-  $status = lwt_database_write_raw(DB_NAME, "UPDATE `groups` SET `id`=0");
+  $status = lwt_db_write_raw(DB_NAME, "UPDATE `groups` SET `id`=0");
   echo $status['error'] . "\n";
-  $status = lwt_database_write_raw(DB_NAME, "ALTER TABLE `groups` AUTO_INCREMENT=1");
+  $status = lwt_db_write_raw(DB_NAME, "ALTER TABLE `groups` AUTO_INCREMENT=1");
   echo $status['error'] . "\n";
   
   //Add groups starting back at ID 1
   $sql = "INSERT INTO `groups` (`name`) VALUES ('Unauthenticated'), ('Authenticated'), ('Internal'), ('External')";
-  $status = lwt_database_write_raw(DB_NAME, $sql);  
+  $status = lwt_db_write_raw(DB_NAME, $sql);  
   echo $status['error'] . "\n";
   
   // Set group hierarchy
@@ -184,22 +189,22 @@ function lwt_install_database(){
   ((SELECT `id` FROM `groups` WHERE `name`='Everyone'), (SELECT `id` FROM `groups` WHERE `name`='Authenticated')), 
   ((SELECT `id` FROM `groups` WHERE `name`='Authenticated'), (SELECT `id` FROM `groups` WHERE `name`='Internal')),
   ((SELECT `id` FROM `groups` WHERE `name`='Authenticated'), (SELECT `id` FROM `groups` WHERE `name`='External'))";
-  $status = lwt_database_write_raw(DB_NAME, $sql);
+  $status = lwt_db_write_raw(DB_NAME, $sql);
   echo $status['error'] . "\n";
   
   // Create the "unauthenticated" role (noone is associated to this role!)
-  $status = lwt_database_write_raw(DB_NAME, "INSERT INTO `roles` (`name`, `desc`) VALUES ('Unauthenticated User', 'Non-logged in user')");
+  $status = lwt_db_write_raw(DB_NAME, "INSERT INTO `roles` (`name`, `desc`) VALUES ('Unauthenticated User', 'Non-logged in user')");
   echo $status['error'] . "\n";
-  $status = lwt_database_write_raw(DB_NAME, "UPDATE `roles` SET `id`=0");
+  $status = lwt_db_write_raw(DB_NAME, "UPDATE `roles` SET `id`=0");
   echo $status['error'] . "\n";
-  $status = lwt_database_write_raw(DB_NAME, "ALTER TABLE `roles` AUTO_INCREMENT=1");
+  $status = lwt_db_write_raw(DB_NAME, "ALTER TABLE `roles` AUTO_INCREMENT=1");
   echo $status['error'] . "\n";
   
   // Create the Administrator role (always set it to an ID of one) and the Authenticated User
   $sql = "INSERT INTO `roles` (`name`, `desc`) VALUES 
   ('Administrator','Administers website'),
   ('Authenticated User', 'Basic user')";
-  $status = lwt_database_write_raw(DB_NAME, $sql);
+  $status = lwt_db_write_raw(DB_NAME, $sql);
   echo $status['error'] . "\n";
   
   // Add the Admin User
@@ -210,36 +215,36 @@ function lwt_install_database(){
     'email' => $_POST['db']['admin_email'],
     'desc' =>  'Site Administrator',
   );
-  $status = lwt_database_write(DB_NAME, 'users', $inputs);
+  $status = lwt_db_write(DB_NAME, 'users', $inputs);
   echo $status['error'] . "\n";
-  $status = lwt_database_write(DB_NAME, 'user_roles', array('role_id' => 1, 'user_id' => 1));
+  $status = lwt_db_write(DB_NAME, 'user_roles', array('role_id' => 1, 'user_id' => 1));
   echo $status['error'] . "\n";
-  $status = lwt_database_write(DB_NAME, 'user_groups', array('group_id' => 0, 'user_id' => 1));
+  $status = lwt_db_write(DB_NAME, 'user_groups', array('group_id' => 0, 'user_id' => 1));
   echo $status['error'] . "\n";
-  $status = lwt_auth_session_setpassword(1, $_POST['db']['admin_pass']);
+  $status = lwt_auth_setpassword(1, $_POST['db']['admin_pass']);
   echo $status['error'] . "\n";
 
   // Add root homepage at id=0
-  $status = lwt_database_write_raw(DB_NAME, "INSERT INTO `content` (`title`,`content`) VALUES ('Home','<p>LibreWebTools is a lightweight content management and web-application development framework. It is currently under development and you may find some breakage. Feel free to go to the <a href=\"https://github.com/transitguru/librewebtools\">GitHub</a> for the source code and instructions on how to set this up.</p>')");
+  $status = lwt_db_write_raw(DB_NAME, "INSERT INTO `content` (`title`,`content`) VALUES ('Home','<p>LibreWebTools is a lightweight content management and web-application development framework. It is currently under development and you may find some breakage. Feel free to go to the <a href=\"https://github.com/transitguru/librewebtools\">GitHub</a> for the source code and instructions on how to set this up.</p>')");
   echo $status['error'] . "\n";
-  $status = lwt_database_write_raw(DB_NAME, "UPDATE `content` SET `id`=0");
+  $status = lwt_db_write_raw(DB_NAME, "UPDATE `content` SET `id`=0");
   echo $status['error'] . "\n";
-  $status = lwt_database_write_raw(DB_NAME, "ALTER TABLE `content` AUTO_INCREMENT=1");
+  $status = lwt_db_write_raw(DB_NAME, "ALTER TABLE `content` AUTO_INCREMENT=1");
   echo $status['error'] . "\n";
   
   // Add required content for site to run
   $sql = "INSERT INTO `content` (`title`,`preprocess_call`,`function_call`,`content`) VALUES
-  ('Login','lwt_process_authentication', 'lwt_render_login',NULL),
+  ('Login','lwt_auth_authentication', 'lwt_render_login',NULL),
   ('File Download','lwt_process_download', 'lwt_render_404',NULL),
-  ('Logout','lwt_process_logout', NULL, NULL),
-  ('Profile',NULL, 'lwt_render_profile', NULL),
-  ('Reset Password',NULL, 'lwt_render_password', NULL),
-  ('Forgot Password',NULL, 'lwt_render_forgot', NULL),
+  ('Logout','lwt_auth_logout', NULL, NULL),
+  ('Profile',NULL, 'lwt_auth_profile', NULL),
+  ('Reset Password',NULL, 'lwt_auth_password', NULL),
+  ('Forgot Password',NULL, 'lwt_auth_forgot', NULL),
   ('Manage Users','lwt_ajax_admin_users', 'lwt_render_admin_users', NULL),
   ('Manage Content','lwt_ajax_admin_content', 'lwt_render_admin_content', NULL),
   ('Register',NULL, NULL, '<p>User self-registration is currently not enabled</p>'),
   ('Test Page',NULL,NULL,'<p>This is a Test Page<br />Making sure it shows up</p>')";
-  $status = lwt_database_write_raw(DB_NAME, $sql);
+  $status = lwt_db_write_raw(DB_NAME, $sql);
   echo $status['error'] . "\n";
   
   // Place pages into correct hierarcy
@@ -255,7 +260,7 @@ function lwt_install_database(){
   (0, (SELECT `id` FROM `content` WHERE `title`='Manage Content'), 'content',1),
   (0, (SELECT `id` FROM `content` WHERE `title`='Register'), 'register',1),
   (0, (SELECT `id` FROM `content` WHERE `title`='Forgot Password'), 'forgot',1)";
-  $status = lwt_database_write_raw(DB_NAME, $sql);
+  $status = lwt_db_write_raw(DB_NAME, $sql);
   echo $status['error'] . "\n";
   
   // Apply permissions
@@ -269,14 +274,14 @@ function lwt_install_database(){
   ((SELECT `id` FROM `content` WHERE `title`='Test Page'), (SELECT `id` FROM `groups` WHERE `name`='Internal')),
   ((SELECT `id` FROM `content` WHERE `title`='Profile'), (SELECT `id` FROM `groups` WHERE `name`='Internal')),
   ((SELECT `id` FROM `content` WHERE `title`='Reset Password'), (SELECT `id` FROM `groups` WHERE `name`='Internal'))";
-  $status = lwt_database_write_raw(DB_NAME, $sql);
+  $status = lwt_db_write_raw(DB_NAME, $sql);
   echo $status['error'] . "\n";
   
   // Limit admin to certain areas
   $sql = "INSERT INTO `role_access` (`content_id`, `role_id`) VALUES
   ((SELECT `id` FROM `content` WHERE `title`='Manage Users'),(SELECT `id` FROM `roles` WHERE `name`='Administrator')),
   ((SELECT `id` FROM `content` WHERE `title`='Manage Content'),(SELECT `id` FROM `roles` WHERE `name`='Administrator'))";
-  $status = lwt_database_write_raw(DB_NAME, $sql);
+  $status = lwt_db_write_raw(DB_NAME, $sql);
   echo $status['error'] . "\n";
   
   echo "</pre>";

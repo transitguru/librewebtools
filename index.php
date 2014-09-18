@@ -27,7 +27,7 @@ foreach ($modules as $module){
   }
 }
 
-// Load other "vendor Modules
+// Load other Modules
 $PATH = $_SERVER['DOCUMENT_ROOT'] . '/includes/contrib';
 $modules = scandir($PATH);
 foreach ($modules as $module){
@@ -42,7 +42,7 @@ foreach ($modules as $module){
 }
 
 // Load settings so that database can connect
-lwt_settings_load();
+lwt_settings();
 
 $request = $_SERVER['REQUEST_URI']; /**< Request URI from user */
 
@@ -51,7 +51,7 @@ lwt_install($request);
 
 
 $maintenance = FALSE; /**< Set maintenance mode */
-$request = lwt_auth_session_gatekeeper($request, $maintenance);
+$request = lwt_auth_gatekeeper($request, $maintenance);
 
 // Process Page
 $success = lwt_render_wrapper($request); /**< Returns true if function completes! */

@@ -127,8 +127,7 @@ CREATE TABLE IF NOT EXISTS `passwords` (
   `expire_date` DATETIME NULL ,
   `reset` TINYINT NOT NULL DEFAULT 0,
   `reset_code` VARCHAR(255) NULL ,
-  `hash` VARCHAR(255) NOT NULL ,
-  `key` VARCHAR(255) NOT NULL ,
+  `hashed` VARCHAR(255) NOT NULL ,
   PRIMARY KEY (`user_id`, `valid_date`) ,
   FOREIGN KEY (`user_id` )
     REFERENCES `users` (`id` )

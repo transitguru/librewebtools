@@ -38,9 +38,8 @@
  * @param array $range Optional: [0] or ['min'], [1] or ['max'], [2] or ['step']  (only when $type=='num' and $format=='int' or $format=='dec')
  * $param array $range_flags Optional: [0] or ['min'], [1] or ['max'], [2] or ['step'] (booleans set to true if not including the end value or turn off autorounding for [2] || ['step'])
  * 
- * @return array Output result: ['success'] boolean true if good, ['value'] sanitized value, ['message'] error message 
+ * @return array Output result: ['error'] int error code (0 is good), ['value'] sanitized value, ['message'] error message 
  */
-
 function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NULL, $notrim=false, $range=array(null, null, null), $range_flags=array(false, false, false)){
   //handle trimming
   if (!$notrim){
@@ -361,3 +360,4 @@ function lwt_validate_descript($html){
 
   return $clean;
 }
+

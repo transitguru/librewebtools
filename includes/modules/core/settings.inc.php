@@ -7,7 +7,12 @@
  * Provides the minimal necessary site settings
  */
 
-function lwt_settings_load(){
+/**
+ * Sets up global constants for site settings
+ *
+ *
+ */
+function lwt_settings(){
   define('DB_HOST', 'localhost');     /**< The host for the database connection */
   define('DB_NAME', 'librewebtools'); /**< The database name for the application's data */
   define('DB_USER', 'lwt');           /**< The username for the application's database user */
@@ -16,4 +21,3 @@ function lwt_settings_load(){
   return TRUE;
 }
 
-  

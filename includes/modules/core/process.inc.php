@@ -10,60 +10,6 @@
  */
 
 /**
- * Processes Login on login page (must be tied to a content item in the database)
- * 
- * @return void
- * 
- */
-
-function lwt_process_authentication(){
-  if (isset($_SESSION['redirect']) && $_SESSION['redirect'] != ''){
-    $redirect = $_SESSION['redirect'];
-  }
-  elseif (!isset($_SESSION['requested_page']) || $_SESSION['requested_page'] == APP_ROOT){
-    $redirect = "/";
-  }
-  else{
-    $redirect = $_SESSION['requested_page'];
-  }
-  if (isset($_POST['login']) && $_POST['login'] == 'Log In') {
-     // strip whitespace from user input
-    $username = trim($_POST['username']);
-    $password = trim($_POST['pwd']);
-
-    // authenticate user
-    $success = lwt_auth_authenticate_user($username, $password);
-    if ($success){
-      session_regenerate_id();
-      unset($_SESSION['redirect']);
-      header("Location: {$redirect}");
-      exit;
-    }
-    else{
-      header("Location: " . APP_ROOT);
-      exit;
-    }
-  }
-}
-
-/**
- * Processes Logout on logout page (must be tied to a content item in the database)
- * 
- * @return void
- * 
- */
-
-function lwt_process_logout(){
-  if (isset($_COOKIE[session_name()])){
-    setcookie(session_name(), '', time()-86400, '/');
-  }
-  // end session and redirect
-  session_destroy();
-  header("Location: /");
-  exit;
-}
-
-/**
  * Provides a title for a given request URI and runs any preprocess calls
  * @todo migrate gatekeeper logic here and use permissions database values
  * 
@@ -82,7 +28,7 @@ function lwt_process_title($request){
       continue;
     }
     if(($url_code != '' || $parent_id == 0) && $app_root == 0){
-      $info = lwt_database_fetch_simple(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
+      $info = lwt_db_fetch(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
       if (count($info)>0){
         $parent_id = $info[0]['content_id'];
         $app_root = $info[0]['app_root'];
@@ -114,7 +60,7 @@ function lwt_process_title($request){
   }
   $output['access'] = lwt_process_permissions($parent_id, $groups, $roles);
   if ($output['access']){
-    $info = lwt_database_fetch_simple(DB_NAME, 'content', array('title','preprocess_call'), array('id' => $parent_id));
+    $info = lwt_db_fetch(DB_NAME, 'content', array('title','preprocess_call'), array('id' => $parent_id));
     if (count($info)>0){
       $fn = $info[0]['preprocess_call'];
       $output['title'] = $info[0]['title'];
@@ -140,7 +86,6 @@ function lwt_process_title($request){
  * 
  * @return boolean Access to content
  */
- 
 function lwt_process_permissions($content_id, $groups, $roles){
   //First, never ever lockout THE Admin user
   if (isset($_SESSION['authenticated']['user_id']) &&  $_SESSION['authenticated']['user_id'] == 1){
@@ -150,7 +95,7 @@ function lwt_process_permissions($content_id, $groups, $roles){
   //Assume no access
   $access = FALSE;
   
-  $content_access = lwt_database_fetch_simple(DB_NAME, 'group_access', NULL, array('content_id' => $content_id));
+  $content_access = lwt_db_fetch(DB_NAME, 'group_access', NULL, array('content_id' => $content_id));
   if (count($content_access)>0){
     foreach ($content_access as $record){
       if (in_array($record['group_id'],$groups)){
@@ -160,7 +105,7 @@ function lwt_process_permissions($content_id, $groups, $roles){
   }
   
   // Check for Role overrides (if unset, means everyone can access!)
-  $role_access = lwt_database_fetch_simple(DB_NAME, 'role_access', NULL, array('content_id' => $content_id));
+  $role_access = lwt_db_fetch(DB_NAME, 'role_access', NULL, array('content_id' => $content_id));
   if (count($role_access)>0){
     //Reset access to false
     $access = FALSE;
@@ -193,7 +138,7 @@ function lwt_process_grouptree($group, $groups){
   $search = $group;
   $loop = true;
   while($loop){
-    $record = lwt_database_fetch_simple(DB_NAME, 'group_hierarchy', NULL, array('group_id' => $group));
+    $record = lwt_db_fetch(DB_NAME, 'group_hierarchy', NULL, array('group_id' => $group));
     if ($record[0]['parent_id'] == 0){
       $loop = false;
       $groups[0] = 0;
@@ -212,10 +157,9 @@ function lwt_process_grouptree($group, $groups){
  * @param type $groups Array of group IDs that are available to keep appending
  * @return array Array of Group IDs (this gets appended to the input)
  */
-
 function lwt_process_get_children($parent, $groups){
   $groups[$parent] = $parent;
-  $children = lwt_database_fetch_simple(DB_NAME, 'group_hierarchy', NULL, array('parent_id' => $parent));
+  $children = lwt_db_fetch(DB_NAME, 'group_hierarchy', NULL, array('parent_id' => $parent));
   if (count($children)>0){
     foreach ($children as $child){
       if ($child['group_id'] != 0){
@@ -233,10 +177,9 @@ function lwt_process_get_children($parent, $groups){
  * @param type $contents Array of content IDs that are available to keep appending
  * @return array Array of Content IDs (this gets appended to the input)
  */
-
 function lwt_process_get_contentchildren($parent, $contents){
   $contents[$parent] = $parent;
-  $children = lwt_database_fetch_simple(DB_NAME, 'content_hierarchy', NULL, array('parent_id' => $parent));
+  $children = lwt_db_fetch(DB_NAME, 'content_hierarchy', NULL, array('parent_id' => $parent));
   if (count($children)>0){
     foreach ($children as $child){
       if ($child['content_id'] != 0){
@@ -266,7 +209,7 @@ function lwt_process_url($request){
       continue;
     }
     if(($url_code != '' || $parent_id == 0) && $app_root == 0){
-      $info = lwt_database_fetch_simple(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
+      $info = lwt_db_fetch(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
       if (count($info)>0){
         $parent_id = $info[0]['content_id'];
         $app_root = $info[0]['app_root'];
@@ -277,7 +220,7 @@ function lwt_process_url($request){
       }
     }
   }
-  $info = lwt_database_fetch_simple(DB_NAME, 'content', NULL, array('id' => $parent_id));
+  $info = lwt_db_fetch(DB_NAME, 'content', NULL, array('id' => $parent_id));
   if (count($info)>0){
     $fn = $info[0]['function_call'];
     $content = $info[0]['content'];
