@@ -20,7 +20,7 @@ function lwt_ajax_admin($wrapper = false){
     header('Cache-Control: no-cache');
   }
   // Do admin stuff
-  echo "Admin page coming soon";
+  echo "Admin page coming soon! ...";
   
   //exit if this was not a "wrapper" (i.e. not using AJAX)
   if (!$wrapper){
@@ -47,7 +47,7 @@ function lwt_render_admin(){
   //Render application in preparation for making ajax content
 ?>
   <div id="adminarea">
-<?php lwt_ajax_admin_users(true); ?>
+<?php lwt_ajax_admin(true); ?>
   </div>
 <?php
   return TRUE;

@@ -17,7 +17,7 @@
  *  
  */
 function lwt_auth_setpassword($user_id, $pass){
-  $hased = password_hash($pass);
+  $hashed = password_hash($pass, PASSWORD_DEFAULT);
   date_default_timezone_set('UTC');
   $current_date = date("Y-m-d H:i:s");
   $sql = "INSERT INTO `passwords` (`user_id`, `valid_date`, `hashed`) VALUES ({$user_id}, '{$current_date}', '{$hashed}')";

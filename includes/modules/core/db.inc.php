@@ -221,7 +221,7 @@ function lwt_db_write_raw($database, $sql){
  * @return array $status error number and message
  */
 function lwt_db_multiquery($database, $sql){
-  $db_login = lwt_database_get_credentials($database);
+  $db_login = lwt_db_creds($database);
    if (!$db_login){
     $status['error'] = 9990;
     $status['message'] = 'Bad database settings';

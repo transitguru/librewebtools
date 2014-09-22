@@ -234,14 +234,13 @@ function lwt_install_db(){
   
   // Add required content for site to run
   $sql = "INSERT INTO `content` (`title`,`preprocess_call`,`function_call`,`content`) VALUES
-  ('Login','lwt_auth_authentication', 'lwt_render_login',NULL),
+  ('Login','lwt_auth_authentication', 'lwt_auth_login',NULL),
   ('File Download','lwt_process_download', 'lwt_render_404',NULL),
   ('Logout','lwt_auth_logout', NULL, NULL),
   ('Profile',NULL, 'lwt_auth_profile', NULL),
   ('Reset Password',NULL, 'lwt_auth_password', NULL),
   ('Forgot Password',NULL, 'lwt_auth_forgot', NULL),
-  ('Manage Users','lwt_ajax_admin_users', 'lwt_render_admin_users', NULL),
-  ('Manage Content','lwt_ajax_admin_content', 'lwt_render_admin_content', NULL),
+  ('Administration','lwt_ajax_admin', 'lwt_render_admin_content', NULL),
   ('Register',NULL, NULL, '<p>User self-registration is currently not enabled</p>'),
   ('Test Page',NULL,NULL,'<p>This is a Test Page<br />Making sure it shows up</p>')";
   $status = lwt_db_write_raw(DB_NAME, $sql);
@@ -256,8 +255,7 @@ function lwt_install_db(){
   (0, (SELECT `id` FROM `content` WHERE `title`='Test Page'), 'test',0),
   (0, (SELECT `id` FROM `content` WHERE `title`='Profile'), 'profile',0),
   (0, (SELECT `id` FROM `content` WHERE `title`='Reset Password'), 'password',0),
-  (0, (SELECT `id` FROM `content` WHERE `title`='Manage Users'), 'users',1),
-  (0, (SELECT `id` FROM `content` WHERE `title`='Manage Content'), 'content',1),
+  (0, (SELECT `id` FROM `content` WHERE `title`='Administration'), 'admin',1),
   (0, (SELECT `id` FROM `content` WHERE `title`='Register'), 'register',1),
   (0, (SELECT `id` FROM `content` WHERE `title`='Forgot Password'), 'forgot',1)";
   $status = lwt_db_write_raw(DB_NAME, $sql);
@@ -279,8 +277,7 @@ function lwt_install_db(){
   
   // Limit admin to certain areas
   $sql = "INSERT INTO `role_access` (`content_id`, `role_id`) VALUES
-  ((SELECT `id` FROM `content` WHERE `title`='Manage Users'),(SELECT `id` FROM `roles` WHERE `name`='Administrator')),
-  ((SELECT `id` FROM `content` WHERE `title`='Manage Content'),(SELECT `id` FROM `roles` WHERE `name`='Administrator'))";
+  ((SELECT `id` FROM `content` WHERE `title`='Administration'),(SELECT `id` FROM `roles` WHERE `name`='Administrator'))";
   $status = lwt_db_write_raw(DB_NAME, $sql);
   echo $status['error'] . "\n";
   
