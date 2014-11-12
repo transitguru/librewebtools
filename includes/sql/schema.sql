@@ -13,15 +13,20 @@
 DROP TABLE IF EXISTS `roles` ;
 
 CREATE TABLE IF NOT EXISTS `roles` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `sortorder`   INT(11) NOT NULL DEFAULT 0 ,
-  `name`  VARCHAR(255) NOT NULL ,
-  `desc` TEXT NULL ,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary identifier for a role',
+  `sortorder`   INT(11) NOT NULL DEFAULT 0 COMMENT 'Allows a site admin to sort roles',
+  `name`  VARCHAR(255) NOT NULL COMMENT 'Human readable name for a role',
+  `created` DATETIME NOT NULL COMMENT 'Date created',
+  `desc` TEXT NULL COMMENT 'Optional additional information about the role',
   PRIMARY KEY (`id`),
   UNIQUE KEY (`name` ASC)
 )
-ENGINE = InnoDB;
+ENGINE = InnoDB COMMENT = 'Basic user roles';
 
+-- Add unauthenticated user to the roles
+INSERT INTO `roles` (`name`, `desc`, `created`) VALUES ('Unauthenticated User', 'Users that are not logged in', (SELECT now()));
+UPDATE `roles` SET `id` = 0;
+ALTER TABLE `roles` auto_increment = 1;
 
 -- -----------------------------------------------------
 -- Table `groups` 
@@ -29,12 +34,22 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `groups` ;
 
 CREATE TABLE IF NOT EXISTS `groups` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(100) NOT NULL,
-  `desc` TEXT,
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary identifier for a group' ,
+  `parent_id` INT UNSIGNED DEFAULT NULL COMMENT 'Parent for a group, 0 is root, NULL means ready to delete' ,
+  `sortorder`   INT(11) NOT NULL DEFAULT 0 COMMENT 'Allows a site admin to sort groups',
+  `name` VARCHAR(100) NOT NULL COMMENT 'Human readable name for a group',
+  `created` DATETIME NOT NULL COMMENT 'Date created',
+  `desc` TEXT COMMENT 'Optional additional information about the group',
   PRIMARY KEY (`id`),
+  FOREIGN KEY (`parent_id`) REFERENCES `groups` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   UNIQUE KEY (`name` ASC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB COMMENT = 'User groups (in a hierarchical tree)';
+
+-- Add root to the groups
+INSERT INTO `groups` (`name`, `desc`, `created`) VALUES ('Everyone', 'Root level group, everyone!', (SELECT now()));
+UPDATE `groups` SET `id` = 0, `parent_id` = 0;
+ALTER TABLE `groups` auto_increment = 1;
+
 
 -- -----------------------------------------------------
 -- Table `users` 
@@ -42,37 +57,18 @@ CREATE TABLE IF NOT EXISTS `groups` (
 DROP TABLE IF EXISTS `users` ;
 
 CREATE TABLE IF NOT EXISTS `users` (
-  `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `login`  VARCHAR(40) NOT NULL ,
-  `firstname`  VARCHAR(100) NOT NULL ,
-  `lastname`  VARCHAR(100) NOT NULL ,
-  `email`  VARCHAR(255) NOT NULL ,
-  `desc`  TEXT NULL ,
+  `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary identifier for the user',
+  `login`  VARCHAR(40) NOT NULL COMMENT 'Username for logging in the website',
+  `firstname`  VARCHAR(100) NOT NULL COMMENT 'First name',
+  `lastname`  VARCHAR(100) NOT NULL COMMENT 'Surname',
+  `email`  VARCHAR(255) NOT NULL COMMENT 'Email address',
+  `created` DATETIME NOT NULL COMMENT 'Date created',
+  `desc`  TEXT NULL  COMMENT 'Optional additional information about the user',
   PRIMARY KEY (`id`),
   UNIQUE KEY (`login`),
   UNIQUE KEY (`email`)
 )
-ENGINE = InnoDB;
-
--- -----------------------------------------------------
--- Table `group_hierarchy`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `group_hierarchy` ;
-
-CREATE TABLE IF NOT EXISTS `group_hierarchy` (
-  `parent_id` INT UNSIGNED NOT NULL DEFAULT 0,
-  `group_id`  INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`group_id`) ,
-  FOREIGN KEY (`parent_id`)
-    REFERENCES `groups` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  FOREIGN KEY (`group_id`)
-    REFERENCES `groups` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-)
-ENGINE = InnoDB;
+ENGINE = InnoDB COMMENT = 'User information for authenticated users';
 
 -- -----------------------------------------------------
 -- Table `user_groups`
@@ -80,19 +76,13 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `user_groups` ;
 
 CREATE TABLE IF NOT EXISTS `user_groups` (
-  `user_id` INT UNSIGNED NOT NULL ,
-  `group_id` INT UNSIGNED NOT NULL ,
+  `user_id` INT UNSIGNED NOT NULL COMMENT 'Reference to users.id',
+  `group_id` INT UNSIGNED NOT NULL COMMENT 'Reference to groups.id',
   PRIMARY KEY (`group_id`, `user_id`) ,
-  FOREIGN KEY (`user_id`) 
-    REFERENCES `users` (`id`) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE,
-  FOREIGN KEY (`group_id`) 
-    REFERENCES `groups` (`id`) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 )
-ENGINE = InnoDB;
+ENGINE = InnoDB COMMENT = 'Adds users to group membership';
 
 
 -- -----------------------------------------------------
@@ -101,19 +91,13 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `user_roles` ;
 
 CREATE TABLE IF NOT EXISTS `user_roles` (
-  `user_id` INT UNSIGNED NOT NULL ,
-  `role_id` INT UNSIGNED NOT NULL ,
+  `user_id` INT UNSIGNED NOT NULL COMMENT 'Reference to users.id',
+  `role_id` INT UNSIGNED NOT NULL COMMENT 'Reference roles.id',
   PRIMARY KEY (`role_id`, `user_id`) ,
-  FOREIGN KEY (`user_id`) 
-    REFERENCES `users` (`id`) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE,
-  FOREIGN KEY (`role_id`) 
-    REFERENCES `roles` (`id`) 
-    ON DELETE CASCADE 
-    ON UPDATE CASCADE
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 )
-ENGINE = InnoDB;
+ENGINE = InnoDB COMMENT = 'Adds users to roles';
 
 
 -- -----------------------------------------------------
@@ -122,160 +106,117 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `passwords` ;
 
 CREATE TABLE IF NOT EXISTS `passwords` (
-  `user_id`  INT UNSIGNED NOT NULL ,
-  `valid_date` DATETIME NOT NULL ,
-  `expire_date` DATETIME NULL ,
-  `reset` TINYINT NOT NULL DEFAULT 0,
-  `reset_code` VARCHAR(255) NULL ,
-  `hashed` VARCHAR(255) NOT NULL ,
+  `user_id`  INT UNSIGNED NOT NULL COMMENT 'Links to users.id',
+  `valid_date` DATETIME NOT NULL COMMENT 'Valid date for this password',
+  `expire_date` DATETIME NULL COMMENT 'Expiration date for this password (or reset)',
+  `reset` TINYINT NOT NULL DEFAULT 0 COMMENT 'Boolean field determining if a reset request is out',
+  `reset_code` VARCHAR(255) NULL COMMENT 'Reset code that would be used in a URL for a user to reset the password',
+  `hashed` VARCHAR(255) NOT NULL COMMENT 'Hashed password',
   PRIMARY KEY (`user_id`, `valid_date`) ,
-  FOREIGN KEY (`user_id` )
-    REFERENCES `users` (`id` )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
+  FOREIGN KEY (`user_id` ) REFERENCES `users` (`id` ) ON DELETE CASCADE ON UPDATE CASCADE
 )
-ENGINE = InnoDB;
+ENGINE = InnoDB COMMENT = 'User hashed passwords';
 
 
 -- -----------------------------------------------------
--- Table `content`
+-- Table `pages`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `content` ;
+DROP TABLE IF EXISTS `pages` ;
 
-CREATE TABLE IF NOT EXISTS `content` (
-  `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `preprocess_call` VARCHAR(255) NULL ,
-  `title` VARCHAR(255) NOT NULL ,
-  `function_call` VARCHAR(255) NULL ,
-  `summary` LONGTEXT NULL ,
-  `content` LONGTEXT NULL ,
-  PRIMARY KEY (`id`)
-)
-ENGINE = InnoDB;
-
--- -----------------------------------------------------
--- Table `content_hierarchy`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `content_hierarchy` ;
-
-CREATE TABLE IF NOT EXISTS `content_hierarchy` (
-  `parent_id` INT UNSIGNED NOT NULL DEFAULT 0,
-  `content_id`  INT UNSIGNED NOT NULL,
-  `url_code` VARCHAR(100) NOT NULL ,
-  `app_root` TINYINT NOT NULL DEFAULT 0 ,
-  PRIMARY KEY (`content_id`) ,
+CREATE TABLE IF NOT EXISTS `pages` (
+  `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique identifier for page' ,
+  `parent_id` INT UNSIGNED DEFAULT NULL COMMENT 'Parent for a page, 0 is root, NULL means ready to delete' ,
+  `url_code` VARCHAR(100) NOT NULL COMMENT 'URL alias at that level (no slashes allowed)',
+  `title` VARCHAR(255) NOT NULL COMMENT 'Current title of this content',
+  `app_root` TINYINT NOT NULL DEFAULT 0 COMMENT 'Boolean to determine if this is the root of an application, therfore no sub-pages allowed',
+  `core_item` TINYINT NOT NULL DEFAULT 0 COMMENT 'Boolean to determine this needs to be protected cannot delete or remove functions',  
+  `ajax_call` VARCHAR(255) NULL COMMENT 'Function to call BEFORE loading the page',
+  `function_call` VARCHAR(255) NULL COMMENT 'Function to call WHILE loading the page',
+  `created` DATETIME NOT NULL COMMENT 'Created date',
   UNIQUE KEY (`parent_id`,`url_code`) ,
-  FOREIGN KEY (`parent_id`)
-    REFERENCES `content` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  FOREIGN KEY (`content_id`)
-    REFERENCES `content` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
+  PRIMARY KEY (`id`), FOREIGN KEY (`parent_id`) REFERENCES `pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 )
-ENGINE = InnoDB;
+ENGINE = InnoDB COMMENT = 'Web "pages" that can bootstrap other applications and/or contain content';
 
+-- Add root to the pages
+INSERT INTO `pages` (`url_code`, `title`, `created`) VALUES ('', 'Home', (SELECT now()));
+UPDATE `pages` SET `id` = 0, `parent_id` = 0;
+ALTER TABLE `pages` auto_increment = 1;
+
+
+-- -----------------------------------------------------
+-- Table `page_content`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `page_content` ;
+
+CREATE TABLE IF NOT EXISTS `page_content` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique identifier to Content',
+  `page_id`  INT UNSIGNED NOT NULL COMMENT 'Reference to pages.id' ,
+  `created` DATETIME NOT NULL COMMENT 'Date when this history item was created',
+  `activated` DATETIME DEFAULT NULL COMMENT 'Optional date for user to post the content',
+  `expired` DATETIME DEFAULT NULL COMMENT 'Optional date for user to retract the content (or to reflect "deleted" items)',
+  `title` VARCHAR(255) NOT NULL COMMENT 'Title of this content',
+  `summary` LONGTEXT NULL COMMENT 'User inputted summary',
+  `content` LONGTEXT NULL COMMENT 'User inputted comment (html)',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`page_id`,`created`),
+  FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+)
+ENGINE = InnoDB COMMENT = 'Content for webpages';
 
 -- -----------------------------------------------------
 -- Table `menus`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `menus` ;
 
-CREATE TABLE IF NOT EXISTS `menus` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `name` VARCHAR(100) NOT NULL ,
-  `title` TEXT NULL ,
+CREATE TABLE IF NOT EXISTS `menus`(
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique identifier to Menu item',
+  `parent_id` INT UNSIGNED DEFAULT NULL COMMENT 'Parent menu item, 0 if at root',
+  `sortorder`   INT(11) NOT NULL DEFAULT 0 COMMENT 'Allows a site admin to sort menu items',
+  `name` VARCHAR(255) NOT NULL COMMENT 'Title or name of menu item',
+  `page_id` INT UNSIGNED NOT NULL COMMENT 'Reference to pages.id',
+  `created` DATETIME NOT NULL COMMENT 'Date when this menu item was created',
   PRIMARY KEY (`id`),
-  UNIQUE KEY (`name`)
+  UNIQUE KEY (`parent_id`, `name`),
+  FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 )
-ENGINE = InnoDB;
+ENGINE = InnoDB COMMENT 'Creates menus and their Menu Links';
 
+-- Add root to the menus
+INSERT INTO `menus` (`name`, `page_id`, `created`) VALUES ('Root', 0, (SELECT now()));
+UPDATE `menus` SET `id` = 0, `parent_id` = 0;
+ALTER TABLE `menus` auto_increment = 1;
 -- -----------------------------------------------------
--- Table `menu_links`
+-- Table `page_roles`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `menu_links` ;
+DROP TABLE IF EXISTS `page_roles` ;
 
-CREATE TABLE IF NOT EXISTS `menu_links` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `menu_id` INT UNSIGNED NOT NULL ,
-  `content_id` INT UNSIGNED NOT NULL ,
-  `name` VARCHAR(100) NOT NULL ,
-  `title` TEXT NULL ,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY (`menu_id` , `name`),
-  FOREIGN KEY (`menu_id`)
-    REFERENCES `menus` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  FOREIGN KEY (`content_id`)
-    REFERENCES `content` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
+CREATE TABLE IF NOT EXISTS `page_roles` (
+  `role_id` INT UNSIGNED NOT NULL COMMENT 'Reference to roles.id',
+  `page_id` INT UNSIGNED NOT NULL COMMENT 'Reference to pages.id',
+  `view` TINYINT NOT NULL DEFAULT 1 COMMENT 'Grants right to view',
+  `edit` TINYINT NOT NULL DEFAULT 0 COMMENT 'Grants right to edit',
+  PRIMARY KEY (`role_id`, `page_id`),
+  FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 )
-ENGINE = InnoDB;
+ENGINE = InnoDB COMMENT 'Simple page permissions for roles';
 
 -- -----------------------------------------------------
--- Table `menulink_hierarchy`
+-- Table `page_groups`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `menulink_hierarchy` ;
+DROP TABLE IF EXISTS `page_groups` ;
 
-CREATE TABLE IF NOT EXISTS `menulink_hierarchy` (
-  `parent_id` INT UNSIGNED NOT NULL DEFAULT 0,
-  `menulink_id`  INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`menulink_id`) ,
-  FOREIGN KEY (`menulink_id`)
-    REFERENCES `menu_links` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
+CREATE TABLE IF NOT EXISTS `page_groups` (
+  `group_id` INT UNSIGNED NOT NULL COMMENT 'Reference to groups.id',
+  `page_id` INT UNSIGNED NOT NULL COMMENT 'Reference to pages.id',
+  `view` TINYINT NOT NULL DEFAULT 1 COMMENT 'Grants right to view',
+  `edit` TINYINT NOT NULL DEFAULT 0 COMMENT 'Grants right to edit',
+  PRIMARY KEY (`group_id`, `page_id`),
+  FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 )
-ENGINE = InnoDB;
-
-
-
--- -----------------------------------------------------
--- Table `role_access`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `role_access` ;
-
-CREATE TABLE IF NOT EXISTS `role_access` (
-  `role_id` INT UNSIGNED NOT NULL ,
-  `content_id` INT UNSIGNED NOT NULL ,
-  `view` TINYINT NOT NULL DEFAULT 1,
-  `edit` TINYINT NOT NULL DEFAULT 0,
-  PRIMARY KEY (`role_id`, `content_id`),
-  FOREIGN KEY (`role_id`)
-    REFERENCES `roles` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  FOREIGN KEY (`content_id`)
-    REFERENCES `content` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-)
-ENGINE = InnoDB;
-
--- -----------------------------------------------------
--- Table `group_access`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `group_access` ;
-
-CREATE TABLE IF NOT EXISTS `group_access` (
-  `group_id` INT UNSIGNED NOT NULL ,
-  `content_id` INT UNSIGNED NOT NULL ,
-  `view` TINYINT NOT NULL DEFAULT 1,
-  `edit` TINYINT NOT NULL DEFAULT 0,
-  PRIMARY KEY (`group_id`, `content_id`),
-  FOREIGN KEY (`group_id`)
-    REFERENCES `groups` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  FOREIGN KEY (`content_id`)
-    REFERENCES `content` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-)
-ENGINE = InnoDB;
+ENGINE = InnoDB COMMENT 'Simple page permissions for groups';
 
 -- -----------------------------------------------------
 -- Table `files`
@@ -283,59 +224,49 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `files` ;
 
 CREATE TABLE IF NOT EXISTS `files` (
-  `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `path` VARCHAR(255) NOT NULL ,
-  `basename` VARCHAR(255) NOT NULL ,
-  `size` BIGINT UNSIGNED NOT NULL DEFAULT 0 ,
-  `mimetype` VARCHAR(255) ,
-  `uploaded` DATETIME NOT NULL ,
-  `title` VARCHAR(255) NULL ,
-  `caption` TEXT NULL ,
+  `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique file identifier',
+  `basename` VARCHAR(255) NOT NULL COMMENT 'File basename (as uploaded)',
+  `path` VARCHAR(255) NOT NULL COMMENT 'File name adjusted, to prevent repeats',
+  `size` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'File size',
+  `mimetype` VARCHAR(255) COMMENT 'File type',
+  `uploaded` DATETIME NOT NULL COMMENT 'Date uploaded',
+  `title` VARCHAR(255) NULL COMMENT 'Optional title',
+  `caption` TEXT NULL COMMENT 'Optional caption text',
   PRIMARY KEY (`id`),
-  UNIQUE INDEX (`path`)
+  UNIQUE INDEX (`basename`)
 )
-ENGINE = InnoDB;
+ENGINE = InnoDB COMMENT 'Files registry';
 
 -- -----------------------------------------------------
--- Table `role_fileaccess`
+-- Table `file_roles`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `role_fileaccess` ;
+DROP TABLE IF EXISTS `file_roles` ;
 
-CREATE TABLE IF NOT EXISTS `role_fileaccess` (
-  `role_id` INT UNSIGNED NOT NULL ,
-  `file_id` INT UNSIGNED NOT NULL ,
-  `view` TINYINT NOT NULL DEFAULT 1,
-  `edit` TINYINT NOT NULL DEFAULT 0,
+CREATE TABLE IF NOT EXISTS `file_roles` (
+  `role_id` INT UNSIGNED NOT NULL COMMENT 'Reference to roles.id',
+  `file_id` INT UNSIGNED NOT NULL COMMENT 'Reference to files.id',
+  `view` TINYINT NOT NULL DEFAULT 1 COMMENT 'Grants right to view',
+  `edit` TINYINT NOT NULL DEFAULT 0 COMMENT 'Grants right to edit',
   PRIMARY KEY (`role_id`, `file_id`),
-  FOREIGN KEY (`role_id`)
-    REFERENCES `roles` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  FOREIGN KEY (`file_id`)
-    REFERENCES `files` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
+  FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`file_id`) REFERENCES `files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 )
-ENGINE = InnoDB;
+ENGINE = InnoDB COMMENT 'Simple file permissions for roles';
 
 -- -----------------------------------------------------
--- Table `group_fileaccess`
+-- Table `file_groups`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `group_fileaccess` ;
+DROP TABLE IF EXISTS `file_groups` ;
 
-CREATE TABLE IF NOT EXISTS `group_fileaccess` (
-  `group_id` INT UNSIGNED NOT NULL ,
-  `file_id` INT UNSIGNED NOT NULL ,
-  `view` TINYINT NOT NULL DEFAULT 1,
-  `edit` TINYINT NOT NULL DEFAULT 0,
+CREATE TABLE IF NOT EXISTS `file_groups` (
+  `group_id` INT UNSIGNED NOT NULL COMMENT 'Reference to groups.id',
+  `file_id` INT UNSIGNED NOT NULL COMMENT 'Reference to files.id',
+  `view` TINYINT NOT NULL DEFAULT 1 COMMENT 'Grants right to view',
+  `edit` TINYINT NOT NULL DEFAULT 0 COMMENT 'Grants right to edit',
   PRIMARY KEY (`group_id`, `file_id`),
-  FOREIGN KEY (`group_id`)
-    REFERENCES `groups` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  FOREIGN KEY (`file_id`)
-    REFERENCES `files` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
+  FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`file_id`)  REFERENCES `files` (`id`)  ON DELETE CASCADE ON UPDATE CASCADE
 )
-ENGINE = InnoDB;
+ENGINE = InnoDB COMMENT 'Simple file permissions for groups';
+
+
