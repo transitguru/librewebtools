@@ -92,7 +92,7 @@ DROP TABLE IF EXISTS `user_roles` ;
 
 CREATE TABLE IF NOT EXISTS `user_roles` (
   `user_id` INT UNSIGNED NOT NULL COMMENT 'Reference to users.id',
-  `role_id` INT UNSIGNED NOT NULL COMMENT 'Reference roles.id',
+  `role_id` INT UNSIGNED NOT NULL COMMENT 'Reference to roles.id',
   PRIMARY KEY (`role_id`, `user_id`) ,
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -106,7 +106,7 @@ ENGINE = InnoDB COMMENT = 'Adds users to roles';
 DROP TABLE IF EXISTS `passwords` ;
 
 CREATE TABLE IF NOT EXISTS `passwords` (
-  `user_id`  INT UNSIGNED NOT NULL COMMENT 'Links to users.id',
+  `user_id`  INT UNSIGNED NOT NULL COMMENT 'Reference to users.id',
   `valid_date` DATETIME NOT NULL COMMENT 'Valid date for this password',
   `expire_date` DATETIME NULL COMMENT 'Expiration date for this password (or reset)',
   `reset` TINYINT NOT NULL DEFAULT 0 COMMENT 'Boolean field determining if a reset request is out',
@@ -129,9 +129,9 @@ CREATE TABLE IF NOT EXISTS `pages` (
   `url_code` VARCHAR(100) NOT NULL COMMENT 'URL alias at that level (no slashes allowed)',
   `title` VARCHAR(255) NOT NULL COMMENT 'Current title of this content',
   `app_root` TINYINT NOT NULL DEFAULT 0 COMMENT 'Boolean to determine if this is the root of an application, therfore no sub-pages allowed',
-  `core_item` TINYINT NOT NULL DEFAULT 0 COMMENT 'Boolean to determine this needs to be protected cannot delete or remove functions',  
+  `core_page` TINYINT NOT NULL DEFAULT 0 COMMENT 'Boolean to determine this needs to be protected cannot delete or remove functions',  
   `ajax_call` VARCHAR(255) NULL COMMENT 'Function to call BEFORE loading the page',
-  `function_call` VARCHAR(255) NULL COMMENT 'Function to call WHILE loading the page',
+  `render_call` VARCHAR(255) NULL COMMENT 'Function to call WHILE loading the page',
   `created` DATETIME NOT NULL COMMENT 'Created date',
   UNIQUE KEY (`parent_id`,`url_code`) ,
   PRIMARY KEY (`id`), FOREIGN KEY (`parent_id`) REFERENCES `pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
@@ -174,11 +174,12 @@ CREATE TABLE IF NOT EXISTS `menus`(
   `parent_id` INT UNSIGNED DEFAULT NULL COMMENT 'Parent menu item, 0 if at root',
   `sortorder`   INT(11) NOT NULL DEFAULT 0 COMMENT 'Allows a site admin to sort menu items',
   `name` VARCHAR(255) NOT NULL COMMENT 'Title or name of menu item',
-  `page_id` INT UNSIGNED NOT NULL COMMENT 'Reference to pages.id',
+  `page_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Reference to pages.id',
   `created` DATETIME NOT NULL COMMENT 'Date when this menu item was created',
   PRIMARY KEY (`id`),
   UNIQUE KEY (`parent_id`, `name`),
   FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (`parent_id`) REFERENCES `menus` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 )
 ENGINE = InnoDB COMMENT 'Creates menus and their Menu Links';
 
