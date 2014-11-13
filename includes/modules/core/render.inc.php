@@ -273,7 +273,11 @@ function core_render_wrapper($request){
             <h1><?php echo $output['title']; ?></h1>
 <?php 
   if ($output['access']){
-    core_process_url($request);
+    core_process_content($request, $output['page_id']);
+    $render_call = $output['render_call'];
+    if (!is_null($render_call) && function_exists($render_call)){
+      $render_call();
+    }
   }
   else{
     core_render_404();
@@ -338,7 +342,7 @@ function core_render_copyright(){
  * @return boolean  Successful completion
  */
 function core_render_menu(){
-  if (is_array($_SESSION['authenticated']) && isset($_SESSION['authenticated']['user'])){
+  if (isset($_SESSION['authenticated']) && isset($_SESSION['authenticated']['user'])){
 ?>
             <ul class="nav">
               <li><a href="/">Home</a></li>

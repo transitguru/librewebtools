@@ -150,25 +150,18 @@ function core_auth_gatekeeper($request, $maintenance = false){
   $timelimit = 60 * 60; /**< time limit in seconds */
   $now = time(); /**< current time */
   
-  
-  $redirect = '/'; /**< URI to redirect if timeout */
-  
-  if ($request != $redirect){
-    $_SESSION['requested_page'] = $request;
+  $_SESSION['requested_page'] = $request;
 
-    if ($now > $_SESSION['start'] + $timelimit  && isset($_SESSION['authenticated'])){
-      // if timelimit has expired, destroy authenticated session
-      unset($_SESSION['authenticated']);
-      $_SESSION['start'] = time() - 86400;
-      $_SESSION['message'] = "Your session has expired, please logon.";
-      header("Location: {$redirect}");
-      exit;
-    }
-    elseif (isset($_SESSION['authenticated']['user'])){
-      // if it's got this far, it's OK, so update start time
-      $_SESSION['start'] = time();
-      $_SESSION['message'] = "Welcome {$_SESSION['authenticated']['user']}!";
-    }
+  if (isset($_SESSION['authenticated']) && $now > $_SESSION['start'] + $timelimit){
+    // if timelimit has expired, destroy authenticated session
+    unset($_SESSION['authenticated']);
+    $_SESSION['start'] = time() - 86400;
+    $_SESSION['message'] = "Your session has expired, please logon.";
+  }
+  elseif (isset($_SESSION['authenticated']['user'])){
+    // if it's got this far, it's OK, so update start time
+    $_SESSION['start'] = time();
+    $_SESSION['message'] = "Welcome {$_SESSION['authenticated']['user']}!";
   }
   
   // Now route the request

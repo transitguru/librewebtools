@@ -32,8 +32,8 @@ function core_install($request){
     if (count($users) == 0){
       $install = TRUE;
     }
-    $content = core_db_fetch(DB_NAME, 'content', NULL, array('id' => 0));
-    if (count($content) == 0){
+    $pages = core_db_fetch(DB_NAME, 'pages', NULL, array('id' => 0));
+    if (count($pages) == 0){
       $install = TRUE;
     }
   }
@@ -178,24 +178,28 @@ function core_install_db(){
     'parent_id' => 0,
   );
   $status = core_db_write(DB_NAME, 'groups', $inputs);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
   $inputs['name'] = 'Authenticated';
   $status = core_db_write(DB_NAME, 'groups', $inputs);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
-  $auth_id = $result['insert_id'];
+  $auth_id = $status['insert_id'];
   // Subgroups of Authenticated
   $inputs['parent_id'] = $auth_id;
   $inputs['name'] = 'Internal';
   $status = core_db_write(DB_NAME, 'groups', $inputs);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
   $inputs['name'] = 'External';
   $status = core_db_write(DB_NAME, 'groups', $inputs);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -209,12 +213,14 @@ function core_install_db(){
     'created' => $date,
   );
   $status = core_db_write(DB_NAME, 'roles', $inputs);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
   $inputs['name'] = 'Authenticated User';
   $inputs['desc'] = 'Basic user';
   $status = core_db_write(DB_NAME, 'roles', $inputs);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -230,27 +236,31 @@ function core_install_db(){
     'created' => $date,
   );
   $status = core_db_write(DB_NAME, 'users', $inputs);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
   $status = core_db_write(DB_NAME, 'user_roles', array('role_id' => 1, 'user_id' => 1));
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
   $status = core_db_write(DB_NAME, 'user_groups', array('group_id' => 0, 'user_id' => 1));
-  if ($status['error'] != 0){
-    return $status['error'];
-  }
-  $status = core_auth_session_setpassword(1, $_POST['db']['admin_pass']);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
   $status = core_auth_setpassword(1, $_POST['db']['admin_pass']);
+  echo $status['error'] . "\n";
+  if ($status['error'] != 0){
+    return $status['error'];
+  }
 
   // Add the pages
   echo "\nPages\n";
   
   $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => 0, 'group_id' => 0));
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -266,6 +276,12 @@ function core_install_db(){
     'created' => $date,
   );
   $status = core_db_write(DB_NAME, 'pages', $inputs);
+  echo $status['error'] . "\n";
+  if ($status['error'] != 0){
+    return $status['error'];
+  }
+  $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => 0));
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -275,10 +291,12 @@ function core_install_db(){
   $inputs['ajax_call'] = 'core_process_download';
   $inputs['render_call'] = 'core_render_404';
   $status = core_db_write(DB_NAME, 'pages', $inputs);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
   $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => 0));
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -288,10 +306,12 @@ function core_install_db(){
   $inputs['ajax_call'] = 'core_auth_logout';
   $inputs['render_call'] = null;
   $status = core_db_write(DB_NAME, 'pages', $inputs);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
   $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => 0));
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -301,10 +321,12 @@ function core_install_db(){
   $inputs['ajax_call'] = null;
   $inputs['render_call'] = 'core_auth_profile';
   $status = core_db_write(DB_NAME, 'pages', $inputs);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
   $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => $auth_id));
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -314,10 +336,12 @@ function core_install_db(){
   $inputs['ajax_call'] = NULL;
   $inputs['render_call'] = 'core_auth_forgot';
   $status = core_db_write(DB_NAME, 'pages', $inputs);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
   $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => 0));
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -327,10 +351,12 @@ function core_install_db(){
   $inputs['ajax_call'] = 'core_ajax_admin';
   $inputs['render_call'] = 'core_render_admin';
   $status = core_db_write(DB_NAME, 'pages', $inputs);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
   $status = core_db_write(DB_NAME, 'page_roles', array('page_id' => $status['insert_id'], 'role_id' => 1));
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -340,10 +366,12 @@ function core_install_db(){
   $inputs['ajax_call'] = null;
   $inputs['render_call'] = 'core_auth_register';
   $status = core_db_write(DB_NAME, 'pages', $inputs);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
   $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => 0));
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -356,6 +384,7 @@ function core_install_db(){
     'content' => '<p>Welcome to LibreWeb Tools</p>',
   );
   $status = core_db_write(DB_NAME, 'page_content', $inputs);
+  echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }

@@ -35,7 +35,7 @@ DROP TABLE IF EXISTS `groups` ;
 
 CREATE TABLE IF NOT EXISTS `groups` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary identifier for a group' ,
-  `parent_id` INT UNSIGNED DEFAULT NULL COMMENT 'Parent for a group, 0 is root, NULL means ready to delete' ,
+  `parent_id` INT UNSIGNED DEFAULT NULL COMMENT 'Parent for a group, 0 is root, NULL means ready to delete (unless id=0)' ,
   `sortorder`   INT(11) NOT NULL DEFAULT 0 COMMENT 'Allows a site admin to sort groups',
   `name` VARCHAR(100) NOT NULL COMMENT 'Human readable name for a group',
   `created` DATETIME NOT NULL COMMENT 'Date created',
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `groups` (
 
 -- Add root to the groups
 INSERT INTO `groups` (`name`, `desc`, `created`) VALUES ('Everyone', 'Root level group, everyone!', (SELECT now()));
-UPDATE `groups` SET `id` = 0, `parent_id` = 0;
+UPDATE `groups` SET `id` = 0;
 ALTER TABLE `groups` auto_increment = 1;
 
 
@@ -125,7 +125,7 @@ DROP TABLE IF EXISTS `pages` ;
 
 CREATE TABLE IF NOT EXISTS `pages` (
   `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique identifier for page' ,
-  `parent_id` INT UNSIGNED DEFAULT NULL COMMENT 'Parent for a page, 0 is root, NULL means ready to delete' ,
+  `parent_id` INT UNSIGNED DEFAULT NULL COMMENT 'Parent for a page, 0 is root, NULL means ready to delete (unless id=0)' ,
   `url_code` VARCHAR(100) NOT NULL COMMENT 'URL alias at that level (no slashes allowed)',
   `title` VARCHAR(255) NOT NULL COMMENT 'Current title of this content',
   `app_root` TINYINT NOT NULL DEFAULT 0 COMMENT 'Boolean to determine if this is the root of an application, therfore no sub-pages allowed',
@@ -133,6 +133,8 @@ CREATE TABLE IF NOT EXISTS `pages` (
   `ajax_call` VARCHAR(255) NULL COMMENT 'Function to call BEFORE loading the page',
   `render_call` VARCHAR(255) NULL COMMENT 'Function to call WHILE loading the page',
   `created` DATETIME NOT NULL COMMENT 'Created date',
+  `activated` DATETIME DEFAULT NULL COMMENT 'Optional date for the page to go live',
+  `deactivated` DATETIME DEFAULT NULL COMMENT 'Optional date for user to retract the content (or to reflect "deleted" items)',
   UNIQUE KEY (`parent_id`,`url_code`) ,
   PRIMARY KEY (`id`), FOREIGN KEY (`parent_id`) REFERENCES `pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 )
@@ -140,7 +142,7 @@ ENGINE = InnoDB COMMENT = 'Web "pages" that can bootstrap other applications and
 
 -- Add root to the pages
 INSERT INTO `pages` (`url_code`, `title`, `created`) VALUES ('', 'Home', (SELECT now()));
-UPDATE `pages` SET `id` = 0, `parent_id` = 0;
+UPDATE `pages` SET `id` = 0;
 ALTER TABLE `pages` auto_increment = 1;
 
 
@@ -153,8 +155,6 @@ CREATE TABLE IF NOT EXISTS `page_content` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique identifier to Content',
   `page_id`  INT UNSIGNED NOT NULL COMMENT 'Reference to pages.id' ,
   `created` DATETIME NOT NULL COMMENT 'Date when this history item was created',
-  `activated` DATETIME DEFAULT NULL COMMENT 'Optional date for user to post the content',
-  `expired` DATETIME DEFAULT NULL COMMENT 'Optional date for user to retract the content (or to reflect "deleted" items)',
   `title` VARCHAR(255) NOT NULL COMMENT 'Title of this content',
   `summary` LONGTEXT NULL COMMENT 'User inputted summary',
   `content` LONGTEXT NULL COMMENT 'User inputted comment (html)',
@@ -178,14 +178,14 @@ CREATE TABLE IF NOT EXISTS `menus`(
   `created` DATETIME NOT NULL COMMENT 'Date when this menu item was created',
   PRIMARY KEY (`id`),
   UNIQUE KEY (`parent_id`, `name`),
-  FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (`parent_id`) REFERENCES `menus` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 )
 ENGINE = InnoDB COMMENT 'Creates menus and their Menu Links';
 
 -- Add root to the menus
 INSERT INTO `menus` (`name`, `page_id`, `created`) VALUES ('Root', 0, (SELECT now()));
-UPDATE `menus` SET `id` = 0, `parent_id` = 0;
+UPDATE `menus` SET `id` = 0;
 ALTER TABLE `menus` auto_increment = 1;
 -- -----------------------------------------------------
 -- Table `page_roles`

@@ -14,24 +14,29 @@
  * @todo migrate gatekeeper logic here and use permissions database values
  * 
  * @param string $request Request URI
- * @return string Title to place in Title tags
+ * @return array $ouput (title, page_id, and access)
  */
 function core_process_title($request){
   $path = explode("/",$request);
   $i = 0;
   $app_root = 0;
-  foreach ($path as $url_code){
+  foreach ($path as $i => $url_code){
     if ($i == 0){
-      $i ++;
-      $parent_id = 0;
+      $page_id = 0;
       $ROOT = '';
       continue;
     }
-    if(($url_code != '' || $parent_id == 0) && $app_root == 0){
-      $info = core_db_fetch(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
+    if($url_code !== '' && $app_root == 0){
+      $info = core_db_fetch(DB_NAME,'pages',NULL, array('parent_id' => $page_id, 'url_code' => $url_code));
       if (count($info)>0){
-        $parent_id = $info[0]['content_id'];
+        $page_id = $info[0]['id'];
         $app_root = $info[0]['app_root'];
+        $ajax_call = $info[0]['ajax_call'];
+        $render_call = $info[0]['render_call'];
+        $created = $info[0]['created'];
+        $activated = $info[0]['activated'];
+        $deactivated = $info[0]['deactivated'];
+        $title = $info[0]['title'];
         $ROOT .= '/' . $url_code;
       }
       else{
@@ -42,12 +47,20 @@ function core_process_title($request){
       }
     }
   }
-  if ($ROOT != '/'){
-    $ROOT .= '/';
-  }
+  
+  // Set Application root for pages that act like applications
   define('APP_ROOT', $ROOT);
   $output = array();
   $groups = array();
+  
+  if ($ROOT != '/'){
+    $ROOT .= '/';
+  }
+  else{
+    $output['page_id'] = $page_id = 0;
+  }
+  var_dump($page_id);
+  // Check permissions
   $roles = $_SESSION['authenticated']['roles'];
   if (isset($_SESSION['authenticated']['groups']) && count($_SESSION['authenticated']['groups'])>0){
     foreach ($_SESSION['authenticated']['groups'] as $group){
@@ -58,19 +71,34 @@ function core_process_title($request){
     $group = 1; /**< Maps to the unauthenticated user*/
     $groups = core_process_grouptree($group, $groups);
   }
-  $output['access'] = core_process_permissions($parent_id, $groups, $roles);
+  $output['access'] = core_process_permissions($page_id, $groups, $roles);
+  var_dump($output);
   if ($output['access']){
-    $info = core_db_fetch(DB_NAME, 'content', array('title','preprocess_call'), array('id' => $parent_id));
-    if (count($info)>0){
-      $fn = $info[0]['preprocess_call'];
-      $output['title'] = $info[0]['title'];
-      if (!is_null($fn) && function_exists($fn)){
-        $fn();
-      }
-      return $output;
+    // Check to see if it is still published
+    $time = date('Y-m-d H:m:s');
+    var_dump($activated);
+    if (!is_null($activated) && $time < $activated){
+      $output['access'] = false;
     }
+    if (!is_null($activated) && $time < $activated){
+      $output['access'] = false;
+    }
+    if(!is_null($deactivated) && $time > $deactivated){
+      $output['access'] = false;
+    }
+    
+    // Run ajax call, if it exists
+    $fn = $info[0]['preprocess_call'];
+    $output['title'] = $info[0]['title'];
+    if (!is_null($ajax_call) && function_exists($ajax_call)){
+      $ajax_call();
+    }
+    $output['page_id'] = $page_id;
+    $output['render_call'] = $render_call;
+    return $output;
   }
   else{
+    // Return 404 title and send 404 header
     header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
     $output['title'] = 'Not Found';
     return $output;
@@ -86,18 +114,18 @@ function core_process_title($request){
  * 
  * @return boolean Access to content
  */
-function core_process_permissions($content_id, $groups, $roles){
+function core_process_permissions($page_id, $groups, $roles){
   //First, never ever lockout THE Admin user
   if (isset($_SESSION['authenticated']['user_id']) &&  $_SESSION['authenticated']['user_id'] == 1){
     return TRUE;
   }
-  
+
   //Assume no access
   $access = FALSE;
   
-  $content_access = core_db_fetch(DB_NAME, 'group_access', NULL, array('content_id' => $content_id));
-  if (count($content_access)>0){
-    foreach ($content_access as $record){
+  $group_access = core_db_fetch(DB_NAME, 'page_groups', NULL, array('page_id' => $page_id));
+  if (count($group_access)>0){
+    foreach ($group_access as $record){
       if (in_array($record['group_id'],$groups)){
         $access = TRUE;
       }
@@ -105,7 +133,7 @@ function core_process_permissions($content_id, $groups, $roles){
   }
   
   // Check for Role overrides (if unset, means everyone can access!)
-  $role_access = core_db_fetch(DB_NAME, 'role_access', NULL, array('content_id' => $content_id));
+  $role_access = core_db_fetch(DB_NAME, 'page_roles', NULL, array('page_id' => $page_id));
   if (count($role_access)>0){
     //Reset access to false
     $access = FALSE;
@@ -115,7 +143,6 @@ function core_process_permissions($content_id, $groups, $roles){
       }
     }
   }
-  
   return $access;
 }
 
@@ -127,7 +154,7 @@ function core_process_permissions($content_id, $groups, $roles){
  * @return array All Group IDs that a user may access
  */
 function core_process_grouptree($group, $groups){
-  if ($group === NULL){
+  if ($group == NULL){
     return $groups;
   }
   
@@ -138,7 +165,7 @@ function core_process_grouptree($group, $groups){
   $search = $group;
   $loop = true;
   while($loop){
-    $record = core_db_fetch(DB_NAME, 'group_hierarchy', NULL, array('group_id' => $group));
+    $record = core_db_fetch(DB_NAME, 'groups', NULL, array('id' => $group));
     if ($record[0]['parent_id'] == 0){
       $loop = false;
       $groups[0] = 0;
@@ -159,12 +186,10 @@ function core_process_grouptree($group, $groups){
  */
 function core_process_get_children($parent, $groups){
   $groups[$parent] = $parent;
-  $children = core_db_fetch(DB_NAME, 'group_hierarchy', NULL, array('parent_id' => $parent));
+  $children = core_db_fetch(DB_NAME, 'groups', NULL, array('parent_id' => $parent));
   if (count($children)>0){
     foreach ($children as $child){
-      if ($child['group_id'] != 0){
-        $groups = core_process_get_children($child['group_id'],$groups);
-      }
+      $groups = core_process_get_children($child['id'],$groups);
     }
   }
   return $groups;
@@ -177,17 +202,15 @@ function core_process_get_children($parent, $groups){
  * @param type $contents Array of content IDs that are available to keep appending
  * @return array Array of Content IDs (this gets appended to the input)
  */
-function core_process_get_contentchildren($parent, $contents){
-  $contents[$parent] = $parent;
-  $children = core_db_fetch(DB_NAME, 'content_hierarchy', NULL, array('parent_id' => $parent));
+function core_process_get_pagechildren($parent, $pages){
+  $pages[$parent] = $parent;
+  $children = core_db_fetch(DB_NAME, 'pages', NULL, array('parent_id' => $parent));
   if (count($children)>0){
     foreach ($children as $child){
-      if ($child['content_id'] != 0){
-        $contents = core_process_get_contentchildren($child['content_id'],$contents);
-      }
+      $pages = core_process_get_contentchildren($child['id'],$pages);
     }
   }
-  return $contents;
+  return $pages;
 }
 
 
@@ -195,45 +218,18 @@ function core_process_get_contentchildren($parent, $contents){
  * Provides markup for the page_content div
  * 
  * @param string $request Request URI
- * @return string HTML Markup from the individual section that was requested
+ * @param int $page_id ID of the page being loaded
  */
-function core_process_url($request){
-  // Switchboard
-  $path = explode("/",$request);
-  $i = 0;
-  $app_root = 0;
-  foreach ($path as $url_code){
-    if ($i == 0){
-      $i ++;
-      $parent_id = 0;
-      continue;
-    }
-    if(($url_code != '' || $parent_id == 0) && $app_root == 0){
-      $info = core_db_fetch(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
-      if (count($info)>0){
-        $parent_id = $info[0]['content_id'];
-        $app_root = $info[0]['app_root'];
-      }
-      else{
-        echo '<p>The URL in the address bar may be in error, please return <a href="/">home</a>.</p>';
-        return TRUE;
+function core_process_content($request, $page_id){
+  // Retrieve any page content, if it exists
+  if(is_numeric($page_id)){
+    $info = core_db_fetch(DB_NAME, 'page_content', NULL, array('page_id' => $page_id));
+    if (count($info)>0){
+      $content = $info[0]['content'];
+      if (!is_null($content)){
+        echo $content;
       }
     }
-  }
-  $info = core_db_fetch(DB_NAME, 'content', NULL, array('id' => $parent_id));
-  if (count($info)>0){
-    $fn = $info[0]['function_call'];
-    $content = $info[0]['content'];
-    if (!is_null($fn) && function_exists($fn)){
-      $success = $fn();
-    }
-    else{
-      $success = TRUE;
-    }
-    if (!is_null($content)){
-      echo $content;
-    }
-    return $success;
   }
 }
 
