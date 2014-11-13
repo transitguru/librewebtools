@@ -54,11 +54,26 @@ function core_db_fetch($database, $table, $fields=NULL,  $where=NULL, $groupby=N
   else{
     $where_elements = array();
     foreach ($where as $key => $value){
+      $type = gettype($value);
+      if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
+        $value = $value;
+      }
+      elseif ($type == 'string'){
+        $value = "'" . str_replace("'", "\\'",str_replace("\\", "\\\\", $value)) . "'";
+      }
+      elseif ($type == 'null' || $value == NULL){
+        $value = NULL;
+      }
+      else{
+        $status['error'] = 9999;
+        $status['message'] = 'Bad input settings';
+        return $status;
+      }
       if (is_null($value)){
         $where_elements[] = "`$key` IS NULL";
       }
       else{
-        $where_elements[] = "`$key`='$value'";
+        $where_elements[] = "`{$key}`={$value}";
       }
     }
     $where_string = "WHERE " . implode(' AND ', $where_elements);
