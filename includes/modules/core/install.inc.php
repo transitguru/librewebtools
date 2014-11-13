@@ -169,7 +169,7 @@ function core_install_db(){
     return $status['error'];
   }
   echo "<pre>";
-  echo "\nRoles\n"
+  echo "\nRoles\n";
   // Add Groups
   $date = date('Y-m-d H:i:s');
   $inputs = array(
@@ -206,7 +206,7 @@ function core_install_db(){
   $inputs = array(
     'name' => 'Administrator',
     'desc' => 'Administers Website',
-    'created' => $time,
+    'created' => $date,
   );
   $status = core_db_write(DB_NAME, 'roles', $inputs);
   if ($status['error'] != 0){
@@ -227,7 +227,7 @@ function core_install_db(){
     'lastname' => 'Administrator',
     'email' => $_POST['db']['admin_email'],
     'desc' =>  'Site Administrator',
-    'created' => $time,
+    'created' => $date,
   );
   $status = core_db_write(DB_NAME, 'users', $inputs);
   if ($status['error'] != 0){
@@ -263,7 +263,7 @@ function core_install_db(){
     'core_page' => 1,
     'ajax_call' => 'core_auth_authentication',
     'render_call' => 'core_auth_login',
-    'created' => $time,
+    'created' => $date,
   );
   $status = core_db_write(DB_NAME, 'pages', $inputs);
   if ($status['error'] != 0){
@@ -351,7 +351,7 @@ function core_install_db(){
   // Add Page content (just home page for now)
   $inputs = array(
     'page_id' => 0,
-    'created' => $time,
+    'created' => $date,
     'title' => 'Home',
     'content' => '<p>Welcome to LibreWeb Tools</p>',
   );
