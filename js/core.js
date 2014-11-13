@@ -2,12 +2,13 @@
  * @file
  * @author <msypolt@transitguru.info>
  *
- * General JavaScript functions
+ * Core JavaScript
  */
 "use strict";
 
 /***************************************
- * AJAX helper functions               *
+ * AJAX                                *
+ * TODO: Completely refactor AJAX area *
  ***************************************/
 
 /**
@@ -15,8 +16,8 @@
  * This is useful when buttons are used to activate a variable and there is a 
  * chance that buttons would have been the same name. 
  * 
- * This function works best if all buttons call this function and there is one 
- * hidden input that would be edited as a result of this function. Using
+ * This works best if all buttons call this, and there is one 
+ * hidden input that would be edited as a result of calling this. Using
  * many hidden inputs could cause names to stick and confuse the server
  * AJAX page. It is best NOT to define the button as a type="submit", however
  * some web browsers would also submit the form a second time when using 
@@ -38,13 +39,12 @@ function click_a_button(button_id, name, value, submit_id, submit_value, validat
   document.getElementById(submit_id).click();
 }
 
-//AJAX Functions
 /**
  * This is the engine of the client side request to the server.
  * 
  * Note: Buttons that have same name will inherit the name of one of the
- * buttons which may or may not be the one clicked. It is best to use the 
- * click_a_button() function to populate a hidden input with a name and value
+ * buttons which may or may not be the one clicked. It is best to use
+ * click_a_button() to populate a hidden input with a name and value
  * for this to work as intended. 
  * 
  * @param {string} formobject Object instance of form that the javascript will send to server
@@ -90,7 +90,7 @@ function ajaxPost(formobject,responsediv,responsemsg) {
 }
 
 /**
- * This function provides a fallback method of creating Form Data 
+ * Provides a fallback method of creating Form Data 
  * for older version of IE. 
  * 
  * @param {object} form Form object that contains elements

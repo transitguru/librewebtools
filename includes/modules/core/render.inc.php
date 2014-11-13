@@ -12,7 +12,7 @@
  * 
  * @return boolean  Successful completion
  */
-function lwt_render_css(){
+function core_render_css(){
   $body_color = "#222222";
   $bg_color = "#222222";
   $content = "#eeeeee";
@@ -239,8 +239,8 @@ function lwt_render_css(){
  * @param string $request Request URI that will determine title and content
  * @return boolean  Successful completion
  */
-function lwt_render_wrapper($request){
-  $output = lwt_process_title($request);
+function core_render_wrapper($request){
+  $output = core_process_title($request);
 ?>
 <!DOCTYPE html>
 <html>
@@ -248,7 +248,7 @@ function lwt_render_wrapper($request){
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <title>LibreWebTools - <?php echo $output['title']; ?></title>
     <!-- Stylesheets -->
-<?php lwt_render_css(); ?>
+<?php core_render_css(); ?>
     
     <!-- Scripts -->
     <script type="text/javascript" src="/js/core.js"></script>
@@ -263,20 +263,20 @@ function lwt_render_wrapper($request){
       </div>
       <div class="main_zone">
         <div class="left">
-<?php lwt_render_buttons(); ?>
+<?php core_render_buttons(); ?>
         </div>
         <div class="content_zone">
           <div class="top">
-<?php lwt_render_menu(); ?>
+<?php core_render_menu(); ?>
           </div>
           <div class="page_content">
             <h1><?php echo $output['title']; ?></h1>
 <?php 
   if ($output['access']){
-    lwt_process_url($request);
+    core_process_url($request);
   }
   else{
-    lwt_render_404();
+    core_render_404();
   }
 ?>
             <div class="hide" id="tooltip"></div>
@@ -298,7 +298,7 @@ function lwt_render_wrapper($request){
         </div>
       </div>
       <div class="bottom">
-<?php lwt_render_copyright();?>
+<?php core_render_copyright();?>
       </div>
     </div>
   </body>
@@ -312,7 +312,7 @@ function lwt_render_wrapper($request){
  * 
  * @return string HTML Markup
  */
-function lwt_render_copyright(){
+function core_render_copyright(){
   $start_year = 2012;
   $current_year = date('Y');
   $owner = "TransitGuru Limited";
@@ -337,7 +337,7 @@ function lwt_render_copyright(){
  * 
  * @return boolean  Successful completion
  */
-function lwt_render_menu(){
+function core_render_menu(){
   if (is_array($_SESSION['authenticated']) && isset($_SESSION['authenticated']['user'])){
 ?>
             <ul class="nav">
@@ -375,7 +375,7 @@ function lwt_render_menu(){
  * 
  * @return string HMTL
  */
-function lwt_render_buttons(){
+function core_render_buttons(){
   //does nothing right now!
 ?>
   &nbsp;
@@ -388,7 +388,7 @@ function lwt_render_buttons(){
  * 
  * @return boolean Successful completion
  */
-function lwt_render_home(){
+function core_render_home(){
 ?>
         <?php echo $_SESSION['message']; ?><br />
 
@@ -414,7 +414,7 @@ function lwt_render_home(){
  * 
  * @return boolean Successful completion
  */
-function lwt_render_404(){
+function core_render_404(){
   $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
 ?>
   <p>Page not found. Please go <a href="/">Home</a> or try <a href="/login/">Logging on</a>.</p>
@@ -426,6 +426,6 @@ function lwt_render_404(){
  * @return boolean Successful completion
  */
 
-function lwt_render_contact(){
+function core_render_contact(){
   
 }

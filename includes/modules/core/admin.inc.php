@@ -15,7 +15,7 @@
  * @return void
  * 
  */
-function lwt_ajax_admin($wrapper = false){
+function core_ajax_admin($wrapper = false){
   if (!$wrapper){
     header('Cache-Control: no-cache');
   }
@@ -36,7 +36,7 @@ function lwt_ajax_admin($wrapper = false){
  * @return boolean Successful rendering of page
  * 
  */
-function lwt_render_admin(){
+function core_render_admin(){
   //Reset admin navigation if POST not set
   if (!isset($_POST) || count($_POST)==0){
     $_SESSION['admin']['navigate'] = array();
@@ -47,7 +47,7 @@ function lwt_render_admin(){
   //Render application in preparation for making ajax content
 ?>
   <div id="adminarea">
-<?php lwt_ajax_admin(true); ?>
+<?php core_ajax_admin(true); ?>
   </div>
 <?php
   return TRUE;

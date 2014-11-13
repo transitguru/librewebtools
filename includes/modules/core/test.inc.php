@@ -4,7 +4,7 @@
  * @file
  * @author Michael Sypolt <msypolt@transitguru.info>
  * 
- * This file includes testing functions, not usually to be run on deployment!
+ * This file is for testing things, not to be run on deployment!
  */
 
 /**
@@ -15,7 +15,7 @@
  * @param int $n Number to make each UL have unique identifier
  * @return int Running total of $n so that all IDs are unique
  */
-function lwt_test_array_print($array, $prefix = 'foo', $n=0){
+function core_test_array_print($array, $prefix = 'foo', $n=0){
   if ($n >= 1){
     $hide = 'class="hide"';
   }
@@ -27,7 +27,7 @@ function lwt_test_array_print($array, $prefix = 'foo', $n=0){
     $n++;
     echo '<li><a href="javascript:;" onclick="toggle_hide(\''.$prefix.'_'.$n.'\');">'.$key.'</a> ';
     if (is_array($value)){
-      $n = lwt_test_array_print($value, $prefix, $n);
+      $n = core_test_array_print($value, $prefix, $n);
     }
     else{
       echo $value;
@@ -38,13 +38,13 @@ function lwt_test_array_print($array, $prefix = 'foo', $n=0){
   return $n;
 }
 
-function lwt_test_showtime($begin, $end){
+function core_test_showtime($begin, $end){
   $time = $end - $begin;
   echo $time * 1000 . 'ms';
 }
 
 /**
- * Tests the lwt_validate_inputs() function
+ * Tests core_validate_inputs()
  * 
  *  0 = no error
  * 11 = Empty value
@@ -64,13 +64,13 @@ function lwt_test_showtime($begin, $end){
  * 66 = Value greater than maximum
  * 67 = Value does not match resolution (too precise)
  * 
- * @param array $inputs inputs that correspond with inputs for lwt_validate_inputs()
+ * @param array $inputs inputs that correspond with inputs for core_validate_inputs()
  * @param int $error Expected error number that should be returned
  * 
  * 
  */
-function lwt_test_validation($inputs, $error=0){
-  $result = call_user_func_array('lwt_validate_inputs', $inputs);
+function core_test_validation($inputs, $error=0){
+  $result = call_user_func_array('core_validate_inputs', $inputs);
   if($result['error'] != $error){
     $status['message'] = "Failure, found {$result['error']}, expected {$error}";
     $status['error'] = 1;
@@ -83,11 +83,11 @@ function lwt_test_validation($inputs, $error=0){
 }
 
 /**
- * Batch-runs tests of lwt_test_validation()
+ * Batch-runs tests of core_test_validation()
  * 
  * 
  */
-function lwt_test_runvalidation(){
+function core_test_runvalidation(){
   $types = array('preg','memo','text','date','num');
   $formats = array(
     'preg' => array('/[0-9a-zA-Z]*/','/[0-9a-z]*/','/[a-z][0-9a-z]*/' ),
@@ -108,7 +108,7 @@ function lwt_test_runvalidation(){
   
   //Test for empty string issues and numchars
   
-  //lwt_validate_inputs($input, $type, $format, $required=false, $chars=NULL, $notrim=false, $range=array(null, null, null), $range_flags=array(false, false, false))
+  //core_validate_inputs($input, $type, $format, $required=false, $chars=NULL, $notrim=false, $range=array(null, null, null), $range_flags=array(false, false, false))
   
   echo "\n\nTesting 10 series (input) errors\n\n";
   $error = 0;
@@ -140,7 +140,7 @@ function lwt_test_runvalidation(){
   );
   $num = count($tests);
   foreach ($tests as $test){
-    $result = call_user_func_array('lwt_test_validation',$test);
+    $result = call_user_func_array('core_test_validation',$test);
     echo $result['message'] . "\n";
     $error += $result['error'];
   }
@@ -164,7 +164,7 @@ function lwt_test_runvalidation(){
   );
   $num = count($tests);
   foreach ($tests as $test){
-    $result = call_user_func_array('lwt_test_validation',$test);
+    $result = call_user_func_array('core_test_validation',$test);
     echo $result['message'] . "\n";
     $error += $result['error'];
   }
@@ -198,7 +198,7 @@ function lwt_test_runvalidation(){
   );
   $num = count($tests);
   foreach ($tests as $test){
-    $result = call_user_func_array('lwt_test_validation',$test);
+    $result = call_user_func_array('core_test_validation',$test);
     echo $result['message'] . "\n";
     $error += $result['error'];
   }
@@ -223,7 +223,7 @@ function lwt_test_runvalidation(){
   );
   $num = count($tests);
   foreach ($tests as $test){
-    $result = call_user_func_array('lwt_test_validation',$test);
+    $result = call_user_func_array('core_test_validation',$test);
     echo $result['message'] . "\n";
     $error += $result['error'];
   }
@@ -282,7 +282,7 @@ function lwt_test_runvalidation(){
   );
   $num = count($tests);
   foreach ($tests as $test){
-    $result = call_user_func_array('lwt_test_validation',$test);
+    $result = call_user_func_array('core_test_validation',$test);
     echo $result['message'] . "\n";
     $error += $result['error'];
   }

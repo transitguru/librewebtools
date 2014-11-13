@@ -16,11 +16,11 @@
  * 
  * @return Request URI if no install needed
  */
-function lwt_install($request){
+function core_install($request){
   $install = FALSE;
   
   // Check to see if lwt can log in
-  $creds = lwt_db_creds(DB_NAME);
+  $creds = core_db_creds(DB_NAME);
   $conn = mysqli_connect('localhost', $creds['user'], $creds['pass'], DB_NAME, DB_PORT);
   if (!$conn){
     $install = TRUE;
@@ -28,11 +28,11 @@ function lwt_install($request){
   
   // Check for existence of admin user password or homepate
   if (!$install){
-    $users = lwt_db_fetch(DB_NAME, 'passwords', NULL, array('user_id' => 1));
+    $users = core_db_fetch(DB_NAME, 'passwords', NULL, array('user_id' => 1));
     if (count($users) == 0){
       $install = TRUE;
     }
-    $content = lwt_db_fetch(DB_NAME, 'content', NULL, array('id' => 0));
+    $content = core_db_fetch(DB_NAME, 'content', NULL, array('id' => 0));
     if (count($content) == 0){
       $install = TRUE;
     }
@@ -111,7 +111,7 @@ function lwt_install($request){
           }
           else{
             // Install the databases using the database.inc.php
-            $status = lwt_install_db();
+            $status = core_install_db();
             if ($status == 0){
               header("Location: /");
             }
@@ -159,11 +159,11 @@ function lwt_install($request){
  * @return int error
  *
  */
-function lwt_install_db(){
+function core_install_db(){
   $file = $_SERVER['DOCUMENT_ROOT'] . '/includes/sql/schema.sql';
   $sql = file_get_contents($file);
   
-  $status = lwt_db_multiquery(DB_NAME, $sql);
+  $status = core_db_multiquery(DB_NAME, $sql);
 
   if ($status['error'] != 0){
     return $status['error'];
@@ -177,12 +177,12 @@ function lwt_install_db(){
     'name' => 'Unauthenticated',
     'parent_id' => 0,
   );
-  $status = lwt_db_write(DB_NAME, 'groups', $inputs);
+  $status = core_db_write(DB_NAME, 'groups', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }
   $inputs['name'] = 'Authenticated';
-  $status = lwt_db_write(DB_NAME, 'groups', $inputs);
+  $status = core_db_write(DB_NAME, 'groups', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -190,12 +190,12 @@ function lwt_install_db(){
   // Subgroups of Authenticated
   $inputs['parent_id'] = $auth_id;
   $inputs['name'] = 'Internal';
-  $status = lwt_db_write(DB_NAME, 'groups', $inputs);
+  $status = core_db_write(DB_NAME, 'groups', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }
   $inputs['name'] = 'External';
-  $status = lwt_db_write(DB_NAME, 'groups', $inputs);
+  $status = core_db_write(DB_NAME, 'groups', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -208,13 +208,13 @@ function lwt_install_db(){
     'desc' => 'Administers Website',
     'created' => $time,
   );
-  $status = lwt_db_write(DB_NAME, 'roles', $inputs);
+  $status = core_db_write(DB_NAME, 'roles', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }
   $inputs['name'] = 'Authenticated User';
   $inputs['desc'] = 'Basic user';
-  $status = lwt_db_write(DB_NAME, 'roles', $inputs);
+  $status = core_db_write(DB_NAME, 'roles', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -229,28 +229,28 @@ function lwt_install_db(){
     'desc' =>  'Site Administrator',
     'created' => $time,
   );
-  $status = lwt_db_write(DB_NAME, 'users', $inputs);
+  $status = core_db_write(DB_NAME, 'users', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }
-  $status = lwt_db_write(DB_NAME, 'user_roles', array('role_id' => 1, 'user_id' => 1));
+  $status = core_db_write(DB_NAME, 'user_roles', array('role_id' => 1, 'user_id' => 1));
   if ($status['error'] != 0){
     return $status['error'];
   }
-  $status = lwt_db_write(DB_NAME, 'user_groups', array('group_id' => 0, 'user_id' => 1));
+  $status = core_db_write(DB_NAME, 'user_groups', array('group_id' => 0, 'user_id' => 1));
   if ($status['error'] != 0){
     return $status['error'];
   }
-  $status = lwt_auth_session_setpassword(1, $_POST['db']['admin_pass']);
+  $status = core_auth_session_setpassword(1, $_POST['db']['admin_pass']);
   if ($status['error'] != 0){
     return $status['error'];
   }
-  $status = lwt_auth_setpassword(1, $_POST['db']['admin_pass']);
+  $status = core_auth_setpassword(1, $_POST['db']['admin_pass']);
 
   // Add the pages
   echo "\nPages\n";
   
-  $status = lwt_db_write(DB_NAME, 'page_groups', array('page_id' => 0, 'group_id' => 0));
+  $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => 0, 'group_id' => 0));
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -261,37 +261,37 @@ function lwt_install_db(){
     'title' => 'Login',
     'app_root' => 1,
     'core_page' => 1,
-    'ajax_call' => 'lwt_auth_authentication',
-    'render_call' => 'lwt_auth_login',
+    'ajax_call' => 'core_auth_authentication',
+    'render_call' => 'core_auth_login',
     'created' => $time,
   );
-  $status = lwt_db_write(DB_NAME, 'pages', $inputs);
+  $status = core_db_write(DB_NAME, 'pages', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }
   
   $inputs['url_code'] = 'file';
   $inputs['title'] ='File Download';
-  $inputs['ajax_call'] = 'lwt_process_download';
-  $inputs['render_call'] = 'lwt_render_404';
-  $status = lwt_db_write(DB_NAME, 'pages', $inputs);
+  $inputs['ajax_call'] = 'core_process_download';
+  $inputs['render_call'] = 'core_render_404';
+  $status = core_db_write(DB_NAME, 'pages', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }
-  $status = lwt_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => 0));
+  $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => 0));
   if ($status['error'] != 0){
     return $status['error'];
   }
   
   $inputs['url_code'] = 'logout';
   $inputs['title'] ='Logout';
-  $inputs['ajax_call'] = 'lwt_auth_logout';
+  $inputs['ajax_call'] = 'core_auth_logout';
   $inputs['render_call'] = null;
-  $status = lwt_db_write(DB_NAME, 'pages', $inputs);
+  $status = core_db_write(DB_NAME, 'pages', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }
-  $status = lwt_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => 0));
+  $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => 0));
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -299,12 +299,12 @@ function lwt_install_db(){
   $inputs['url_code'] = 'profile';
   $inputs['title'] ='Profile';
   $inputs['ajax_call'] = null;
-  $inputs['render_call'] = 'lwt_auth_profile';
-  $status = lwt_db_write(DB_NAME, 'pages', $inputs);
+  $inputs['render_call'] = 'core_auth_profile';
+  $status = core_db_write(DB_NAME, 'pages', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }
-  $status = lwt_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => $auth_id));
+  $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => $auth_id));
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -312,25 +312,25 @@ function lwt_install_db(){
   $inputs['url_code'] = 'password';
   $inputs['title'] ='Recover Password';
   $inputs['ajax_call'] = NULL;
-  $inputs['render_call'] = 'lwt_auth_forgot';
-  $status = lwt_db_write(DB_NAME, 'pages', $inputs);
+  $inputs['render_call'] = 'core_auth_forgot';
+  $status = core_db_write(DB_NAME, 'pages', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }
-  $status = lwt_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => 0));
+  $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => 0));
   if ($status['error'] != 0){
     return $status['error'];
   }
 
   $inputs['url_code'] = 'admin';
   $inputs['title'] ='Administration';
-  $inputs['ajax_call'] = 'lwt_ajax_admin';
-  $inputs['render_call'] = 'lwt_render_admin';
-  $status = lwt_db_write(DB_NAME, 'pages', $inputs);
+  $inputs['ajax_call'] = 'core_ajax_admin';
+  $inputs['render_call'] = 'core_render_admin';
+  $status = core_db_write(DB_NAME, 'pages', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }
-  $status = lwt_db_write(DB_NAME, 'page_roles', array('page_id' => $status['insert_id'], 'role_id' => 1));
+  $status = core_db_write(DB_NAME, 'page_roles', array('page_id' => $status['insert_id'], 'role_id' => 1));
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -338,12 +338,12 @@ function lwt_install_db(){
   $inputs['url_code'] = 'register';
   $inputs['title'] ='Register';
   $inputs['ajax_call'] = null;
-  $inputs['render_call'] = 'lwt_auth_register';
-  $status = lwt_db_write(DB_NAME, 'pages', $inputs);
+  $inputs['render_call'] = 'core_auth_register';
+  $status = core_db_write(DB_NAME, 'pages', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }
-  $status = lwt_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => 0));
+  $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => 0));
   if ($status['error'] != 0){
     return $status['error'];
   }
@@ -355,7 +355,7 @@ function lwt_install_db(){
     'title' => 'Home',
     'content' => '<p>Welcome to LibreWeb Tools</p>',
   );
-  $status = lwt_db_write(DB_NAME, 'page_content', $inputs);
+  $status = core_db_write(DB_NAME, 'page_content', $inputs);
   if ($status['error'] != 0){
     return $status['error'];
   }

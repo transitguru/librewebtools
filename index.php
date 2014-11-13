@@ -42,15 +42,15 @@ foreach ($modules as $module){
 }
 
 // Load settings so that database can connect
-lwt_settings();
+core_settings();
 
 // Check to see if the database has been installed yet
-lwt_install($_SERVER['REQUEST_URI']);
+core_install($_SERVER['REQUEST_URI']);
 
 
 $maintenance = FALSE; /**< Set maintenance mode */
-$request = lwt_auth_gatekeeper($_SERVER['REQUEST_URI'], $maintenance);
+$request = core_auth_gatekeeper($_SERVER['REQUEST_URI'], $maintenance);
 
 // Process Page
-$success = lwt_render_wrapper($request); /**< Returns true if function completes! */
+$success = core_render_wrapper($request); /**< Returns true if function completes! */
 

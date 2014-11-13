@@ -12,7 +12,7 @@
  *
  *
  */
-function lwt_settings(){
+function core_settings(){
   define('DB_HOST', 'localhost');     /**< The host for the database connection */
   define('DB_NAME', 'librewebtools'); /**< The database name for the application's data */
   define('DB_USER', 'lwt');           /**< The username for the application's database user */

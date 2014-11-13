@@ -40,7 +40,7 @@
  * 
  * @return array Output result: ['error'] int error code (0 is good), ['value'] sanitized value, ['message'] error message 
  */
-function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NULL, $notrim=false, $range=array(null, null, null), $range_flags=array(false, false, false)){
+function core_validate_inputs($input, $type, $format, $required=false, $chars=NULL, $notrim=false, $range=array(null, null, null), $range_flags=array(false, false, false)){
   //handle trimming
   if (!$notrim){
     $input = trim($input);
@@ -86,11 +86,11 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
     }
     elseif($format=='noscript'){
       // Automatically remove script tags and such
-      $input = lwt_validate_descript($html);
+      $input = core_validate_descript($html);
     }
     elseif($format=='somehtml'){
       // First, remove script tags and attributes
-      $input = lwt_validate_descript($html);
+      $input = core_validate_descript($html);
       
       // Then get whitelisted tags, convert remaining to spans?
     }
@@ -110,7 +110,7 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
       }
     }
     elseif($format=='oneline'){
-      $input = lwt_validate_descript($html);
+      $input = core_validate_descript($html);
       //Allow only one line text, do not allow CR or LF
       if(fnmatch("*\r*",$input) || fnmatch("*\n*",$input)){
         $output["error"] = 42;
@@ -280,12 +280,12 @@ function lwt_validate_inputs($input, $type, $format, $required=false, $chars=NUL
  * @return array $elements Array of elements that continue to be appended
  * 
  */
-function lwt_validate_dom_children($node, $elements){
+function core_validate_dom_children($node, $elements){
   $children = $node->childNodes;
   if (count($children)>0){
     foreach ($children as $child){
       $elements[] = $child;
-      $elements = lwt_validate_dom_children($child, $elements);
+      $elements = core_validate_dom_children($child, $elements);
     }
   }
   return $elements;
@@ -299,7 +299,7 @@ function lwt_validate_dom_children($node, $elements){
  * @return string $cleaned Clean HTML that should be safe
  * 
  */
-function lwt_validate_descript($html){
+function core_validate_descript($html){
   $dom = new DOMDocument;
   $dom->loadHTML($html);
       
@@ -344,7 +344,7 @@ function lwt_validate_descript($html){
     'onchange',  
   );
   $elements = array();
-  $elements = lwt_validate_dom_children($dom,$elements);
+  $elements = core_validate_dom_children($dom,$elements);
   
   foreach($elements as $element){
     if (get_class($element) == 'DOMElement'){

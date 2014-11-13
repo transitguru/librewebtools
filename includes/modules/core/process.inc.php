@@ -16,7 +16,7 @@
  * @param string $request Request URI
  * @return string Title to place in Title tags
  */
-function lwt_process_title($request){
+function core_process_title($request){
   $path = explode("/",$request);
   $i = 0;
   $app_root = 0;
@@ -28,7 +28,7 @@ function lwt_process_title($request){
       continue;
     }
     if(($url_code != '' || $parent_id == 0) && $app_root == 0){
-      $info = lwt_db_fetch(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
+      $info = core_db_fetch(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
       if (count($info)>0){
         $parent_id = $info[0]['content_id'];
         $app_root = $info[0]['app_root'];
@@ -51,16 +51,16 @@ function lwt_process_title($request){
   $roles = $_SESSION['authenticated']['roles'];
   if (isset($_SESSION['authenticated']['groups']) && count($_SESSION['authenticated']['groups'])>0){
     foreach ($_SESSION['authenticated']['groups'] as $group){
-      $groups = lwt_process_grouptree($group, $groups);
+      $groups = core_process_grouptree($group, $groups);
     }
   }
   else{
     $group = 1; /**< Maps to the unauthenticated user*/
-    $groups = lwt_process_grouptree($group, $groups);
+    $groups = core_process_grouptree($group, $groups);
   }
-  $output['access'] = lwt_process_permissions($parent_id, $groups, $roles);
+  $output['access'] = core_process_permissions($parent_id, $groups, $roles);
   if ($output['access']){
-    $info = lwt_db_fetch(DB_NAME, 'content', array('title','preprocess_call'), array('id' => $parent_id));
+    $info = core_db_fetch(DB_NAME, 'content', array('title','preprocess_call'), array('id' => $parent_id));
     if (count($info)>0){
       $fn = $info[0]['preprocess_call'];
       $output['title'] = $info[0]['title'];
@@ -86,7 +86,7 @@ function lwt_process_title($request){
  * 
  * @return boolean Access to content
  */
-function lwt_process_permissions($content_id, $groups, $roles){
+function core_process_permissions($content_id, $groups, $roles){
   //First, never ever lockout THE Admin user
   if (isset($_SESSION['authenticated']['user_id']) &&  $_SESSION['authenticated']['user_id'] == 1){
     return TRUE;
@@ -95,7 +95,7 @@ function lwt_process_permissions($content_id, $groups, $roles){
   //Assume no access
   $access = FALSE;
   
-  $content_access = lwt_db_fetch(DB_NAME, 'group_access', NULL, array('content_id' => $content_id));
+  $content_access = core_db_fetch(DB_NAME, 'group_access', NULL, array('content_id' => $content_id));
   if (count($content_access)>0){
     foreach ($content_access as $record){
       if (in_array($record['group_id'],$groups)){
@@ -105,7 +105,7 @@ function lwt_process_permissions($content_id, $groups, $roles){
   }
   
   // Check for Role overrides (if unset, means everyone can access!)
-  $role_access = lwt_db_fetch(DB_NAME, 'role_access', NULL, array('content_id' => $content_id));
+  $role_access = core_db_fetch(DB_NAME, 'role_access', NULL, array('content_id' => $content_id));
   if (count($role_access)>0){
     //Reset access to false
     $access = FALSE;
@@ -126,19 +126,19 @@ function lwt_process_permissions($content_id, $groups, $roles){
  * @param array $groups Group IDs already found from previous iterations
  * @return array All Group IDs that a user may access
  */
-function lwt_process_grouptree($group, $groups){
+function core_process_grouptree($group, $groups){
   if ($group === NULL){
     return $groups;
   }
   
   //find children
-  $groups = lwt_process_get_children($group, $groups);
+  $groups = core_process_get_children($group, $groups);
   
   //find parents until we reach root
   $search = $group;
   $loop = true;
   while($loop){
-    $record = lwt_db_fetch(DB_NAME, 'group_hierarchy', NULL, array('group_id' => $group));
+    $record = core_db_fetch(DB_NAME, 'group_hierarchy', NULL, array('group_id' => $group));
     if ($record[0]['parent_id'] == 0){
       $loop = false;
       $groups[0] = 0;
@@ -157,13 +157,13 @@ function lwt_process_grouptree($group, $groups){
  * @param type $groups Array of group IDs that are available to keep appending
  * @return array Array of Group IDs (this gets appended to the input)
  */
-function lwt_process_get_children($parent, $groups){
+function core_process_get_children($parent, $groups){
   $groups[$parent] = $parent;
-  $children = lwt_db_fetch(DB_NAME, 'group_hierarchy', NULL, array('parent_id' => $parent));
+  $children = core_db_fetch(DB_NAME, 'group_hierarchy', NULL, array('parent_id' => $parent));
   if (count($children)>0){
     foreach ($children as $child){
       if ($child['group_id'] != 0){
-        $groups = lwt_process_get_children($child['group_id'],$groups);
+        $groups = core_process_get_children($child['group_id'],$groups);
       }
     }
   }
@@ -177,13 +177,13 @@ function lwt_process_get_children($parent, $groups){
  * @param type $contents Array of content IDs that are available to keep appending
  * @return array Array of Content IDs (this gets appended to the input)
  */
-function lwt_process_get_contentchildren($parent, $contents){
+function core_process_get_contentchildren($parent, $contents){
   $contents[$parent] = $parent;
-  $children = lwt_db_fetch(DB_NAME, 'content_hierarchy', NULL, array('parent_id' => $parent));
+  $children = core_db_fetch(DB_NAME, 'content_hierarchy', NULL, array('parent_id' => $parent));
   if (count($children)>0){
     foreach ($children as $child){
       if ($child['content_id'] != 0){
-        $contents = lwt_process_get_contentchildren($child['content_id'],$contents);
+        $contents = core_process_get_contentchildren($child['content_id'],$contents);
       }
     }
   }
@@ -197,7 +197,7 @@ function lwt_process_get_contentchildren($parent, $contents){
  * @param string $request Request URI
  * @return string HTML Markup from the individual section that was requested
  */
-function lwt_process_url($request){
+function core_process_url($request){
   // Switchboard
   $path = explode("/",$request);
   $i = 0;
@@ -209,7 +209,7 @@ function lwt_process_url($request){
       continue;
     }
     if(($url_code != '' || $parent_id == 0) && $app_root == 0){
-      $info = lwt_db_fetch(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
+      $info = core_db_fetch(DB_NAME,'content_hierarchy',NULL, array('parent_id' => $parent_id, 'url_code' => $url_code));
       if (count($info)>0){
         $parent_id = $info[0]['content_id'];
         $app_root = $info[0]['app_root'];
@@ -220,7 +220,7 @@ function lwt_process_url($request){
       }
     }
   }
-  $info = lwt_db_fetch(DB_NAME, 'content', NULL, array('id' => $parent_id));
+  $info = core_db_fetch(DB_NAME, 'content', NULL, array('id' => $parent_id));
   if (count($info)>0){
     $fn = $info[0]['function_call'];
     $content = $info[0]['content'];
@@ -243,7 +243,7 @@ function lwt_process_url($request){
  * 
  * @return void
  */
-function lwt_process_download(){
+function core_process_download(){
   // Stop output buffering
   ob_clean();
   

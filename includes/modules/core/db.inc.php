@@ -13,7 +13,7 @@
  * @param type $database Database name
  * @return array $creds Database credentials
  */
-function lwt_db_creds($database){
+function core_db_creds($database){
   $creds = array();
   if ($database == DB_NAME){
     $creds['host'] = DB_HOST;
@@ -41,7 +41,7 @@ function lwt_db_creds($database){
  * 
  * @return array $output 
  */
-function lwt_db_fetch($database, $table, $fields=NULL,  $where=NULL, $groupby=NULL, $sortby=NULL, $id=NULL){
+function core_db_fetch($database, $table, $fields=NULL,  $where=NULL, $groupby=NULL, $sortby=NULL, $id=NULL){
   if (!is_array($fields)){
     $field_string = '*';
   }
@@ -76,7 +76,7 @@ function lwt_db_fetch($database, $table, $fields=NULL,  $where=NULL, $groupby=NU
     $sortby_string = "ORDER BY `".implode('` , `', $sortby)."`";
   }
   $sql = "SELECT {$field_string} FROM `{$table}` {$where_string} {$groupby_string} {$sortby_string}";
-  return lwt_db_fetch_raw($database, $sql, $id);
+  return core_db_fetch_raw($database, $sql, $id);
 }
 
 /**
@@ -88,8 +88,8 @@ function lwt_db_fetch($database, $table, $fields=NULL,  $where=NULL, $groupby=NU
  * 
  * @return array $output
  */
-function lwt_db_fetch_raw($database, $query, $id=NULL){
-  $db_login = lwt_db_creds($database);
+function core_db_fetch_raw($database, $query, $id=NULL){
+  $db_login = core_db_creds($database);
   if ($db_login){
     $conn = new mysqli($db_login['host'], $db_login['user'], $db_login['pass'], $database, $db_login['port']);
     $conn->real_query($query);
@@ -123,7 +123,7 @@ function lwt_db_fetch_raw($database, $query, $id=NULL){
  * 
  * @return array $status error number, message, and insert id
  */
-function lwt_db_write($database, $table, $inputs, $where = NULL){
+function core_db_write($database, $table, $inputs, $where = NULL){
   $fields = array();
   $values = array();
   foreach ($inputs as $field => $value){
@@ -176,7 +176,7 @@ function lwt_db_write($database, $table, $inputs, $where = NULL){
     }
     $sql = "UPDATE `$table` SET " . implode(" , ",$queries) . " WHERE " . implode(" AND ", $wheres);
   }
-  return lwt_db_write_raw($database, $sql);
+  return core_db_write_raw($database, $sql);
 }
 
 /**
@@ -187,8 +187,8 @@ function lwt_db_write($database, $table, $inputs, $where = NULL){
  * 
  * @return array $status error number, message, and insert id
  */
-function lwt_db_write_raw($database, $sql){
-  $db_login = lwt_db_creds($database);
+function core_db_write_raw($database, $sql){
+  $db_login = core_db_creds($database);
   if (!$db_login){
     $status['error'] = 9990;
     $status['message'] = 'Bad database settings';
@@ -213,15 +213,15 @@ function lwt_db_write_raw($database, $sql){
 }
 
 /**
- * Multiple query function, may be removed...
+ * Multiple query, may be removed...
  *
  * @param string $database Database name
  * @param string $sql Raw multi-statement SQL Query
  *
  * @return array $status error number and message
  */
-function lwt_db_multiquery($database, $sql){
-  $db_login = lwt_db_creds($database);
+function core_db_multiquery($database, $sql){
+  $db_login = core_db_creds($database);
    if (!$db_login){
     $status['error'] = 9990;
     $status['message'] = 'Bad database settings';
