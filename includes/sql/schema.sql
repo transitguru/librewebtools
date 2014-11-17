@@ -23,10 +23,6 @@ CREATE TABLE IF NOT EXISTS `roles` (
 )
 ENGINE = InnoDB COMMENT = 'Basic user roles';
 
--- Add unauthenticated user to the roles
-INSERT INTO `roles` (`name`, `desc`, `created`) VALUES ('Unauthenticated User', 'Users that are not logged in', (SELECT now()));
-UPDATE `roles` SET `id` = 0;
-ALTER TABLE `roles` auto_increment = 1;
 
 -- -----------------------------------------------------
 -- Table `groups` 
@@ -44,11 +40,6 @@ CREATE TABLE IF NOT EXISTS `groups` (
   FOREIGN KEY (`parent_id`) REFERENCES `groups` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   UNIQUE KEY (`name` ASC)
 ) ENGINE=InnoDB COMMENT = 'User groups (in a hierarchical tree)';
-
--- Add root to the groups
-INSERT INTO `groups` (`name`, `desc`, `created`) VALUES ('Everyone', 'Root level group, everyone!', (SELECT now()));
-UPDATE `groups` SET `id` = 0;
-ALTER TABLE `groups` auto_increment = 1;
 
 
 -- -----------------------------------------------------
@@ -126,6 +117,7 @@ DROP TABLE IF EXISTS `pages` ;
 CREATE TABLE IF NOT EXISTS `pages` (
   `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique identifier for page' ,
   `parent_id` INT UNSIGNED DEFAULT NULL COMMENT 'Parent for a page, 0 is root, NULL means ready to delete (unless id=0)' ,
+  `user_id` INT UNSIGNED  DEFAULT NULL COMMENT 'User who created originally the page (references users.id)',
   `url_code` VARCHAR(100) NOT NULL COMMENT 'URL alias at that level (no slashes allowed)',
   `title` VARCHAR(255) NOT NULL COMMENT 'Current title of this content',
   `app_root` TINYINT NOT NULL DEFAULT 0 COMMENT 'Boolean to determine if this is the root of an application, therfore no sub-pages allowed',
@@ -136,15 +128,11 @@ CREATE TABLE IF NOT EXISTS `pages` (
   `activated` DATETIME DEFAULT NULL COMMENT 'Optional date for the page to go live',
   `deactivated` DATETIME DEFAULT NULL COMMENT 'Optional date for user to retract the content (or to reflect "deleted" items)',
   UNIQUE KEY (`parent_id`,`url_code`) ,
-  PRIMARY KEY (`id`), FOREIGN KEY (`parent_id`) REFERENCES `pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  PRIMARY KEY (`id`), FOREIGN KEY (`parent_id`) REFERENCES `pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  FOREIGN KEY (`parent_id`) REFERENCES `pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 )
 ENGINE = InnoDB COMMENT = 'Web "pages" that can bootstrap other applications and/or contain content';
-
--- Add root to the pages
-INSERT INTO `pages` (`url_code`, `title`, `created`) VALUES ('', 'Home', (SELECT now()));
-UPDATE `pages` SET `id` = 0;
-ALTER TABLE `pages` auto_increment = 1;
-
 
 -- -----------------------------------------------------
 -- Table `page_content`
@@ -154,13 +142,15 @@ DROP TABLE IF EXISTS `page_content` ;
 CREATE TABLE IF NOT EXISTS `page_content` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique identifier to Content',
   `page_id`  INT UNSIGNED NOT NULL COMMENT 'Reference to pages.id' ,
+  `user_id` INT UNSIGNED DEFAULT NULL COMMENT 'User who edited the content (references users.id)',
   `created` DATETIME NOT NULL COMMENT 'Date when this history item was created',
   `title` VARCHAR(255) NOT NULL COMMENT 'Title of this content',
   `summary` LONGTEXT NULL COMMENT 'User inputted summary',
   `content` LONGTEXT NULL COMMENT 'User inputted comment (html)',
   PRIMARY KEY (`id`),
   UNIQUE KEY (`page_id`,`created`),
-  FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE  
 )
 ENGINE = InnoDB COMMENT = 'Content for webpages';
 
@@ -183,10 +173,6 @@ CREATE TABLE IF NOT EXISTS `menus`(
 )
 ENGINE = InnoDB COMMENT 'Creates menus and their Menu Links';
 
--- Add root to the menus
-INSERT INTO `menus` (`name`, `page_id`, `created`) VALUES ('Root', 0, (SELECT now()));
-UPDATE `menus` SET `id` = 0;
-ALTER TABLE `menus` auto_increment = 1;
 -- -----------------------------------------------------
 -- Table `page_roles`
 -- -----------------------------------------------------
@@ -195,8 +181,6 @@ DROP TABLE IF EXISTS `page_roles` ;
 CREATE TABLE IF NOT EXISTS `page_roles` (
   `role_id` INT UNSIGNED NOT NULL COMMENT 'Reference to roles.id',
   `page_id` INT UNSIGNED NOT NULL COMMENT 'Reference to pages.id',
-  `view` TINYINT NOT NULL DEFAULT 1 COMMENT 'Grants right to view',
-  `edit` TINYINT NOT NULL DEFAULT 0 COMMENT 'Grants right to edit',
   PRIMARY KEY (`role_id`, `page_id`),
   FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -211,8 +195,6 @@ DROP TABLE IF EXISTS `page_groups` ;
 CREATE TABLE IF NOT EXISTS `page_groups` (
   `group_id` INT UNSIGNED NOT NULL COMMENT 'Reference to groups.id',
   `page_id` INT UNSIGNED NOT NULL COMMENT 'Reference to pages.id',
-  `view` TINYINT NOT NULL DEFAULT 1 COMMENT 'Grants right to view',
-  `edit` TINYINT NOT NULL DEFAULT 0 COMMENT 'Grants right to edit',
   PRIMARY KEY (`group_id`, `page_id`),
   FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -226,6 +208,7 @@ DROP TABLE IF EXISTS `files` ;
 
 CREATE TABLE IF NOT EXISTS `files` (
   `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique file identifier',
+  `user_id` INT UNSIGNED  DEFAULT NULL COMMENT 'User who created uploaded the file (references users.id)',
   `basename` VARCHAR(255) NOT NULL COMMENT 'File basename (as uploaded)',
   `path` VARCHAR(255) NOT NULL COMMENT 'File name adjusted, to prevent repeats',
   `size` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'File size',
@@ -234,7 +217,8 @@ CREATE TABLE IF NOT EXISTS `files` (
   `title` VARCHAR(255) NULL COMMENT 'Optional title',
   `caption` TEXT NULL COMMENT 'Optional caption text',
   PRIMARY KEY (`id`),
-  UNIQUE INDEX (`basename`)
+  UNIQUE INDEX (`path`),
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 )
 ENGINE = InnoDB COMMENT 'Files registry';
 
@@ -246,8 +230,6 @@ DROP TABLE IF EXISTS `file_roles` ;
 CREATE TABLE IF NOT EXISTS `file_roles` (
   `role_id` INT UNSIGNED NOT NULL COMMENT 'Reference to roles.id',
   `file_id` INT UNSIGNED NOT NULL COMMENT 'Reference to files.id',
-  `view` TINYINT NOT NULL DEFAULT 1 COMMENT 'Grants right to view',
-  `edit` TINYINT NOT NULL DEFAULT 0 COMMENT 'Grants right to edit',
   PRIMARY KEY (`role_id`, `file_id`),
   FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (`file_id`) REFERENCES `files` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -262,8 +244,6 @@ DROP TABLE IF EXISTS `file_groups` ;
 CREATE TABLE IF NOT EXISTS `file_groups` (
   `group_id` INT UNSIGNED NOT NULL COMMENT 'Reference to groups.id',
   `file_id` INT UNSIGNED NOT NULL COMMENT 'Reference to files.id',
-  `view` TINYINT NOT NULL DEFAULT 1 COMMENT 'Grants right to view',
-  `edit` TINYINT NOT NULL DEFAULT 0 COMMENT 'Grants right to edit',
   PRIMARY KEY (`group_id`, `file_id`),
   FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (`file_id`)  REFERENCES `files` (`id`)  ON DELETE CASCADE ON UPDATE CASCADE

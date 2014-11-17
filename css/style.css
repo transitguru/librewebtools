@@ -1,0 +1,352 @@
+/**
+ * @author Michael Sypolt <msypolt@transitguru.limited>
+ * Styling for TransitGuru Limited website
+ *
+ * 
+ */
+
+/* Importing Fonts for the site */
+
+/* Cooper Replacement(s) */
+@font-face {
+    font-family: Wooden;
+    src: url('/fonts/WOODENNI-webfont.eot');
+    src: url('/fonts/WOODENNI-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/WOODENNI-webfont.woff') format('woff'),
+         url('/fonts/WOODENNI-webfont.ttf') format('truetype'),
+         url('/fonts/WOODENNI-webfont.svg#woodennickelblackregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: Slab;
+    src: url('/fonts/slab-regular-webfont.eot');
+    src: url('/fonts/slab-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/slab-regular-webfont.woff2') format('woff2'),
+         url('/fonts/slab-regular-webfont.woff') format('woff'),
+         url('/fonts/slab-regular-webfont.ttf') format('truetype'),
+         url('/fonts/slab-regular-webfont.svg#slabregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* LiberationSans */
+@font-face {
+    font-family: LiberationSans;
+    src: url('/fonts/liberationsans-regular-webfont.eot');
+    src: url('/fonts/liberationsans-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationsans-regular-webfont.woff2') format('woff2'),
+         url('/fonts/liberationsans-regular-webfont.woff') format('woff'),
+         url('/fonts/liberationsans-regular-webfont.ttf') format('truetype'),
+         url('/fonts/liberationsans-regular-webfont.svg#liberation_sansregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: LiberationSans;
+    src: url('/fonts/liberationsans-bold-webfont.eot');
+    src: url('/fonts/liberationsans-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationsans-bold-webfont.woff2') format('woff2'),
+         url('/fonts/liberationsans-bold-webfont.woff') format('woff'),
+         url('/fonts/liberationsans-bold-webfont.ttf') format('truetype'),
+         url('/fonts/liberationsans-bold-webfont.svg#liberation_sansbold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: LiberationSans;
+    src: url('/fonts/liberationsans-italic-webfont.eot');
+    src: url('/fonts/liberationsans-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationsans-italic-webfont.woff2') format('woff2'),
+         url('/fonts/liberationsans-italic-webfont.woff') format('woff'),
+         url('/fonts/liberationsans-italic-webfont.ttf') format('truetype'),
+         url('/fonts/liberationsans-italic-webfont.svg#liberation_sansitalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+}
+@font-face {
+    font-family: LiberationSans;
+    src: url('/fonts/liberationsans-bolditalic-webfont.eot');
+    src: url('/fonts/liberationsans-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationsans-bolditalic-webfont.woff2') format('woff2'),
+         url('/fonts/liberationsans-bolditalic-webfont.woff') format('woff'),
+         url('/fonts/liberationsans-bolditalic-webfont.ttf') format('truetype'),
+         url('/fonts/liberationsans-bolditalic-webfont.svg#liberation_sansbold_italic') format('svg');
+    font-weight: bold;
+    font-style: italic;
+}
+
+/* LiberationSerif */
+@font-face {
+    font-family: LiberationSerif;
+    src: url('/fonts/liberationserif-regular-webfont.eot');
+    src: url('/fonts/liberationserif-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationserif-regular-webfont.woff2') format('woff2'),
+         url('/fonts/liberationserif-regular-webfont.woff') format('woff'),
+         url('/fonts/liberationserif-regular-webfont.ttf') format('truetype'),
+         url('/fonts/liberationserif-regular-webfont.svg#liberation_serifregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: LiberationSerif;
+    src: url('/fonts/liberationserif-bold-webfont.eot');
+    src: url('/fonts/liberationserif-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationserif-bold-webfont.woff2') format('woff2'),
+         url('/fonts/liberationserif-bold-webfont.woff') format('woff'),
+         url('/fonts/liberationserif-bold-webfont.ttf') format('truetype'),
+         url('/fonts/liberationserif-bold-webfont.svg#liberation_serifbold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face {
+    font-family: LiberationSerif;
+    src: url('/fonts/liberationserif-italic-webfont.eot');
+    src: url('/fonts/liberationserif-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationserif-italic-webfont.woff2') format('woff2'),
+         url('/fonts/liberationserif-italic-webfont.woff') format('woff'),
+         url('/fonts/liberationserif-italic-webfont.ttf') format('truetype'),
+         url('/fonts/liberationserif-italic-webfont.svg#liberation_serifitalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+}
+@font-face {
+    font-family: LiberationSerif;
+    src: url('/fonts/liberationserif-bolditalic-webfont.eot');
+    src: url('/fonts/liberationserif-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationserif-bolditalic-webfont.woff2') format('woff2'),
+         url('/fonts/liberationserif-bolditalic-webfont.woff') format('woff'),
+         url('/fonts/liberationserif-bolditalic-webfont.ttf') format('truetype'),
+         url('/fonts/liberationserif-bolditalic-webfont.svg#liberation_serifbold_italic') format('svg');
+    font-weight: bold;
+    font-style: italic;
+}
+
+/* LiberationSansNarrow */
+@font-face {
+    font-family: LiberationSansNarrow;
+    src: url('/fonts/liberationsansnarrow-regular-webfont.eot');
+    src: url('/fonts/liberationsansnarrow-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationsansnarrow-regular-webfont.woff2') format('woff2'),
+         url('/fonts/liberationsansnarrow-regular-webfont.woff') format('woff'),
+         url('/fonts/liberationsansnarrow-regular-webfont.ttf') format('truetype'),
+         url('/fonts/liberationsansnarrow-regular-webfont.svg#liberation_sans_narrowregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: LiberationSansNarrow;
+    src: url('/fonts/liberationsansnarrow-bold-webfont.eot');
+    src: url('/fonts/liberationsansnarrow-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationsansnarrow-bold-webfont.woff2') format('woff2'),
+         url('/fonts/liberationsansnarrow-bold-webfont.woff') format('woff'),
+         url('/fonts/liberationsansnarrow-bold-webfont.ttf') format('truetype'),
+         url('/fonts/liberationsansnarrow-bold-webfont.svg#liberation_sans_narrowbold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face {
+    font-family: LiberationSansNarrow;
+    src: url('/fonts/liberationsansnarrow-italic-webfont.eot');
+    src: url('/fonts/liberationsansnarrow-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationsansnarrow-italic-webfont.woff2') format('woff2'),
+         url('/fonts/liberationsansnarrow-italic-webfont.woff') format('woff'),
+         url('/fonts/liberationsansnarrow-italic-webfont.ttf') format('truetype'),
+         url('/fonts/liberationsansnarrow-italic-webfont.svg#liberation_sans_narrowitalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+}
+@font-face {
+    font-family: LiberationSansNarrow;
+    src: url('/fonts/liberationsansnarrow-bolditalic-webfont.eot');
+    src: url('/fonts/liberationsansnarrow-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationsansnarrow-bolditalic-webfont.woff2') format('woff2'),
+         url('/fonts/liberationsansnarrow-bolditalic-webfont.woff') format('woff'),
+         url('/fonts/liberationsansnarrow-bolditalic-webfont.ttf') format('truetype'),
+         url('/fonts/liberationsansnarrow-bolditalic-webfont.svg#liberation_sans_narrowBdIt') format('svg');
+    font-weight: bold;
+    font-style: italic;
+}
+
+/* LiberationMono */
+@font-face {
+    font-family: LiberationMono;
+    src: url('/fonts/liberationmono-regular-webfont.eot');
+    src: url('/fonts/liberationmono-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationmono-regular-webfont.woff2') format('woff2'),
+         url('/fonts/liberationmono-regular-webfont.woff') format('woff'),
+         url('/fonts/liberationmono-regular-webfont.ttf') format('truetype'),
+         url('/fonts/liberationmono-regular-webfont.svg#liberation_monoregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: LiberationMono;
+    src: url('/fonts/liberationmono-bold-webfont.eot');
+    src: url('/fonts/liberationmono-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationmono-bold-webfont.woff2') format('woff2'),
+         url('/fonts/liberationmono-bold-webfont.woff') format('woff'),
+         url('/fonts/liberationmono-bold-webfont.ttf') format('truetype'),
+         url('/fonts/liberationmono-bold-webfont.svg#liberation_monobold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face {
+    font-family: LiberationMono;
+    src: url('/fonts/liberationmono-bolditalic-webfont.eot');
+    src: url('/fonts/liberationmono-bolditalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationmono-bolditalic-webfont.woff2') format('woff2'),
+         url('/fonts/liberationmono-bolditalic-webfont.woff') format('woff'),
+         url('/fonts/liberationmono-bolditalic-webfont.ttf') format('truetype'),
+         url('/fonts/liberationmono-bolditalic-webfont.svg#liberation_monobold_italic') format('svg');
+    font-weight: bold;
+    font-style: italic;
+}
+@font-face {
+    font-family: LiberationMono;
+    src: url('/fonts/liberationmono-italic-webfont.eot');
+    src: url('/fonts/liberationmono-italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/fonts/liberationmono-italic-webfont.woff2') format('woff2'),
+         url('/fonts/liberationmono-italic-webfont.woff') format('woff'),
+         url('/fonts/liberationmono-italic-webfont.ttf') format('truetype'),
+         url('/fonts/liberationmono-italic-webfont.svg#liberation_monoitalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+}
+
+/* Background */
+
+html {height: 100%}
+body {font-family: LiberationSans; background-color: #999999;}
+
+/* vanilla framework */
+input[type="text"], input[type="password"] {width: 400px;}
+
+textarea {width: 90%; min-height: 300px;}
+
+.adminmenu li{ display: inline; padding: 5px; list-style: none; border-radius: 5px; background-color: #559900;}
+.adminmenu li a {color: #ffffff;}
+.adminmenu li:hover, .adminmenu li.current {background-color: #333333;}
+
+.button {background-color: #333333; color: #ffffff; padding: 5px; margin: 5px; border-radius: 5px; border: none; cursor: pointer; font-size: inherit;}
+.button:hover {background-color: #999999;}
+
+.alert {background-color: #990000}
+.alert:hover {background-color: #ff0000;}
+
+.container a{
+  text-decoration: none; 
+}
+
+.container {
+  width: 1000px;
+  top: 20px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.content {
+  width: 100%;
+  padding: 10px;
+  background-color: #ffffff;
+}
+
+.right { float:right;}
+.left { float:left;}
+.clear { clear:both;}
+.disabled {color: #aaaaaa; }
+
+.hide {display: none}
+
+
+.error {
+  background-color: #ff9999;
+  border: 1px dotted #990000;
+  padding: 2px;
+}
+.warning {
+  background-color: #ffff99;
+  border: 1px dotted #999900;
+  padding: 2px;
+}
+.success {
+  background-color: #99ff99;
+  border: 1px dotted #009900;
+  padding: 2px;
+}
+
+label {
+  display: block;
+  font-style: italic;
+}
+
+label strong {
+  color: #ff3300;
+}
+
+.required {
+  border: 2px solid black;
+}
+
+.invalid {
+  border-color: #ff3300;
+}
+
+.hand {
+  cursor: pointer;
+}
+
+h1, h2, h3, h4, h5, h6 {clear: both}
+
+figure {font-family: LiberationSansNarrow; font-style: italic;}
+figure img {max-width: 500px;display: block; padding: 4px}
+
+.copy {color: #ffffff; font-family: LiberationSansNarrow;}
+.credit {color: #ffffff; float: right; font-family: LiberationSansNarrow;}
+.credit a {color: #ffffff; font-weight: bold;}
+
+/* calendar */
+.calendar {background-color: #ffff99; width: 200px; padding: 10px; border-radius: 10px; border: 1px solid #000000}
+.calendar table {width: 100%; background-color:#666666}
+.calendar td, .calendar th {text-align: center}
+.calendar button {border: 1px solid #888888; background-color: #ffff66;font-size: 10px; border-radius: 4px}
+.othermonth {background-color: #aaaaaa;}
+.startpoint {background-color: #ffff99;}
+.today {background-color: #ff0000; font-weight: bold; color: #ffffff}
+.calendar .hand:hover {background-color: #ffff00; font-weight: bold;}
+.inactive {color: #dddddd; font-weight: normal;}
+.othermonth a {font-weight: normal; font-color: #999999}
+.currentmonth {}
+
+/* Dialogue boxes*/
+.inner  {padding: 10px}
+.dialogue {
+  z-index: 9;
+  position:fixed;
+  top: 10%;
+  min-width:400px;
+  min-height:200px;
+  margin-left:auto;
+  margin-right:auto;
+  padding: 10px;
+  overflow: auto;
+  background-color: #ffffff;
+  max-width:90% !important;
+  max-height:80%  !important;
+  opacity: 1;
+  border: 2px solid #000000;
+}
+.dialoguebg{
+  z-index: 8;
+  position:fixed;
+  top: 0px;
+  left: 0px;
+  min-height: 100%;
+  min-width: 100%;
+  opacity: 0.5;
+  background-color: #777777;
+}
+
+
+

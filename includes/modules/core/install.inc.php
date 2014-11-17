@@ -164,25 +164,49 @@ function core_install_db(){
   $sql = file_get_contents($file);
   
   $status = core_db_multiquery(DB_NAME, $sql);
-
   if ($status['error'] != 0){
     return $status['error'];
   }
-  echo "<pre>";
-  echo "\nRoles\n";
-  // Add Groups
+  // Set Date
   $date = date('Y-m-d H:i:s');
+
+  echo "<pre>";
+  echo "\nGroups\n";
+  
+  // Add root group at ID=0
   $inputs = array(
     'created' => $date,
-    'name' => 'Unauthenticated',
-    'parent_id' => 0,
+    'name' => 'Everyone',
+    'parent_id' => null,
+    'desc' => 'Root Level Group, Everyone!'
   );
   $status = core_db_write(DB_NAME, 'groups', $inputs);
   echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
+  $status = core_db_write_raw(DB_NAME, "UPDATE `groups` SET `id` = 0");
+  echo $status['error'] . "\n";
+  if ($status['error'] != 0){
+    return $status['error'];
+  }
+  $status = core_db_write_raw(DB_NAME, "ALTER TABLE `groups` AUTO_INCREMENT=1");
+  echo $status['error'] . "\n";
+  if ($status['error'] != 0){
+    return $status['error'];
+  }
+  
+  // Continuing on the autonumbering the rest of the groups
+  $inputs['name'] = 'Unauthenticated';
+  $inputs['parent_id'] = 0;
+  $inputs['desc'] = 'Users who are not logged in, no user gets assigned this group';
+  $status = core_db_write(DB_NAME, 'groups', $inputs);
+  echo $status['error'] . "\n";
+  if ($status['error'] != 0){
+    return $status['error'];
+  }
   $inputs['name'] = 'Authenticated';
+  $inputs['desc'] = 'Basic Authenticated users';
   $status = core_db_write(DB_NAME, 'groups', $inputs);
   echo $status['error'] . "\n";
   if ($status['error'] != 0){
@@ -192,12 +216,14 @@ function core_install_db(){
   // Subgroups of Authenticated
   $inputs['parent_id'] = $auth_id;
   $inputs['name'] = 'Internal';
+  $inputs['desc'] = 'Users within the organization';
   $status = core_db_write(DB_NAME, 'groups', $inputs);
   echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
   $inputs['name'] = 'External';
+  $inputs['desc'] = 'Users outside of the organization';
   $status = core_db_write(DB_NAME, 'groups', $inputs);
   echo $status['error'] . "\n";
   if ($status['error'] != 0){
@@ -205,13 +231,33 @@ function core_install_db(){
   }
   
   
-  // Add roles
+  
+  // Starting with role ID=0
   echo "\nRoles\n";
   $inputs = array(
-    'name' => 'Administrator',
-    'desc' => 'Administers Website',
+    'name' => 'Unauthenticated User',
+    'desc' => 'Users that are not logged in',
     'created' => $date,
   );
+  $status = core_db_write(DB_NAME, 'roles', $inputs);
+  echo $status['error'] . "\n";
+  if ($status['error'] != 0){
+    return $status['error'];
+  }
+  $status = core_db_write_raw(DB_NAME, "UPDATE `roles` SET `id` = 0");
+  echo $status['error'] . "\n";
+  if ($status['error'] != 0){
+    return $status['error'];
+  }
+  $status = core_db_write_raw(DB_NAME, "ALTER TABLE `roles` AUTO_INCREMENT=1");
+  echo $status['error'] . "\n";
+  if ($status['error'] != 0){
+    return $status['error'];
+  }
+  
+  // Add the rest of the roles
+  $inputs['name'] = 'Administrator';
+  $inputs['desc'] = 'Administers website';
   $status = core_db_write(DB_NAME, 'roles', $inputs);
   echo $status['error'] . "\n";
   if ($status['error'] != 0){
@@ -259,14 +305,44 @@ function core_install_db(){
   // Add the pages
   echo "\nPages\n";
   
+  // Add the homepage
+  $inputs = array(
+    'parent_id' => null,
+    'user_id' => 1,
+    'url_code' => '/',
+    'title' => 'Home',
+    'app_root' => 0,
+    'core_page' => 1,
+    'ajax_call' => '',
+    'render_call' => '',
+    'created' => $date,
+  );
+  $status = core_db_write(DB_NAME, 'pages', $inputs);
+  echo $status['error'] . "\n";
+  if ($status['error'] != 0){
+    return $status['error'];
+  }
+  $status = core_db_write_raw(DB_NAME, "UPDATE `pages` SET `id` = 0 , `url_code` = ''");
+  if ($status['error'] != 0){
+    return $status['error'];
+  }
+  echo $status['error'] . "\n";
+  $status = core_db_write_raw(DB_NAME, "ALTER TABLE `pages` AUTO_INCREMENT=1");
+  if ($status['error'] != 0){
+    return $status['error'];
+  }
+  echo $status['error'] . "\n";  
   $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => 0, 'group_id' => 0));
   echo $status['error'] . "\n";
   if ($status['error'] != 0){
     return $status['error'];
   }
   
+  
+  // Add the rest of the pages
   $inputs = array(
     'parent_id' => 0,
+    'user_id' => 1,
     'url_code' => 'login',
     'title' => 'Login',
     'app_root' => 1,
@@ -332,7 +408,22 @@ function core_install_db(){
   }
 
   $inputs['url_code'] = 'password';
-  $inputs['title'] ='Recover Password';
+  $inputs['title'] ='Change Password';
+  $inputs['ajax_call'] = NULL;
+  $inputs['render_call'] = 'core_auth_password';
+  $status = core_db_write(DB_NAME, 'pages', $inputs);
+  echo $status['error'] . "\n";
+  if ($status['error'] != 0){
+    return $status['error'];
+  }
+  $status = core_db_write(DB_NAME, 'page_groups', array('page_id' => $status['insert_id'], 'group_id' => $auth_id));
+  echo $status['error'] . "\n";
+  if ($status['error'] != 0){
+    return $status['error'];
+  }
+
+  $inputs['url_code'] = 'forgot';
+  $inputs['title'] ='Forgot Password';
   $inputs['ajax_call'] = NULL;
   $inputs['render_call'] = 'core_auth_forgot';
   $status = core_db_write(DB_NAME, 'pages', $inputs);
@@ -348,8 +439,8 @@ function core_install_db(){
 
   $inputs['url_code'] = 'admin';
   $inputs['title'] ='Administration';
-  $inputs['ajax_call'] = 'core_ajax_admin';
-  $inputs['render_call'] = 'core_render_admin';
+  $inputs['ajax_call'] = 'core_admin_ajax';
+  $inputs['render_call'] = 'core_admin_page';
   $status = core_db_write(DB_NAME, 'pages', $inputs);
   echo $status['error'] . "\n";
   if ($status['error'] != 0){
@@ -379,9 +470,10 @@ function core_install_db(){
   // Add Page content (just home page for now)
   $inputs = array(
     'page_id' => 0,
+    'user_id' => 1,
     'created' => $date,
     'title' => 'Home',
-    'content' => '<p>Welcome to LibreWeb Tools</p>',
+    'content' => '<p>Welcome to LibreWebTools</p>',
   );
   $status = core_db_write(DB_NAME, 'page_content', $inputs);
   echo $status['error'] . "\n";

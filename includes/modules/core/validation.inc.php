@@ -110,7 +110,7 @@ function core_validate_inputs($input, $type, $format, $required=false, $chars=NU
       }
     }
     elseif($format=='oneline'){
-      $input = core_validate_descript($html);
+      //$input = core_validate_descript($input);
       //Allow only one line text, do not allow CR or LF
       if(fnmatch("*\r*",$input) || fnmatch("*\n*",$input)){
         $output["error"] = 42;

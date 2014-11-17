@@ -20,13 +20,10 @@ function core_process_title($request){
   $path = explode("/",$request);
   $i = 0;
   $app_root = 0;
+  $page_id = null;
+  $ROOT = '';
   foreach ($path as $i => $url_code){
-    if ($i == 0){
-      $page_id = 0;
-      $ROOT = '';
-      continue;
-    }
-    if($url_code !== '' && $app_root == 0){
+    if($app_root == 0 && ($i == 0 || ($i > 0 && $url_code !== ''))){
       $info = core_db_fetch(DB_NAME,'pages',NULL, array('parent_id' => $page_id, 'url_code' => $url_code));
       if (count($info)>0){
         $page_id = $info[0]['id'];
@@ -37,7 +34,7 @@ function core_process_title($request){
         $activated = $info[0]['activated'];
         $deactivated = $info[0]['deactivated'];
         $title = $info[0]['title'];
-        $ROOT .= '/' . $url_code;
+        $ROOT .= $url_code . '/';
       }
       else{
         header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
@@ -49,19 +46,18 @@ function core_process_title($request){
   }
   
   // Set Application root for pages that act like applications
-  define('APP_ROOT', $ROOT);
   $output = array();
   $groups = array();
   
-  if ($ROOT != '/'){
-    $ROOT .= '/';
+  define('APP_ROOT', $ROOT);
+  
+  // Check permissions
+  if (isset($_SESSION['authenticated']['roles']) && count($_SESSION['authenticated']['roles'])>0){
+    $roles = $_SESSION['authenticated']['roles'];
   }
   else{
-    $output['page_id'] = $page_id = 0;
+    $roles = array(0);
   }
-  var_dump($page_id);
-  // Check permissions
-  $roles = $_SESSION['authenticated']['roles'];
   if (isset($_SESSION['authenticated']['groups']) && count($_SESSION['authenticated']['groups'])>0){
     foreach ($_SESSION['authenticated']['groups'] as $group){
       $groups = core_process_grouptree($group, $groups);
@@ -72,11 +68,9 @@ function core_process_title($request){
     $groups = core_process_grouptree($group, $groups);
   }
   $output['access'] = core_process_permissions($page_id, $groups, $roles);
-  var_dump($output);
   if ($output['access']){
     // Check to see if it is still published
-    $time = date('Y-m-d H:m:s');
-    var_dump($activated);
+    $time = date('Y-m-d H:i:s');
     if (!is_null($activated) && $time < $activated){
       $output['access'] = false;
     }
@@ -87,14 +81,19 @@ function core_process_title($request){
       $output['access'] = false;
     }
     
-    // Run ajax call, if it exists
-    $fn = $info[0]['preprocess_call'];
-    $output['title'] = $info[0]['title'];
-    if (!is_null($ajax_call) && function_exists($ajax_call)){
-      $ajax_call();
-    }
     $output['page_id'] = $page_id;
-    $output['render_call'] = $render_call;
+    if ($output['access']){
+      // Run ajax call, if it exists
+      $ajax_call = $info[0]['ajax_call'];
+      $output['title'] = $info[0]['title'];
+      if (!is_null($ajax_call) && function_exists($ajax_call)){
+        $ajax_call();
+      }
+      $output['render_call'] = $render_call;
+    }
+    else{
+      $output['title'] = 'Not Found';
+    }
     return $output;
   }
   else{
@@ -165,7 +164,7 @@ function core_process_grouptree($group, $groups){
   $search = $group;
   $loop = true;
   while($loop){
-    $record = core_db_fetch(DB_NAME, 'groups', NULL, array('id' => $group));
+    $record = core_db_fetch(DB_NAME, 'groups', NULL, array('id' => $search));
     if ($record[0]['parent_id'] == 0){
       $loop = false;
       $groups[0] = 0;
@@ -207,7 +206,7 @@ function core_process_get_pagechildren($parent, $pages){
   $children = core_db_fetch(DB_NAME, 'pages', NULL, array('parent_id' => $parent));
   if (count($children)>0){
     foreach ($children as $child){
-      $pages = core_process_get_contentchildren($child['id'],$pages);
+      $pages = core_process_get_pagechildren($child['id'],$pages);
     }
   }
   return $pages;

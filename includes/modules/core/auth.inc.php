@@ -16,12 +16,19 @@
  * @return array $status an array determining success or failure with message explaining what happened
  *  
  */
-function core_auth_setpassword($user_id, $pass){
+function core_auth_setpassword($user_id, $pass=null){
+  if (is_null($pass)){
+    $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    $len = strlen($chars);
+    $pass = '';
+    for ($i = 0; $i<10; $i++){
+      $num = rand(0,$len-1);
+      $reset_code .= substr($chars, $num, 1);
+    }
+  }
   $hashed = password_hash($pass, PASSWORD_DEFAULT);
-  date_default_timezone_set('UTC');
   $current_date = date("Y-m-d H:i:s");
-  $sql = "INSERT INTO `passwords` (`user_id`, `valid_date`, `hashed`) VALUES ({$user_id}, '{$current_date}', '{$hashed}')";
-  $success = core_db_write_raw(DB_NAME,$sql);
+  $success = core_db_write(DB_NAME, 'passwords', array('user_id' => $user_id, 'valid_date' => $current_date, 'hashed' => $hashed));
   return $success;
 }
 
@@ -38,6 +45,7 @@ function core_auth_resetpassword($email){
   $result = core_db_fetch(DB_NAME, 'users', NULL, array('email' => $email));
   if (count($result) > 0){
     $user = $result[0]['id'];
+    $login = $result[0]['login'];
     $passwords = core_db_fetch(DB_NAME, 'passwords', array('user_id', 'valid_date'), array('user_id' => $result[0]['id']), NULL, array('valid_date'));
     foreach ($passwords as $data){
       $user_id = $data['user_id'];
@@ -65,7 +73,7 @@ function core_auth_resetpassword($email){
     }
     $headers = "From: LibreWebTools <noreply@transitguru.info>\r\n";
     $headers .= "Content-Type: text/plain; charset=utf-8";
-    mail($email, "Password Reset", "Username: ".$user_id."\r\nPlease visit the following url to reset your password:\r\nhttp://transitguru.info/forgot/".$reset_code."/", $headers);
+    mail($email, "Password Reset", "Username: ".$login."\r\nPlease visit the following url to reset your password:\r\nhttp://librewebtools.org/forgot/".$reset_code."/", $headers);
   }
   else{
 
@@ -161,7 +169,6 @@ function core_auth_gatekeeper($request, $maintenance = false){
   elseif (isset($_SESSION['authenticated']['user'])){
     // if it's got this far, it's OK, so update start time
     $_SESSION['start'] = time();
-    $_SESSION['message'] = "Welcome {$_SESSION['authenticated']['user']}!";
   }
   
   // Now route the request
@@ -194,7 +201,6 @@ function core_auth_login(){
               <input name="login" type="submit" id="login" value="Log In">
             </form>
         <p>
-          Need to <a href="/register/">register</a>? <br />
           <a href="/forgot/">Forgot</a> your password?
         </p>
 <?php
