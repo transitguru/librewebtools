@@ -289,3 +289,60 @@ function core_test_runvalidation(){
   echo "Tests ran with {$error}/{$num} errors.\n";  
 }
 
+
+function core_test_domtest(){
+
+  echo "Testing a basic set of nodes\n\n";
+  $xml = <<< XML
+  <p class="foo" style="font-family: Sans;" onclick="Ha, trying to break this!" >Hi there, I like having <strong>Bold Text</strong> and <em>Italic Text</em>. Does the DOM Document Show this properly?</p>
+  <ul>
+    <!-- This is a comment!!! -->
+    <li class="bar" style="style">List item one</li>
+    <li>List item two</li>
+    <li>List Item three</li>
+  </ul>
+  <div>
+    Hi, I shouldn't show up!!!
+  </div>
+XML;
+  $elements = array('p', 'em', 'ul', 'li');
+  $attributes = array ('class' => null, 'style' => array('p'));
+  $output = core_xmlvalidation_scrubxml($xml, 'html', $elements, $attributes);
+  echo $output;
+  
+  echo "\n\nTesting something a bit more complex\n\n";
+  
+  $xml = <<< XML
+
+<svg>
+  <g>
+    <circle cx="0" cy="56" r="10" style="fill: #ff0000; stroke:none;" />
+    <circle class="foo" cx="0" cy="56" r="10" style="fill: #ff0000; stroke:none;" />
+    <path d="m 0,0 7,4 0,0 60,30 z" />
+    <text d="bogus input" >Some Text</text>
+    <script>
+      Some script...
+    </script>
+  </g>
+</svg>
+
+XML;
+  $elements = array('svg', 'g', 'circle', 'path', 'text');
+  $attributes = array ('cx' => null, 'cy' => null, 'r' => null, 'style' => null, 'd' => array('path'));
+  $output = core_xmlvalidation_scrubxml($xml, 'html', $elements, $attributes);
+  echo $output;
+
+}
+
+function core_test_dumpdata($node){
+  var_dump($node);
+  $children = $node->childNodes;
+  if (count($children)>0){
+    foreach ($children as $child){
+      core_test_dumpdata($child);
+    }
+  }
+
+
+}
+
