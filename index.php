@@ -27,8 +27,8 @@ foreach ($modules as $module){
   }
 }
 
-// Load other Modules
-$PATH = $_SERVER['DOCUMENT_ROOT'] . '/includes/contrib';
+// Load custom Modules
+$PATH = $_SERVER['DOCUMENT_ROOT'] . '/includes/custom';
 $modules = scandir($PATH);
 foreach ($modules as $module){
   if (is_dir($PATH . '/' . $module) && $module != '.' && $module != '..'){
