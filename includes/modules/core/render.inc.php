@@ -25,7 +25,7 @@ function core_render_wrapper($request){
     <link rel="stylesheet" type="text/css" href="/css/style.css" />
         
     <!-- Scripts -->
-    <script type="text/javascript" src="/js/script.js"></script>
+    <script type="text/javascript" src="/js/core.js"></script>
         
   </head>
   <body>
