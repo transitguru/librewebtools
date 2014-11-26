@@ -222,7 +222,7 @@ function core_process_get_pagechildren($parent, $pages){
 function core_process_content($request, $page_id){
   // Retrieve any page content, if it exists
   if(is_numeric($page_id)){
-    $info = core_db_fetch(DB_NAME, 'page_content', NULL, array('page_id' => $page_id));
+    $info = core_db_fetch_raw(DB_NAME, "SELECT * FROM `page_content` WHERE `page_id` = {$page_id} ORDER BY `created` DESC LIMIT 1");
     if (count($info)>0){
       $content = $info[0]['content'];
       if (!is_null($content)){
