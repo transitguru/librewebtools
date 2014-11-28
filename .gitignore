@@ -1,5 +1,2 @@
-#Ignore contributed modules`
-/includes/custom/*/
-
 #Ignore generated files
-/FILES/*/
+/files/
