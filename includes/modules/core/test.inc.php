@@ -70,9 +70,39 @@ function core_test_showtime($begin, $end){
  * 
  */
 function core_test_validation($inputs, $error=0){
-  $result = call_user_func_array('core_validate_inputs', $inputs);
-  if($result['error'] != $error){
-    $status['message'] = "Failure, found {$result['error']}, expected {$error}";
+  // try making the object
+  if(!isset($inputs[1])){
+    $field = new Field($inputs[0]);
+  }
+  elseif(!isset($inputs[2])){
+    $field = new Field($inputs[0], $inputs[1]);
+  }
+  elseif(!isset($inputs[3])){
+    $field = new Field($inputs[0], $inputs[1], $inputs[2]);
+  }
+  elseif(!isset($inputs[4])){
+    $field = new Field($inputs[0], $inputs[1], $inputs[2], $inputs[3]);
+  }
+  elseif(!isset($inputs[5])){
+    $field = new Field($inputs[0], $inputs[1], $inputs[2], $inputs[3], $inputs[4]);
+  }
+  else{
+    $field = new Field($inputs[0], $inputs[1], $inputs[2], $inputs[3], $inputs[4], $inputs[5]);
+  }
+  
+  // Set range
+  if (isset($inputs[6])){
+    $field->setRange($inputs[6][0],$inputs[6][1],$inputs[6][2]);
+  }
+  // Set bounds
+  if (isset($inputs[7])){
+    $field->setBounds($inputs[7][0],$inputs[7][1],$inputs[7][2]);
+  }
+  
+  $field->validate();
+  // Break the object!
+  if($field->error != $error){
+    $status['message'] = "Failure, found {$field->error}, expected {$error}";
     $status['error'] = 1;
   }
   else{
@@ -83,7 +113,7 @@ function core_test_validation($inputs, $error=0){
 }
 
 /**
- * Batch-runs tests of core_test_validation()
+ * Batch-runs tests of the new field object
  * 
  * 
  */
@@ -244,14 +274,14 @@ function core_test_runvalidation(){
     array(array('0', 'num', $formats['num'][1], true, null, false, array(0,3,0.5)),0),
     array(array('3', 'num', $formats['num'][1], true, null, false, array(0,3,0.5)),0),
     array(array('2.5', 'num', $formats['num'][1], true, null, false, array(0,3,0.5)),0),
-    array(array('2.51', 'num', $formats['num'][1], true, null, false, array(0,3,0.5), array(false,false,true)),67),
+    array(array('2.51', 'num', $formats['num'][1], true, null, false, array(0,3,0.5), array(false,false,false)),67),
     array(array('2.51', 'num', $formats['num'][1], true, null, false, array(0,3,0.5)),0),
     array(array('3.2', 'num', $formats['num'][1], true, null, false, array(0,3.2,0.5)),0),
     array(array('0', 'num', $formats['num'][0], true, null, false, array(0,50,5)),0),
     array(array('5', 'num', $formats['num'][0], true, null, false, array(0,50,5)),0),
     array(array('2.5', 'num', $formats['num'][0], true, null, false, array(0,50,5)),61),
     array(array('25', 'num', $formats['num'][0], true, null, false, array(0,50,5)),0),
-    array(array('24', 'num', $formats['num'][0], true, null, false, array(0,50,5), array(false,false,true)),67),
+    array(array('24', 'num', $formats['num'][0], true, null, false, array(0,50,5), array(false, false, false)),67),
     array(array('24', 'num', $formats['num'][0], true, null, false, array(0,50,5)),0),
     
     //Testing ranges (integers)
@@ -259,24 +289,24 @@ function core_test_runvalidation(){
     array(array('0', 'num', $formats['num'][0], true, null, false, array(0,3,null)),0),
     array(array('3', 'num', $formats['num'][0], true, null, false, array(0,3,null)),0),
     array(array('4', 'num', $formats['num'][0], true, null, false, array(0,3,null)),66),
-    array(array('-1', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(true, true, false)),63),
-    array(array('0', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(true, true, false)),63),
-    array(array('1', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(true, true, false)),0),
-    array(array('2', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(true, true, false)),0),
-    array(array('3', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(true, true, false)),65),
-    array(array('4', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(true, true, false)),65),
+    array(array('-1', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(false, false, true)),63),
+    array(array('0', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(false, false, true)),63),
+    array(array('1', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(false, false, true)),0),
+    array(array('2', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(false, false, true)),0),
+    array(array('3', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(false, false, true)),65),
+    array(array('4', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(false, false, true)),65),
     
     //Testing ranges (floats)
     array(array('-1', 'num', $formats['num'][1], true, null, false, array(0,3,null)),64),
     array(array('0', 'num', $formats['num'][1], true, null, false, array(0,3,null)),0),
     array(array('3', 'num', $formats['num'][1], true, null, false, array(0,3,null)),0),
     array(array('4', 'num', $formats['num'][1], true, null, false, array(0,3,null)),66),
-    array(array('-1', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(true, true, false)),63),
-    array(array('0', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(true, true, false)),63),
-    array(array('0.00001', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(true, true, false)),0),
-    array(array('2.99999', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(true, true, false)),0),
-    array(array('3', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(true, true, false)),65),
-    array(array('4', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(true, true, false)),65),
+    array(array('-1', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(false, false, true)),63),
+    array(array('0', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(false, false, true)),63),
+    array(array('0.00001', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(false, false, true)),0),
+    array(array('2.99999', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(false, false, true)),0),
+    array(array('3', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(false, false, true)),65),
+    array(array('4', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(false, false, true)),65),
     
 
   );
