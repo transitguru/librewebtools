@@ -2,31 +2,47 @@
 
 /**
  * @file
- * Field class
- *
+ * Field class to use for creating, collecting, and validating user fields
  *
  */
 
-/**
- * Field object
- *
- */
 class Field{
-  public $value = '';
-  public $message = '';
-  public $error = 0;
+  public $value = '';        /**< value to be validated */
+  public $message = '';      /**< message to be emitted based on validation */
+  public $error = 0;         /**< int error number based on validation */
+  
+  /**
+   * Qualitative name of format type
+   *
+   * 'preg' test against a regular expression
+   * 'memo' longer, multi-line text
+   * 'text' oneline text
+   * 'num'  numeric values
+   * 'date' test against any date format
+   *
+   */
   private $type;
+  /**
+   * Qualitative format type or regular expression
+   *
+   * Any regular expression where $type=='preg'
+   * 'all', 'noscript', 'somehtml', 'nohtml' where $type=='memo' TODO: better define qualitative filters for memo!
+   * 'email', 'password', 'oneline', 'nowacky' where $type=='text'
+   * 'int', 'dec' where $type=='num'
+   * Any string date format where $type=='date'
+   *
+   */
   private $format;
-  private $required = false;
-  private $min_chars=0;
-  private $max_chars=0;
-  private $trim = true;
-  private $min = null;
-  private $max = null;
-  private $step = null;
-  private $inc_min = true;
-  private $inc_max = true;
-  private $auto_step = true;
+  private $required = false; /**< Determines if the field is required */
+  private $min_chars=0;      /**< Minumum number of characters */
+  private $max_chars=0;      /**< Maximum number of characters, zero means no limit */
+  private $trim = true;      /**< Determines if automatic trimming is enabled */
+  private $min = null;       /**< Minumum numeric value, null if no limit */
+  private $max = null;       /**< Maximum numeric value, null if no limit */
+  private $step = null;      /**< Minumum "precision", null if no limit */
+  private $inc_min = true;   /**< Set to false for 'greater than' */
+  private $inc_max = true;   /**< Set to false for 'less than' */
+  private $auto_step = true; /**< set to false to throw error instead of 'auto rounding' */
   
   /**
    * Initializes new Field
@@ -205,6 +221,7 @@ class Field{
       }
     }
     elseif ($this->type=='memo'){
+      // TODO: better determine qualitative filters for HTML
       if ($this->format=='all'){
         // Allow everything (this is dangerous, unless this is HTML encoded somewhere else)
         
@@ -219,7 +236,7 @@ class Field{
       }
       elseif($this->format=='nohtml'){
         // Encode all tags to prevent them from being tags?
-        $this->value = htmlspecialchars($input);
+        $this->value = htmlspecialchars($this->value);
       }
     }
     elseif ($this->type=='text'){
@@ -370,5 +387,4 @@ class Field{
       echo '</select>';
     }
   }
-
 }
