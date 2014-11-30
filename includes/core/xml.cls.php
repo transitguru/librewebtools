@@ -18,11 +18,20 @@ class XMLfragment{
    * 'svg': load defaults for SVG only
    * 'html+svg': load both HTML and SVG defaults
    */
-  private $type = 'html';
+  public $type = 'html';
   /**
    * Whitelist of elements, simple array with just the element names
    */
-  private $elements = array(
+  public $elements = array();
+  /**
+   * Whitelist of attributes, set up as a an array of arrays
+   *
+   * keys of the top level array are the attribute names
+   * values are arrays of elements to accept, make empty array if accepting all
+   */
+  public $attributes = array();
+  
+  private $html_elements = array(
     'a',           //defines a hyperlink, the named target destination for a hyperlink, or both.
     'abbr',        //represents an abbreviation and optionally provides a full description for it. 
     'address',     //used by authors to supply contact information.
@@ -126,13 +135,8 @@ class XMLfragment{
     'video',       //HTML5 ONLY! [IE9+] used to embed video content
     'wbr',         //HTML5 ONLY! [IE5.5-7]  represents a position within text where the browser may optionally break a line
   );
-  /**
-   * Whitelist of attributes, set up as a an array of arrays
-   *
-   * keys of the top level array are the attribute names
-   * values are arrays of elements to accept, make empty array if accepting all
-   */
-  private $attributes = array(
+
+  private $html_attributes = array(
     'accept' => array('form', 'input'), //List of filetypes the server accepts
     'accept-charset' => array('form'), //List of supported charsets.
     'accesskey' => array(), //Defines a keyboard shortcut
