@@ -26,7 +26,7 @@ class Field{
    * Qualitative format type or regular expression
    *
    * Any regular expression where $type=='preg'
-   * 'all', 'noscript', 'somehtml', 'nohtml' where $type=='memo' TODO: better define qualitative filters for memo!
+   * 'all', 'svghtml', 'html', 'basicsvg', 'basichtml', 'simple', 'nohtml' where $type=='memo'
    * 'email', 'password', 'oneline', 'nowacky' where $type=='text'
    * 'int', 'dec' where $type=='num'
    * Any string date format where $type=='date'
