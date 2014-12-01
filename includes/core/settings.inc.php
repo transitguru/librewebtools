@@ -14,6 +14,7 @@
  */
 function core_settings(){
   define('DB_HOST', 'localhost');     /**< The host for the database connection */
+  define('DB_TYPE', 'mysql');         /**< Type of database */
   define('DB_NAME', 'librewebtools'); /**< The database name for the application's data */
   define('DB_USER', 'lwt');           /**< The username for the application's database user */
   define('DB_PASS', 'LibreW38t00ls'); /**< The password for the application's database user (It is recommended to change this from the default!!! */

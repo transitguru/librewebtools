@@ -12,6 +12,7 @@ class DB{
   public $message = '';       /**< Error or success message */
   public $affected_rows = 0;  /**< Number of affected rows */
   public $insert_id = null;   /**< ID of record that was recently inserted */
+  protected $type = null;     /**< Database type */
   protected $name = null;     /**< Database name */
   protected $host = null;     /**< Database host */
   protected $user = null;     /**< Database user */
@@ -25,6 +26,7 @@ class DB{
    */
   public function __construct($name){
     if ($name == DB_NAME){
+      $this->type = DB_TYPE;
       $this->name = DB_NAME;
       $this->host = DB_HOST;
       $this->user = DB_USER;
