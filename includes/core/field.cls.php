@@ -220,24 +220,43 @@ class Field{
         return;
       }
     }
-    elseif ($this->type=='memo'){
+    elseif ($this->type == 'memo'){
       // TODO: better determine qualitative filters for HTML
-      if ($this->format=='all'){
+      if ($this->format === 'all'){
         // Allow everything (this is dangerous, unless this is HTML encoded somewhere else)
         
       }
-      elseif($this->format=='noscript'){
-        // Automatically remove script tags and such
+      elseif($this->format !== 'nohtml'){
+        if($this->format==='svghtml'){
+          // Allow most HTML and SVG, but no scripts
+          $qualifier = 'html+svg';
+        }
+        elseif($this->format=='html'){
+          // Allow most HTML, but no SVG and no scripts
+          $qualifier = 'html';
+        }
+        elseif($this->format=='basicsvg'){
+          // Allow basic HTML/SVG, but no raster images
+          $qualifier = 'basic+svg';
+        }
+        elseif($this->format=='basichtml'){
+          // Allow basic HTML, no images, no SVG
+          $qualifier = 'basic';
+        }
+        else{
+          // Allow the nearly no tags, and definitely no links or styling
+          $qualifier = 'simple';
+        }
+        $xml = new XML($input, $qualifier);
+        $xml->scrub();
+        $this->value = $xml->markup;
+
       }
-      elseif($this->format=='somehtml'){
-        // First, remove script tags and attributes
-        
-        // Then get whitelisted tags, convert remaining to spans?
-      }
-      elseif($this->format=='nohtml'){
-        // Encode all tags to prevent them from being tags?
+      else{
+        //Just HTMLencode everything!
         $this->value = htmlspecialchars($this->value);
       }
+      
     }
     elseif ($this->type=='text'){
       if ($this->format=='password'){
