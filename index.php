@@ -16,9 +16,9 @@
 $PATH = $_SERVER['DOCUMENT_ROOT'] . '/includes/core';
 $modules = scandir($PATH);
 foreach ($includes as $include){
-  if (is_dir($PATH . '/' . $include) && $include != '.' && $include != '..' && fnmatch("*.php", $include){
+  if (is_dir($PATH . '/' . $include) && $include != '.' && $include != '..' && fnmatch("*.php", $include)){
     include ($PATH . '/' . $include);
   }
 }
 
-
+phpinfo();
