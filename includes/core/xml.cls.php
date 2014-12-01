@@ -11,7 +11,7 @@ class XML{
   /**
    * All valid HTML elements
    */  
-  private $html_elements = array(
+  protected $html_elements = array(
     'a',           //defines a hyperlink, the named target destination for a hyperlink, or both.
     'abbr',        //represents an abbreviation and optionally provides a full description for it. 
     'address',     //used by authors to supply contact information.
@@ -118,7 +118,7 @@ class XML{
   /**
    * All valid HTML attributes
    */
-  private $html_attributes = array(
+  protected $html_attributes = array(
     'accept' => array('form', 'input'), //List of filetypes the server accepts
     'accept-charset' => array('form'), //List of supported charsets.
     'accesskey' => array(), //Defines a keyboard shortcut
@@ -238,7 +238,7 @@ class XML{
    * Array of valid SVG elements
    * Unless otherwise shown, there is native support in IE9+
    */
-  private $svg_elements = array(
+  protected $svg_elements = array(
     'a',                     //defines a hyperlink
     'altGlyph',              //[no IE?] allows sophisticated selection of the glyphs used to render its child character data.
     'altGlyphDef',           //[no IE?] defines a substitution representation for glyphs.
@@ -320,7 +320,7 @@ class XML{
   /**
    * Array of valid SVG attributes
    */
-  private $svg_attributes = array(
+  protected $svg_attributes = array(
     'accelerate' => array(),
     'accent-height' => array(),
     'accumulate' => array(),
