@@ -373,6 +373,66 @@ function core_test_dumpdata($node){
     }
   }
 
-
 }
 
+function core_test_xmlobject(){
+
+  echo "Testing a basic set of nodes\n\n";
+  $input = <<< XML
+  <p class="foo" style="font-family: Sans;" onclick="Ha, trying to break this!" >Hi there, I like having <strong>Bold Text</strong> and <em>Italic Text</em>. Does the DOM Document Show this properly?</p>
+  <ul>
+    <!-- This is a comment!!! -->
+    <li class="bar" style="style">List item one</li>
+    <li>List item two</li>
+    <li>List Item three</li>
+  </ul>
+  <div>
+    Hi, I shouldn't show up!!!
+  </div>
+XML;
+  echo $input ."\nAfter scrubbing..\n\n";
+  $elements = array('p', 'em', 'ul', 'li');
+  $attributes = array ('class' => array(), 'style' => array('p'));
+  
+  $xml = new XML($input, 'html', $elements, $attributes);
+  $xml->scrub();
+  echo $xml->markup;
+
+  
+  echo "\n\nTesting something a bit more complex\n\n";
+  
+  $input = <<< XML
+
+<svg>
+  <style>
+    svg {font-family: sans;}
+    circle {fill-color: #ff0000;}
+    .foo {stroke-color; #000000;}
+  </style>
+  <script>
+    var foo = 78;
+    bar = foo + 5;
+    console.log(bar);
+  </script>
+  <g>
+    <circle cx="0" cy="56" r="10" style="fill: #ff0000; stroke:none;" />
+    <circle class="foo" cx="0" cy="56" r="10" style="fill: #ff0000; stroke:none;" />
+    <path d="m 0,0 7,4 0,0 60,30 z" />
+    <text d="bogus input" >Some Text</text>
+    <script><![CDATA[
+      var baz = 87;
+    ]]></script>
+  </g>
+</svg>
+
+XML;
+  echo $input ."\nAfter scrubbing..\n\n";
+  $elements = array('svg', 'g', 'circle', 'path', 'text', 'style', 'script');
+  $attributes = array ('cx' => array(), 'cy' => array(), 'r' => array(), 'style' => array(), 'd' => array('path'));
+
+  $svg = new XML($input, 'html', $elements, $attributes);
+  $svg->scrub();
+  echo $svg->markup;
+
+
+}

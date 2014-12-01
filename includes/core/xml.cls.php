@@ -2,35 +2,15 @@
 
 /**
  * @file
- * XMLfragment class to use for creating or scrubbing XML fragments
+ * XML class to use for creating or scrubbing XML fragments
  *
  */
 
-class XMLfragment{
+class XML{
+
   /**
-   * Markup that will be scrubbed
-   */
-  public $markup = '';
-  /**
-   * Type of markup being scrubbed
-   * 'html': load defaults for HTML
-   * 'xml': generic XML, no defaults are loaded
-   * 'svg': load defaults for SVG only
-   * 'html+svg': load both HTML and SVG defaults
-   */
-  public $type = 'html';
-  /**
-   * Whitelist of elements, simple array with just the element names
-   */
-  public $elements = array();
-  /**
-   * Whitelist of attributes, set up as a an array of arrays
-   *
-   * keys of the top level array are the attribute names
-   * values are arrays of elements to accept, make empty array if accepting all
-   */
-  public $attributes = array();
-  
+   * All valid HTML elements
+   */  
   private $html_elements = array(
     'a',           //defines a hyperlink, the named target destination for a hyperlink, or both.
     'abbr',        //represents an abbreviation and optionally provides a full description for it. 
@@ -135,7 +115,9 @@ class XMLfragment{
     'video',       //HTML5 ONLY! [IE9+] used to embed video content
     'wbr',         //HTML5 ONLY! [IE5.5-7]  represents a position within text where the browser may optionally break a line
   );
-
+  /**
+   * All valid HTML attributes
+   */
   private $html_attributes = array(
     'accept' => array('form', 'input'), //List of filetypes the server accepts
     'accept-charset' => array('form'), //List of supported charsets.
@@ -207,8 +189,9 @@ class XMLfragment{
     'method' => array('form'), //Defines which HTTP method to use when submitting the form.
     'min' => array('input', 'meter'), //Indicates the minimum value allowed.
     'multiple' => array('input', 'select'), //Indicates whether multiple values can be entered.
-    'name' => array('button', 'form', 'fieldset', 'iframe', 'input', 'keygen', 'object', 'output', 'select', 'textarea', 'map', 'meta', 'param') //Name of the element.
+    'name' => array('button', 'form', 'fieldset', 'iframe', 'input', 'keygen', 'object', 'output', 'select', 'textarea', 'map', 'meta', 'param'), //Name of the element.
     'novalidate' => array('form'), //This attribute indicates that the form shouldn't be validated when submitted.
+    'on*' => array(), //Javascript event handler
     'open' => array('details'), //Indicates whether the details will be shown on page load.
     'optimum' => array('meter'), //Indicates the optimal numeric value.
     'pattern' => array('input'), //Defines a regular expression which the element's value will be validated against.
@@ -251,9 +234,8 @@ class XMLfragment{
     'width' => array('canvas', 'embed', 'iframe', 'img', 'input', 'object', 'video'), //Width of element, deprecated for some of these elements
     'wrap' => array('textarea')  //Indicates whether the text should be wrapped.
   );
-
   /**
-   * Array of acceptable SVG elements
+   * Array of valid SVG elements
    * Unless otherwise shown, there is native support in IE9+
    */
   private $svg_elements = array(
@@ -335,7 +317,9 @@ class XMLfragment{
     'view',                  //[?] A view is a defined way to view the image, like a zoom level or a detail view.
     'vkern',                 //The vertical distance between two glyphs in top-to-bottom fonts can be fine-tweaked with an vkern Element. This process is known as Kerning.  
   );
-  
+  /**
+   * Array of valid SVG attributes
+   */
   private $svg_attributes = array(
     'accelerate' => array(),
     'accent-height' => array(),
@@ -609,4 +593,119 @@ class XMLfragment{
     'zoomAndPan' => array(),
   );
 
+  /**
+   * Markup that will be scrubbed
+   */
+  public $markup = '';
+  /**
+   * Type of markup being scrubbed
+   * 'xml': generic XML, no defaults are loaded
+   * 'html': load defaults for HTML
+   * 'svg': load defaults for SVG only
+   * 'html+svg': load both HTML and SVG defaults
+   */
+  public $type = 'html';
+  /**
+   * Whitelist of elements, simple array with just the element names
+   */
+  public $elements = array();
+  /**
+   * Whitelist of attributes, set up as a an array of arrays
+   *
+   * keys of the top level array are the attribute names
+   * values are arrays of elements to accept, make empty array if accepting all
+   */
+  public $attributes = array();
+  /**
+   * Whether to include comments (or not)
+   */
+  public $comments = false;
+  
+  /**
+   * Initializes new XML
+   * 
+   * @param string $markup untrusted markup
+   * @param string $type Qualitative name of format type
+   * @param array $elements Allowable elements
+   * @param array $attributes Allowable attributes
+   * $param boolean $comments Allow comments nodes
+   */
+  public function __construct($markup, $type, $elements = array(), $attributes = array(), $comments=false){
+    $this->markup = $markup;
+    $this->type = $type;
+    $this->elements = $elements;
+    $this->attributes = $attributes;
+  }
+  
+  
+  /**
+   * Scrubs the markup
+   */
+  public function scrub(){
+    // Load input into dom document and find the Body
+    $input_doc = new DOMDocument('1.0');
+    libxml_use_internal_errors(true);
+    $input_doc->loadHTML($this->markup);
+    libxml_clear_errors();
+    $input_body = $input_doc->getElementsByTagName('body')->item(0);
+    
+    // Begin to build output document
+    $output_doc = new DOMDocument('1.0');
+    $output_doc->formatOutput = true;
+    $root = $output_doc->createElement('html');
+    $root = $output_doc->appendChild($root);
+    $body = $output_doc->createElement('body');
+    $body = $root->appendChild($body);
+    $body = $this->buildxml($output_doc, $input_body, $body);
+    
+    //Saving only the contents of the Body tag
+
+    $this->markup = ""; 
+    $children  = $body->childNodes;
+    foreach ($children as $child){ 
+      $this->markup .= $output_doc->saveXML($child);
+    }
+    return;
+
+  }
+
+  /**
+   * Recursively processes the XML tree
+   *
+   * @param object $output_doc Output XML Document
+   * @param object $input_node Input XML Document Node
+   * @param object $output_node Output XML Document Node
+   */
+  protected function buildxml($output_doc, $input_node, $output_node){
+    $children = $input_node->childNodes;
+    if (count($children)>0){
+      foreach ($children as $child){
+        if (in_array($child->nodeName,$this->elements)){
+          $output_child = $output_doc->createElement($child->nodeName);
+          $input_attributes = $child->attributes;
+          foreach ($input_attributes as $attr){
+            if (array_key_exists($attr->name, $this->attributes) && ($this->attributes[$attr->name] == null || count($this->attributes[$attr->name])==0 || (count($this->attributes[$attr->name])>0 && in_array($child->nodeName,$this->attributes[$attr->name])))){
+              $output_child->setAttribute($attr->name, $attr->value);
+            }
+          }
+          $output_child = $this->buildxml($output_doc, $child, $output_child);
+          $output_node->appendChild($output_child);
+        }
+        elseif($child->nodeName === '#text'){
+          $text_node = $output_doc->createTextNode($child->nodeValue);
+          $output_node->appendChild($text_node);
+        }
+        elseif($child->nodeName === '#comment' && $this->comments){
+          $text_node = $output_doc->createComment($child->nodeValue);
+          $output_node->appendChild($text_node);
+        }
+        elseif($child->nodeName === '#cdata-section'){
+          $string = str_replace('<![CDATA[','',str_replace(']]>','',$child->nodeValue));
+          $text_node = $output_doc->createCDATASection($string);
+          $output_node->appendChild($text_node);
+        }
+      }
+    }
+    return $output_node;
+  }
 }
