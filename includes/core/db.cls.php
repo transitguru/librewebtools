@@ -230,5 +230,37 @@ class DB{
         $this->affected_rows = count($this->output);
       }
     }
-  } 
+  }
+  
+  /**
+   * Multiple query, may be removed...
+   *
+   * @param string $database Database name
+   * @param string $sql Raw multi-statement SQL Query
+   *
+   * @return array $status error number and message
+   */
+  public function multiquery($sql){
+    if (!is_null($this->name)){
+      $conn = new mysqli($this->host, $this->user, $this->pass, $this->name, $this->port);
+      $conn->multi_query($sql);
+      if ($conn->errno > 0){
+        $this->error = $conn->errno;
+        $this->message = "Error: {$conn->errno} ({$conn->error})";
+        $this->affected_rows = 0;
+        $this->insert_id = null;
+      }
+      else{
+        $this->error = 0;
+        $this->message = 'Multi-Query done successfully';
+        $this->affected_rows = 0; // This is a lie, but need to reset the value
+        $this->insert_id = null;  // This is a lie, but need to reset the value
+      }
+      while ($conn->next_result()){
+        // Flush the multi queries to prevent issues  
+      }
+      $conn->close();
+    }
+  }
+ 
 }
