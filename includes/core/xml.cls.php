@@ -22,7 +22,7 @@ class XML{
    * 'basic': Load basic HTML (no images)
    * 'simple': Load simple tags and attributes
    */
-  public $type = 'html';
+  public $type = 'simple';
   /**
    * Whitelist of elements, simple array with just the element names
    */
@@ -64,44 +64,71 @@ class XML{
     
     // Build defaults
     if ((!is_array($this->elements) || count($this->elements)==0) && (!is_array($this->attributes) || count($this->attributes)==0)){
-      if ($this->type == 'simple'){
-        $this->elements = $this->allow_elem['simple'];
-        $this->attributes = $this->allow_attr['simple'];
-      }
-      elseif($this->type == 'basic'){
-        $this->elements = array_merge($this->allow_elem['simple'], $this->allow_elem['basic']);
-        $this->attributes = array_merge($this->allow_attr['simple'], $this->allow_attr['basic']);
-      }
-      elseif($this->type == 'basic+svg'){
-        $this->elements = array_merge($this->allow_elem['simple'], $this->allow_elem['basic'], $this->allow_elem['svg']);
-        $this->attributes = array_merge($this->allow_attr['simple'], $this->allow_attr['basic'], $this->allow_attr['svg']);      
-      }
-      elseif($this->type == 'html'){
-        $this->elements = array_merge($this->allow_elem['simple'], $this->allow_elem['basic'], $this->allow_elem['html']);
-        $this->attributes = array_merge($this->allow_attr['simple'], $this->allow_attr['basic'], $this->allow_attr['html']);            
-      }
-      elseif($this->type == 'html+svg'){
-        $this->elements = array_merge($this->allow_elem['simple'], $this->allow_elem['basic'], $this->allow_elem['html'], $this->allow_elem['svg']);
-        $this->attributes = array_merge($this->allow_attr['simple'], $this->allow_attr['basic'], $this->allow_attr['html'], $this->allow_attr['svg']);            
-      }
+      $this->buildDefaults();
     }
   }
+  /**
+   * Sets qualitative type
+   * 
+   * @param string $type Qualitative name of format type
+   */
   public function setType($type){
     $this->type = $type;
   }
+  /**
+   * Sets elements
+   * 
+   * @param array $elements Allowable elements
+   */
   public function setElements($elements){
     if (is_array($elements)){
       $this->elements = $elements;
     }
   }
+  /**
+   * Sets attributes
+   * 
+   * @param array $attributes Allowable attributes
+   */
   public function setAttributes($attributes){
     if (is_array($attributes)){
       $this->attributes = $attributes;
+      $this->buildDefaults();
     }
   }
+  /**
+   * Sets comments
+   * 
+   * $param boolean $comments Allow comments nodes
+   */
   public function setComments($comments){
     if (is_bool($comments)){
       $this->comments = $comments;
+    }
+  }
+  /**
+   * Builds defaults based on qualitative type
+   */
+  protected function buildDefaults(){
+    if ($this->type == 'simple'){
+      $this->elements = $this->allow_elem['simple'];
+      $this->attributes = $this->allow_attr['simple'];
+    }
+    elseif($this->type == 'basic'){
+      $this->elements = array_merge($this->allow_elem['simple'], $this->allow_elem['basic']);
+      $this->attributes = array_merge($this->allow_attr['simple'], $this->allow_attr['basic']);
+    }
+    elseif($this->type == 'basic+svg'){
+      $this->elements = array_merge($this->allow_elem['simple'], $this->allow_elem['basic'], $this->allow_elem['svg']);
+      $this->attributes = array_merge($this->allow_attr['simple'], $this->allow_attr['basic'], $this->allow_attr['svg']);      
+    }
+    elseif($this->type == 'html'){
+      $this->elements = array_merge($this->allow_elem['simple'], $this->allow_elem['basic'], $this->allow_elem['html']);
+      $this->attributes = array_merge($this->allow_attr['simple'], $this->allow_attr['basic'], $this->allow_attr['html']);            
+    }
+    elseif($this->type == 'html+svg'){
+      $this->elements = array_merge($this->allow_elem['simple'], $this->allow_elem['basic'], $this->allow_elem['html'], $this->allow_elem['svg']);
+      $this->attributes = array_merge($this->allow_attr['simple'], $this->allow_attr['basic'], $this->allow_attr['html'], $this->allow_attr['svg']);            
     }
   }
   /**
