@@ -19,10 +19,10 @@
   
   <!-- Define Marker -->
   <marker id="arrowstart" markerWidth="10" markerHeight="10" refx="2" refy="5" orient="auto">
-    <path d="M5,8 L2,5 5,2" style="stroke: currentColor; fill: none; stroke-width: 1;" />
+    <path d="M5,8 L2,5 5,2" style="fill: none; stroke-width: 0.5;" />
   </marker>
   <marker id="arrowend" markerWidth="10" markerHeight="10" refx="5" refy="5" orient="auto">
-    <path d="M2,2 L5,5 2,8" style="stroke: currentColor; fill: none; stroke-width: 1;" />
+    <path d="M2,2 L5,5 2,8" style="fill: none; stroke-width: 0.5;" />
   </marker>
   
   <!-- Layer descriptions -->
@@ -47,17 +47,18 @@
   </symbol>
 
   <!-- Connectors -->
+  <path d="M 150,20 l 0,15 c 0,10 0,10 10,10 l 40,0" style="marker-end: url(#arrowend);" />
+  
   <path class="up" d="M 349,45 l 52,0" style="marker-start: url(#arrowstart);" />
   <path class="up" d="M 549,45 l 52,0" style="marker-end: url(#arrowend);" />
-
   <path class="down" d="M 275,69 l 0,112" style="marker-end: url(#arrowend);" />
   <path class="up" d="M 475,69 l 0,32" style="marker-start: url(#arrowstart)" />
+
   <path class="up" d="M 549,125 l 52,0" style="marker-start: url(#arrowstart);" />
   <path class="up" d="M 749,125 l 15,0 c 10,0 10,0 10,10 l 0,45" style="marker-start: url(#arrowstart);" />
 
   <path class="down" d="M 349,205 l 52,0" style="marker-end: url(#arrowend);" />
   <path class="down" d="M 475,229 l 0,32" style="marker-end: url(#arrowend)" />
-  <path class="down" d="M 549,205 l 152,0" style="marker-end: url(#arrowend);" />
   <path class="up" d="M 785,229 l 0,7 c 0,10 0,10 10,10 l 70,0 c 10,0 10,0 10,10 l 0,5" style="marker-start: url(#arrowstart)" />
   <path class="up" d="M 775,229 l 0,60 c 0,10 0,10 -10,10 l -70,0 c -10,0 -10,0 -10,10 l 0,32" style="marker-start: url(#arrowstart)" />
   <path class="up" d="M 765,229 l 0,52 c 0,10 0,10 -10,10 l -160,0 c -10,0 -10,0 -10,10 l 0,52 c 0,10 0,10 -10,10 l -25,0" style="marker-start: url(#arrowstart)" />
@@ -76,6 +77,8 @@
   
   
   <path d="M 575,469 l 0,30" style="marker-start: url(#arrowstart); marker-end: url(#arrowend);" />
+  
+  <circle cx="150" cy="15" r="10" />
   
   <!-- Boxes -->
   <!-- Client level -->
