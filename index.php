@@ -21,4 +21,5 @@ foreach ($includes as $include){
   }
 }
 
-phpinfo();
+$svg = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/includes/design/design.svg');
+echo $svg;
