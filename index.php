@@ -13,6 +13,7 @@
  */
 
 // Load the core
+$start = microtime(true);
 $PATH = $_SERVER['DOCUMENT_ROOT'] . '/includes/core';
 $modules = scandir($PATH);
 foreach ($includes as $include){
@@ -23,3 +24,6 @@ foreach ($includes as $include){
 
 $svg = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/includes/design/design.svg');
 echo $svg;
+$end = microtime(true);
+$time = 1000 * ($end - $start);
+echo $time . "ms";
