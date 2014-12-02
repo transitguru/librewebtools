@@ -59,6 +59,7 @@
 
   <path class="down" d="M 349,205 l 52,0" style="marker-end: url(#arrowend);" />
   <path class="down" d="M 475,229 l 0,32" style="marker-end: url(#arrowend)" />
+  <path d="M 401,215 l -30,0 c -10,0 -10,0 -10,10 l 0,120 c 0,10 0,10 10,10 l 30,0" style="marker-start: url(#arrowstart); marker-end: url(#arrowend); stroke-dasharray: 2,1;" />
   <path class="up" d="M 785,229 l 0,7 c 0,10 0,10 10,10 l 70,0 c 10,0 10,0 10,10 l 0,5" style="marker-start: url(#arrowstart)" />
   <path class="up" d="M 775,229 l 0,60 c 0,10 0,10 -10,10 l -70,0 c -10,0 -10,0 -10,10 l 0,32" style="marker-start: url(#arrowstart)" />
   <path class="up" d="M 765,229 l 0,52 c 0,10 0,10 -10,10 l -160,0 c -10,0 -10,0 -10,10 l 0,52 c 0,10 0,10 -10,10 l -25,0" style="marker-start: url(#arrowstart)" />
