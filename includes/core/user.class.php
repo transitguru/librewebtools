@@ -2,7 +2,7 @@
 
 /**
  * @file
- * User class for loading the user information and authentication
+ * This object allows for loading and editing of user information and authentication
  *
  */
 
@@ -15,6 +15,7 @@ class User{
   public $desc = '';        /**< Description of user */
   public $groups = array(); /**< Groups that the user is a member of */
   public $roles = array();  /**< Roles that a user is a member of */
+  public $message = '';     /**< Message to view when editing or viewing a profile */
   
   /**
    * Constructs user based on user ID in database, or makes an empty user
@@ -176,4 +177,33 @@ class User{
     }
   }
   
+  
+  /**
+   * Renders a user profile editing page (intended for one's own user)
+   */
+  public function viewProfile(){
+    if ($this->id > 0){
+      // Use Field object to build form...
+      
+      
+      // Render the form ...
+      
+    }
+  }
+  
+  /**
+   * Writes a user's profile editing page (intended for one's own user)
+   */
+  public function writeProfile(){
+    if ($this->id > 0){
+    // Run field checks...
+    
+    
+    // Write to database....
+    
+    
+    // Report on status
+  
+    }
+  }
 }
