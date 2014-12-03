@@ -2,7 +2,7 @@
 
 /**
  * @file
- * @author Michael Sypolt <msypolt@transitguru.info>
+ * @author Michael Sypolt <msypolt@transitguru.limited>
  * 
  * This object loads default site settings
  */

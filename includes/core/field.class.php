@@ -2,6 +2,8 @@
 
 /**
  * @file
+ * @author Michael Sypolt <msypolt@transitguru.limited>
+ *
  * This object creates, collectes, and validates user fields
  *
  */

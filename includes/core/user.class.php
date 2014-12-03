@@ -2,6 +2,8 @@
 
 /**
  * @file
+ * @author Michael Sypolt <msypolt@transitguru.limited>
+ *
  * This object allows for loading and editing of user information and authentication
  *
  */
