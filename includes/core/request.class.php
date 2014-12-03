@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Request class to handle page requests from the user
+ * This object handles page requests from the user
  *
  */
 

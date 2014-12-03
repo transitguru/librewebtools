@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Field class to use for creating, collecting, and validating user fields
+ * This object creates, collectes, and validates user fields
  *
  */
 
@@ -221,7 +221,6 @@ class Field{
       }
     }
     elseif ($this->type == 'memo'){
-      // TODO: better determine qualitative filters for HTML
       if ($this->format === 'all'){
         // Allow everything (this is dangerous, unless this is HTML encoded somewhere else)
         

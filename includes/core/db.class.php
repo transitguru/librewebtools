@@ -2,7 +2,7 @@
 
 /**
  * @file
- * DB class to use for reading and writing to the database
+ * This object reads and writes to the database
  *
  */
  
