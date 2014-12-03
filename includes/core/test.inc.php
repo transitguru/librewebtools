@@ -38,11 +38,6 @@ function core_test_array_print($array, $prefix = 'foo', $n=0){
   return $n;
 }
 
-function core_test_showtime($begin, $end){
-  $time = $end - $begin;
-  echo $time * 1000 . 'ms';
-}
-
 /**
  * Tests core_validate_inputs()
  * 
@@ -394,7 +389,7 @@ XML;
   $elements = array('p', 'em', 'ul', 'li');
   $attributes = array ('class' => array(), 'style' => array('p'));
   
-  $xml = new XML($input, 'html', $elements, $attributes);
+  $xml = new XML($input, 'html', $elements, $attributes, true);
   $xml->scrub();
   echo $xml->markup;
 
@@ -427,12 +422,78 @@ XML;
 
 XML;
   echo $input ."\nAfter scrubbing..\n\n";
-  $elements = array('svg', 'g', 'circle', 'path', 'text', 'style', 'script');
+  $elements = array('svg', 'g', 'circle', 'path', 'text', 'style');
   $attributes = array ('cx' => array(), 'cy' => array(), 'r' => array(), 'style' => array(), 'd' => array('path'));
 
   $svg = new XML($input, 'html', $elements, $attributes);
   $svg->scrub();
   echo $svg->markup;
+  
+  echo "\n\nA very simple text String\n\n";
+  
+  $input = "This is a basic String";
+  
+  echo $input ."\nAfter scrubbing..\n\n";
+
+  $xml = new XML($input, 'basic');
+  $xml->scrub();
+  echo $xml->markup;
+
+  echo "\n\nA very basic text String\n\n";
+  
+  $input = "This is another <em>basic</em> String";
+  
+  echo $input ."\nAfter scrubbing..\n\n";
+
+  $xml = new XML($input, 'basic');
+  $xml->scrub();
+  echo $xml->markup;
+
+  echo "\n\nHow about mal-formed XML?\n\n";
+  
+  $input = "This is a <strong> Broken <em>file with </strong> misnested</em> Strings";
+  
+  echo $input ."\nAfter scrubbing..\n\n";
+
+  $xml = new XML($input, 'basic');
+  $xml->scrub();
+  echo $xml->markup;
+
+  echo "\n\nTesting XML with empty attributes\n\n";
+  
+  $input = <<< XML
+
+<svg>
+  <style>
+    svg {font-family: sans;}
+    circle {fill-color: #ff0000;}
+    .foo {stroke-color; #000000;}
+  </style>
+  <script>
+    var foo = 78;
+    bar = foo + 5;
+    console.log(bar);
+  </script>
+  <g>
+    <circle selected cx="0" cy="56" r="10" style="fill: #ff0000; stroke:none;" />
+    <circle class="foo" cx="0" cy="56" r="10" style="fill: #ff0000; stroke:none;" />
+    <path foo bar d="m 0,0 7,4 0,0 60,30 z" />
+    <text d="bogus input" >Some Text</text>
+    <script><![CDATA[
+      var baz = 87;
+    ]]></script>
+  </g>
+</svg>
+
+XML;
+  echo $input ."\nAfter scrubbing..\n\n";
+  $elements = array('svg', 'g', 'circle', 'path', 'text', 'style');
+  $attributes = array ('cx' => array(), 'cy' => array(), 'r' => array(), 'style' => array(), 'd' => array('path'));
+
+  $svg = new XML($input, 'html', $elements, $attributes);
+  $svg->scrub();
+  echo $svg->markup;
+  
 
 
 }

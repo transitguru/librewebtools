@@ -2,7 +2,7 @@
 
 /**
  * @file
- * XML class to use for creating or scrubbing XML fragments
+ * This object creates or scrubs XML fragments
  *
  */
 
@@ -323,27 +323,31 @@ class XML{
     // Load input into dom document and find the Body
     $input_doc = new DOMDocument('1.0');
     libxml_use_internal_errors(true);
-    $input_doc->loadHTML($this->markup);
+    $success = $input_doc->loadXML("<root>{$this->markup}</root>");
     libxml_clear_errors();
-    $input_body = $input_doc->getElementsByTagName('body')->item(0);
-    
-    // Begin to build output document
-    $output_doc = new DOMDocument('1.0');
-    $output_doc->formatOutput = true;
-    $root = $output_doc->createElement('html');
-    $root = $output_doc->appendChild($root);
-    $body = $output_doc->createElement('body');
-    $body = $root->appendChild($body);
-    $body = $this->buildxml($output_doc, $input_body, $body);
-    
-    //Saving only the contents of the Body tag
+    if ($success){
+      $input_root = $input_doc->getElementsByTagName('root')->item(0);
+      
+      // Begin to build output document
+      $output_doc = new DOMDocument('1.0');
+      $output_doc->formatOutput = true;
+      $root = $output_doc->createElement('root');
+      $output_doc->appendChild($root);
+      $root = $this->buildxml($output_doc, $input_root, $root);
+      
+      //Saving only the contents of the Body tag
 
-    $this->markup = ""; 
-    $children  = $body->childNodes;
-    foreach ($children as $child){ 
-      $this->markup .= $output_doc->saveXML($child);
+      $this->markup = ""; 
+      $children  = $root->childNodes;
+      foreach ($children as $child){ 
+        $this->markup .= $output_doc->saveXML($child);
+      }
+      return true;
     }
-    return;
+    else{
+      $this->markup = htmlspecialchars($this->markup);
+      return false;
+    }
 
   }
 
@@ -373,7 +377,7 @@ class XML{
           $text_node = $output_doc->createTextNode($child->nodeValue);
           $output_node->appendChild($text_node);
         }
-        elseif($child->nodeName === '#comment' && $this->comments){
+        elseif($child->nodeName === '#comment' && $this->comments == true){
           $text_node = $output_doc->createComment($child->nodeValue);
           $output_node->appendChild($text_node);
         }
