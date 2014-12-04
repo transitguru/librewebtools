@@ -99,8 +99,8 @@ DROP TABLE IF EXISTS `passwords` ;
 CREATE TABLE IF NOT EXISTS `passwords` (
   `user_id`  INT UNSIGNED NOT NULL COMMENT 'Reference to users.id',
   `valid_date` DATETIME NOT NULL COMMENT 'Valid date for this password',
-  `expire_date` DATETIME NULL COMMENT 'Expiration date for this password (or reset)',
-  `reset` TINYINT NOT NULL DEFAULT 0 COMMENT 'Boolean field determining if a reset request is out',
+  `expire_date` DATETIME NULL COMMENT 'Expiration date for this password',
+  `reset_date` DATETIME NULL COMMENT 'Expiration date for this reset code',
   `reset_code` VARCHAR(255) NULL COMMENT 'Reset code that would be used in a URL for a user to reset the password',
   `hashed` VARCHAR(255) NOT NULL COMMENT 'Hashed password',
   PRIMARY KEY (`user_id`, `valid_date`) ,
@@ -164,12 +164,13 @@ CREATE TABLE IF NOT EXISTS `menus`(
   `parent_id` INT UNSIGNED DEFAULT NULL COMMENT 'Parent menu item, 0 if at root',
   `sortorder`   INT(11) NOT NULL DEFAULT 0 COMMENT 'Allows a site admin to sort menu items',
   `name` VARCHAR(255) NOT NULL COMMENT 'Title or name of menu item',
-  `page_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Reference to pages.id',
+  `page_id` INT UNSIGNED DEFAULT NULL COMMENT 'Reference to pages.id',
+  `external_link` VARCHAR(255) DEFAULT NULL COMMENT 'External link in lieu of Page ID',
   `created` DATETIME NOT NULL COMMENT 'Date when this menu item was created',
   PRIMARY KEY (`id`),
   UNIQUE KEY (`parent_id`, `name`),
-  FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (`parent_id`) REFERENCES `menus` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  FOREIGN KEY (`parent_id`) REFERENCES `menus` (`id`) ON DELETE SET NULL ON UPDATE SET NULL
 )
 ENGINE = InnoDB COMMENT 'Creates menus and their Menu Links';
 

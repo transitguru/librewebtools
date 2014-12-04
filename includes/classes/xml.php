@@ -1,12 +1,18 @@
 <?php
 
 /**
- * @file
- * @author Michael Sypolt <msypolt@transitguru.limited>
+ * lwtXML class
  *
- * This object creates or scrubs XML fragments
+ * creates or scrubs XML fragments
+ *
+ * @category Data Abstraction
+ * @package LibreWebTools
+ * @author Michael Sypolt <msypolt@transitguru.limited>
+ * @copyright Copyright (c) 2014
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt
+ * @version Release: @package_version@
  */
-class XML{
+class lwtXml{
 
   /**
    * Markup that will be scrubbed
@@ -356,7 +362,9 @@ class XML{
    *
    * @param object $output_doc Output XML Document
    * @param object $input_node Input XML Document Node
-   * @param object $output_node Output XML Document Node
+   * @param object $output_node Output XML Document Node (to be worked on)
+   *
+   * @return object $output_node Finished output node
    */
   protected function buildxml($output_doc, $input_node, $output_node){
     $children = $input_node->childNodes;

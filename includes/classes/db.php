@@ -1,12 +1,18 @@
 <?php
 
 /**
- * @file
- * @author Michael Sypolt <msypolt@transitguru.limited>
+ * lwtDb Class
  *
- * This object reads and writes to the database
+ * reads and writes to the database
+ * 
+ * @category Database Access
+ * @package LibreWebTools
+ * @author Michael Sypolt <msypolt@transitguru.limited>
+ * @copyright Copyright (c) 2014
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt
+ * @version Release: @package_version@
  */
-class DB{
+class lwtDb{
   public $output = array();   /**< Results that would be returned from query */
   public $error = 0;          /**< Error number that would be returned from query */
   public $message = '';       /**< Error or success message */
@@ -47,7 +53,6 @@ class DB{
    * @param string $table Table name
    * @param array $inputs Associative array of Inputs
    * @param array $where Associative array of WHERE clause
-   * 
    */
   public function write($table, $inputs, $where = NULL){
     $fields = array();
@@ -139,9 +144,8 @@ class DB{
    * @param array $groupby Optional GROUP BY variables
    * @param array $sortby Optional SORT BY variables
    * @param string $id Optional field to use as index instead of numeric index
-   * 
    */
-  function fetch($table, $fields=NULL,  $where=NULL, $groupby=NULL, $sortby=NULL, $id=NULL){
+  public function fetch($table, $fields=NULL,  $where=NULL, $groupby=NULL, $sortby=NULL, $id=NULL){
     if (!is_array($fields)){
       $field_string = '*';
     }
@@ -201,7 +205,6 @@ class DB{
    * 
    * @param string $query raw query to send to the database
    * @param string $id Optional field to use as index instead of numeric index
-   * 
    */
   public function fetch_raw($sql, $id=NULL){
     if (!is_null($this->name)){
@@ -239,8 +242,6 @@ class DB{
    *
    * @param string $database Database name
    * @param string $sql Raw multi-statement SQL Query
-   *
-   * @return array $status error number and message
    */
   public function multiquery($sql){
     if (!is_null($this->name)){
@@ -264,5 +265,4 @@ class DB{
       $conn->close();
     }
   }
- 
 }

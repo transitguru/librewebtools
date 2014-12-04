@@ -1,12 +1,18 @@
 <?php
 
 /**
- * @file
- * @author Michael Sypolt <msypolt@transitguru.limited>
+ * lwtField Class
+ * 
+ * creates, collectes, and validates user inputs for data fields
  *
- * This object creates, collectes, and validates user fields
+ * @category Processing and Validation
+ * @package LibreWebTools
+ * @author Michael Sypolt <msypolt@transitguru.limited>
+ * @copyright Copyright (c) 2014
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt
+ * @version Release: @package_version@
  */
-class Field{
+class lwtField{
   public $value = '';        /**< value to be validated */
   public $message = '';      /**< message to be emitted based on validation */
   public $error = 0;         /**< int error number based on validation */
@@ -51,7 +57,7 @@ class Field{
    * @param string $type Qualitative name of format type
    * @param string $format Qualitative format type OR Regular expression test (only when $type=='preg')
    * @param boolean $required Optional: set to true if the value is required
-   * $param int $max_chars Optional: Limit number of characters
+   * @param int $max_chars Optional: Limit number of characters
    * @param boolean $trim Optional: set to true if you want to enable auto trimming
    */
   public function __construct($value, $type, $format, $required=false, $max_chars=0, $trim=true){
@@ -176,7 +182,6 @@ class Field{
    * 65 = Value greater than or equal to maximum
    * 66 = Value greater than maximum
    * 67 = Value does not match resolution (too precise)
-   * 
    */  
   public function validate(){
     //handle trimming
@@ -246,7 +251,7 @@ class Field{
           // Allow the nearly no tags, and definitely no links or styling
           $qualifier = 'simple';
         }
-        $xml = new XML($input, $qualifier);
+        $xml = new lwtXml($input, $qualifier);
         $xml->scrub();
         $this->value = $xml->markup;
 
@@ -387,6 +392,9 @@ class Field{
     return;
   }
   
+  /**
+   * Rendering function (maybe moved to a form object)
+   */
   public function render($name, $type, $list = array()){
     if ($type == 'button'){
       echo '<input type="button" value="' . $this->value . '" name="' . $name . '"/>';

@@ -10,12 +10,12 @@ Here are a few simple steps for installing LibreWebTools
     (which is a very basic set-up, but make sure have AllowOverride All enabled
     for your directory as this site relies on .htaccess files.
     
- 1. Edit your includes/modules/core/settings.inc.php to your desired database
+ 1. Edit your includes/classes/settings.php to your desired database
     user and password settings. Make sure you use a different password than the
     one given in the default file.
     
  2. Navigate to your website using your web browser. It will do a few checks
     and it is determined that the database is not installed, a form will appear
     to collect basic information to build your database based on the 
-    instructions in the includes/modules/core/settings.inc.php and your form
+    instructions in the includes/classes/settings.php and your form
     data regarding the administrative website user.

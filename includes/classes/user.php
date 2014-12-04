@@ -1,12 +1,18 @@
 <?php
 
 /**
- * @file
+ * lwtUser Class
+ * 
+ * allows for loading and editing of user information and authentication
+ * 
+ * @category Data Abstraction
+ * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
- *
- * This object allows for loading and editing of user information and authentication
+ * @copyright Copyright (c) 2014
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt
+ * @version Release: @package_version@
  */
-class User{
+class lwtUser{
   public $id = 0;           /**< User ID (0 if not logged in) */
   public $login = '';       /**< User Login */
   public $firstname = '';   /**< First name */
@@ -25,7 +31,7 @@ class User{
   public function __construct($id = 0){
     if ($id>0){
       // Lookup user by ID
-      $db = new DB(DB_NAME);
+      $db = new lwtDb(DB_NAME);
       $db->fetch('users', null, array('id' => $id));
       if ($db->affected_rows == 1){
         $this->id = $db->output[0]['id'];
@@ -84,7 +90,7 @@ class User{
     //cleanse input
     $user = trim(strtolower($username));
     $pass = trim($password);
-    $db = new DB(DB_NAME);
+    $db = new lwtDb(DB_NAME);
     
     //lookup the user by ID
     $db->fetch('users', array('id'), array('login' => $user));
@@ -172,7 +178,7 @@ class User{
       else{
         $headers = "From: LibreWebTools <noreply@transitguru.limited>\r\n";
         $headers .= "Content-Type: text/plain; charset=utf-8";
-        mail($email, "Password Reset", "Username: {$login}\r\nPlease visit the following url to reset your password:\r\nhttp://librewebtools.org/forgot/{$reset_code}/", $headers);
+        mail($email, "Password Reset", "Username: {$login}\r\nPlease visit the following url to reset your password:\r\nhttp://LibreWebTools.org/forgot/{$reset_code}/", $headers);
       }
     }
   }

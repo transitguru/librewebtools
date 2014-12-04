@@ -1,19 +1,25 @@
 <?php
 
 /**
- * @file
- * @author Michael Sypolt <msypolt@transitguru.limited>
- *
+ * lwtRequest Class
+ * 
  * This object handles page requests from the user
+ *
+ * @category Request Handling
+ * @package LibreWebTools
+ * @author Michael Sypolt <msypolt@transitguru.limited>
+ * @copyright Copyright (c) 2014
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt
+ * @version Release: @package_version@
  */
-class Request{
+class lwtRequest{
   public $uri = '/';  /**< Request from the User, as a string */
   public $title = '';  /**< Title of the page, as loaded from the database */
   public $header = '200 OK';  /**< HTTP status of the request */
   public $access = false; /**< Whether this request can be fulfilled */
   public $page_id = null; /**< Page ID that would be fetched from database */
   public $app_root = 0; /**< Determines if this request is the root of a "subapp" */
-  public $ajax_call = ''; /**< User function to call prior to page load */
+  public $ajax_call = ''; /**< Function to call prior to page load */
   public $render_call = ''; /**< Function to call while loading page (in content area) */
   public $created = ''; /**< Date created in ISO format */
   public $activated = null; /**< Date when it is desired for page to be valid */
@@ -29,7 +35,7 @@ class Request{
    */
   public function __construct($uri, $user){
     $this->uri = $uri;
-    $db = new DB(DB_NAME);
+    $db = new lwtDb(DB_NAME);
     $path = explode("/",$uri);
     $i = 0;
     $this->app_root = 0;
