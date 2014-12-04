@@ -56,6 +56,7 @@ class coreRequest{
           $this->root .= $url_code . '/';
         }
         else{
+          $this->page_id = null;
           $this->header = "404 Not Found";
           $this->access = FALSE;
           $this->title = 'Not Found';
@@ -68,7 +69,6 @@ class coreRequest{
     $output = array();
     $groups = array();
     
-    
     // Check permissions
     if (count($user->roles)>0){
       $roles = $user->roles;
@@ -76,31 +76,21 @@ class coreRequest{
     else{
       $roles = array(0);
     }
-    if (count($user->groups)>0){
-      foreach ($user->groups as $group){
-        $groups = core_process_grouptree($group, $groups);
-      }
-    }
-    else{
-      $group = 1; /**< Maps to the unauthenticated user */
-      $groups = core_process_grouptree($group, $groups);
-    }
-    $output['access'] = core_process_permissions($page_id, $groups, $roles);
-    if ($output['access']){
+    $this->access = $this->permissions($user);
+    if ($this->access){
       // Check to see if it is still published
       $time = date('Y-m-d H:i:s');
       if (!is_null($activated) && $time < $activated){
-        $output['access'] = false;
+        $this->access = false;
       }
       if (!is_null($activated) && $time < $activated){
-        $output['access'] = false;
+        $this->access = false;
       }
       if(!is_null($deactivated) && $time > $deactivated){
-        $output['access'] = false;
+        $this->access = false;
       }
       
-      $output['page_id'] = $page_id;
-      if ($output['access']){
+      if ($this->access){
         // Run ajax call, if it exists
         $ajax_call = $info[0]['ajax_call'];
         $output['title'] = $info[0]['title'];
@@ -110,16 +100,58 @@ class coreRequest{
         $output['render_call'] = $render_call;
       }
       else{
-        $output['title'] = 'Not Found';
+        $this->page_id = null;
+        $this->title = 'Not Found';
+        $this->ajax_call = '';
+        $this->render_call = '';
       }
-      return $output;
+      return;
     }
     else{
       // Return 404 title and send 404 header
-      header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
-      $output['title'] = 'Not Found';
-      return $output;
+      $this->header = "404 Not Found";
+      $this->title = 'Not Found';
     }    
   
+  }
+  
+  /**
+   * Processes permissions to content based on group and role
+   *
+   * @param coreUser $user User object containing authentication information
+   *
+   * @return boolean $access Whether the user is allowed to access the location
+   */ 
+  private function permissions($user){
+    //First, never ever lockout THE Admin user
+    if ($user->id == 1){
+      return TRUE;
+    }
+
+    //Assume no access
+    $access = FALSE;
+    
+    $db = new coreDb(DB_NAME);
+    $db->fetch('page_groups', NULL, array('page_id' => $this->page_id));
+    if ($db->affected_rows > 0){
+      foreach ($db->output as $record){
+        if (in_array($record['group_id'],$user->all_groups)){
+          $access = TRUE;
+        }
+      }
+    }
+    
+    // Check for Role overrides (if unset, means everyone can access!)
+    $db->fetch('page_roles', NULL, array('page_id' => $this->page_id));
+    if ($db->affected_rows > 0){
+      //Reset access to false
+      $access = FALSE;
+      foreach ($db->output as $record){
+        if (in_array($record['role_id'],$user->roles)){
+          $access = TRUE;
+        }
+      }
+    }
+    return $access;
   }
 }

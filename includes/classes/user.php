@@ -13,15 +13,16 @@
  * @version Release: @package_version@
  */
 class coreUser{
-  public $id = 0;           /**< User ID (0 if not logged in) */
-  public $login = '';       /**< User Login */
-  public $firstname = '';   /**< First name */
-  public $lastname = '';    /**< Last name */
-  public $email = '';       /**< Email address */
-  public $desc = '';        /**< Description of user */
-  public $groups = array(); /**< Groups that the user is a member of */
-  public $roles = array();  /**< Roles that a user is a member of */
-  public $message = '';     /**< Message to view when editing or viewing a profile */
+  public $id = 0;               /**< User ID (0 if not logged in) */
+  public $login = '';           /**< User Login */
+  public $firstname = '';       /**< First name */
+  public $lastname = '';        /**< Last name */
+  public $email = '';           /**< Email address */
+  public $desc = '';            /**< Description of user */
+  public $groups = array();     /**< Groups that the user is a member of */
+  public $all_groups = array(); /**< Permitted groups a user can access */
+  public $roles = array();      /**< Roles that a user is a member of */
+  public $message = '';         /**< Message to view when editing or viewing a profile */
   
   /**
    * Constructs user based on user ID in database, or makes an empty user
@@ -54,6 +55,16 @@ class coreUser{
             $this->groups[$key] = $value['group_id'];
           }
         }
+        $groups = array();
+        if (count($this->groups) > 0){
+          foreach ($this->groups as $group){
+            $groups = $this->grouptree($group, $groups);
+          }
+        }
+        else{
+          $groups = $this->grouptree(1, $groups);
+        }
+        $this->all_groups = $groups;
       }
       else{
         $this->logout();
@@ -183,6 +194,57 @@ class coreUser{
     }
   }
   
+  /**
+   * Provides user group IDs that can be accessed, based on input
+   * 
+   * @param type $group Group ID where the search up and down the tree begins
+   * @param array $groups Group IDs already found from previous iterations
+   *
+   * @return array All Group IDs that a user may access
+   */
+  public function grouptree($group, $groups){
+    if ($group == NULL){
+      return $groups;
+    }
+    
+    //find children
+    $groups = $this->groupchildren($group, $groups);
+    
+    //find parents until we reach root
+    $search = $group;
+    $loop = true;
+    $db = new coreDb(DB_NAME);
+    while($loop){
+      $db->fetch('groups', NULL, array('id' => $search));
+      if ($db->output[0]['parent_id'] == 0){
+        $loop = false;
+        $groups[0] = 0;
+      }
+      else{
+        $groups[$search] = $search = $db->output[0]['parent_id'];
+      }
+    }
+    return $groups;  
+  }
+
+  /**
+   * Finds children to the group IDs for a given parent
+   * 
+   * @param int $parent Parent ID to find the children
+   * @param type $groups Array of group IDs that are available to keep appending
+   * @return array Array of Group IDs (this gets appended to the input)
+   */
+  protected function groupchildren($parent, $groups){
+    $groups[$parent] = $parent;
+    $db = new coreDb(DB_NAME);
+    $db->fetch('groups', NULL, array('parent_id' => $parent));
+    if ($db->affected_rows > 0){
+      foreach ($db->output as $child){
+        $groups = $this->groupchildren($child['id'],$groups);
+      }
+    }
+    return $groups;
+  }
   
   /**
    * Renders a user profile editing page (intended for one's own user)
