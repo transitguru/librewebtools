@@ -44,9 +44,11 @@ foreach ($includes as $include){
     include ($PATH . '/' . $include);
   }
 }
-
+echo "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\" />\n    <title>LibreWebTools</title>\n</head>\n  <body>\n    <h1>Under Construction</h1><p>Please visit my <a href=\"https://github.com/transitguru/librewebtools\">GitHub</a> for more information about release plans.</p>\n";
 $svg = file_get_contents(DOC_ROOT . '/includes/design/design.svg');
 echo $svg;
 $end = microtime(true);
 $time = 1000 * ($end - $start);
 echo $time . "ms";
+echo "\n  </body>\n</html>";
+
