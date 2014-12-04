@@ -37,7 +37,7 @@
 $start = microtime(true);
 define('DOC_ROOT', getcwd());
 
-$PATH = DOC_ROOT . '/includes/core';
+$PATH = DOC_ROOT . '/includes/classes';
 $includes = scandir($PATH);
 foreach ($includes as $include){
   if (is_file($PATH . '/' . $include) && $include != '.' && $include != '..' && fnmatch("*.php", $include)){

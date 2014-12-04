@@ -64,7 +64,6 @@ class lwtRequest{
       }
     }
     
-    return;
     // Set Application root for pages that act like applications
     $output = array();
     $groups = array();
@@ -123,6 +122,4 @@ class lwtRequest{
     }    
   
   }
-  
-
 }
