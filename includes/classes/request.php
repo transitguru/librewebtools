@@ -1,7 +1,7 @@
 <?php
 
 /**
- * lwtRequest Class
+ * coreRequest Class
  * 
  * This object handles page requests from the user
  *
@@ -12,7 +12,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class lwtRequest{
+class coreRequest{
   public $uri = '/';  /**< Request from the User, as a string */
   public $title = '';  /**< Title of the page, as loaded from the database */
   public $header = '200 OK';  /**< HTTP status of the request */
@@ -35,7 +35,7 @@ class lwtRequest{
    */
   public function __construct($uri, $user){
     $this->uri = $uri;
-    $db = new lwtDb(DB_NAME);
+    $db = new coreDb(DB_NAME);
     $path = explode("/",$uri);
     $i = 0;
     $this->app_root = 0;

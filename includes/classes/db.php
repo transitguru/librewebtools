@@ -1,7 +1,7 @@
 <?php
 
 /**
- * lwtDb Class
+ * coreDb Class
  *
  * reads and writes to the database
  * 
@@ -12,7 +12,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class lwtDb{
+class coreDb{
   public $output = array();   /**< Results that would be returned from query */
   public $error = 0;          /**< Error number that would be returned from query */
   public $message = '';       /**< Error or success message */

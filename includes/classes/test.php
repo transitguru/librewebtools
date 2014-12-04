@@ -1,7 +1,7 @@
 <?php
 
 /**
- * lwtTest Class
+ * coreTest Class
  * 
  * Generally for testing things
  *
@@ -12,7 +12,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class lwtTest{
+class coreTest{
   
   public $time = '1988-06-06 15:00:00'; /**< Date test object made, not really needed */
   
@@ -80,22 +80,22 @@ class lwtTest{
   private function validation($inputs, $error=0){
     // try making the object
     if(!isset($inputs[1])){
-      $field = new lwtField($inputs[0]);
+      $field = new coreField($inputs[0]);
     }
     elseif(!isset($inputs[2])){
-      $field = new lwtField($inputs[0], $inputs[1]);
+      $field = new coreField($inputs[0], $inputs[1]);
     }
     elseif(!isset($inputs[3])){
-      $field = new lwtField($inputs[0], $inputs[1], $inputs[2]);
+      $field = new coreField($inputs[0], $inputs[1], $inputs[2]);
     }
     elseif(!isset($inputs[4])){
-      $field = new lwtField($inputs[0], $inputs[1], $inputs[2], $inputs[3]);
+      $field = new coreField($inputs[0], $inputs[1], $inputs[2], $inputs[3]);
     }
     elseif(!isset($inputs[5])){
-      $field = new lwtField($inputs[0], $inputs[1], $inputs[2], $inputs[3], $inputs[4]);
+      $field = new coreField($inputs[0], $inputs[1], $inputs[2], $inputs[3], $inputs[4]);
     }
     else{
-      $field = new lwtField($inputs[0], $inputs[1], $inputs[2], $inputs[3], $inputs[4], $inputs[5]);
+      $field = new coreField($inputs[0], $inputs[1], $inputs[2], $inputs[3], $inputs[4], $inputs[5]);
     }
     
     // Set range
@@ -378,7 +378,7 @@ XML;
     $elements = array('p', 'em', 'ul', 'li');
     $attributes = array ('class' => array(), 'style' => array('p'));
     
-    $xml = new lwtXml($input, 'html', $elements, $attributes, true);
+    $xml = new coreXml($input, 'html', $elements, $attributes, true);
     $xml->scrub();
     echo $xml->markup;
 
@@ -414,7 +414,7 @@ XML;
     $elements = array('svg', 'g', 'circle', 'path', 'text', 'style');
     $attributes = array ('cx' => array(), 'cy' => array(), 'r' => array(), 'style' => array(), 'd' => array('path'));
 
-    $svg = new lwtXml($input, 'html', $elements, $attributes);
+    $svg = new coreXml($input, 'html', $elements, $attributes);
     $svg->scrub();
     echo $svg->markup;
     
@@ -424,7 +424,7 @@ XML;
     
     echo $input ."\nAfter scrubbing..\n\n";
 
-    $xml = new lwtXml($input, 'basic');
+    $xml = new coreXml($input, 'basic');
     $xml->scrub();
     echo $xml->markup;
 
@@ -434,7 +434,7 @@ XML;
     
     echo $input ."\nAfter scrubbing..\n\n";
 
-    $xml = new lwtXml($input, 'basic');
+    $xml = new coreXml($input, 'basic');
     $xml->scrub();
     echo $xml->markup;
 
@@ -444,7 +444,7 @@ XML;
     
     echo $input ."\nAfter scrubbing..\n\n";
 
-    $xml = new lwtXml($input, 'basic');
+    $xml = new coreXml($input, 'basic');
     $xml->scrub();
     echo $xml->markup;
 
@@ -479,7 +479,7 @@ XML;
     $elements = array('svg', 'g', 'circle', 'path', 'text', 'style');
     $attributes = array ('cx' => array(), 'cy' => array(), 'r' => array(), 'style' => array(), 'd' => array('path'));
 
-    $svg = new lwtXml($input, 'html', $elements, $attributes);
+    $svg = new coreXml($input, 'html', $elements, $attributes);
     $svg->scrub();
     echo $svg->markup;
     

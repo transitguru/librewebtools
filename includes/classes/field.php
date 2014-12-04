@@ -1,7 +1,7 @@
 <?php
 
 /**
- * lwtField Class
+ * coreField Class
  * 
  * creates, collectes, and validates user inputs for data fields
  *
@@ -12,7 +12,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class lwtField{
+class coreField{
   public $value = '';        /**< value to be validated */
   public $message = '';      /**< message to be emitted based on validation */
   public $error = 0;         /**< int error number based on validation */
@@ -251,7 +251,7 @@ class lwtField{
           // Allow the nearly no tags, and definitely no links or styling
           $qualifier = 'simple';
         }
-        $xml = new lwtXml($input, $qualifier);
+        $xml = new coreXml($input, $qualifier);
         $xml->scrub();
         $this->value = $xml->markup;
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * lwtUser Class
+ * coreUser Class
  * 
  * allows for loading and editing of user information and authentication
  * 
@@ -12,7 +12,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class lwtUser{
+class coreUser{
   public $id = 0;           /**< User ID (0 if not logged in) */
   public $login = '';       /**< User Login */
   public $firstname = '';   /**< First name */
@@ -31,7 +31,7 @@ class lwtUser{
   public function __construct($id = 0){
     if ($id>0){
       // Lookup user by ID
-      $db = new lwtDb(DB_NAME);
+      $db = new coreDb(DB_NAME);
       $db->fetch('users', null, array('id' => $id));
       if ($db->affected_rows == 1){
         $this->id = $db->output[0]['id'];
@@ -90,7 +90,7 @@ class lwtUser{
     //cleanse input
     $user = trim(strtolower($username));
     $pass = trim($password);
-    $db = new lwtDb(DB_NAME);
+    $db = new coreDb(DB_NAME);
     
     //lookup the user by ID
     $db->fetch('users', array('id'), array('login' => $user));

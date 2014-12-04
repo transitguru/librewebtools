@@ -1,7 +1,7 @@
 <?php
 
 /**
- * lwtXML class
+ * coreXML class
  *
  * creates or scrubs XML fragments
  *
@@ -12,7 +12,7 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class lwtXml{
+class coreXml{
 
   /**
    * Markup that will be scrubbed

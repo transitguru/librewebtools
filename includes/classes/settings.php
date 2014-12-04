@@ -1,7 +1,7 @@
 <?php
 
 /**
- * lwtSettings Class
+ * coreSettings Class
  * 
  * This object loads default site settings
  *
@@ -12,11 +12,11 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class lwtSettings{
+class coreSettings{
   public $host = 'localhost';       /**< The host for the database connection */
   public $type = 'mysql';           /**< Type of database */
   public $name = 'librewebtools';   /**< The database name for the application's data */
-  public $user = 'lwt';             /**< The username for the application's database user */
+  public $user = 'core';             /**< The username for the application's database user */
   public $pass = 'LibreW38t00ls';   /**< The password for the application's database user (It is recommended to change this from the default!!! */
   public $port = 3306;              /**< The port for the database connection */
   
