@@ -6,7 +6,6 @@
  * 
  * This object is for testing things
  */
-
 class Test{
   
   public $time = '1988-06-06 15:00:00'; /**< Date test object made, not really needed */

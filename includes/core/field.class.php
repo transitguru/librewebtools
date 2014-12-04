@@ -5,9 +5,7 @@
  * @author Michael Sypolt <msypolt@transitguru.limited>
  *
  * This object creates, collectes, and validates user fields
- *
  */
-
 class Field{
   public $value = '';        /**< value to be validated */
   public $message = '';      /**< message to be emitted based on validation */

@@ -5,9 +5,7 @@
  * @author Michael Sypolt <msypolt@transitguru.limited>
  *
  * This object handles page requests from the user
- *
  */
-
 class Request{
   public $uri = '/';  /**< Request from the User, as a string */
   public $title = '';  /**< Title of the page, as loaded from the database */

@@ -5,9 +5,7 @@
  * @author Michael Sypolt <msypolt@transitguru.limited>
  *
  * This object allows for loading and editing of user information and authentication
- *
  */
-
 class User{
   public $id = 0;           /**< User ID (0 if not logged in) */
   public $login = '';       /**< User Login */

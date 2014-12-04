@@ -5,9 +5,7 @@
  * @author Michael Sypolt <msypolt@transitguru.limited>
  *
  * This object reads and writes to the database
- *
  */
- 
 class DB{
   public $output = array();   /**< Results that would be returned from query */
   public $error = 0;          /**< Error number that would be returned from query */

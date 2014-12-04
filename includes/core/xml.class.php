@@ -5,9 +5,7 @@
  * @author Michael Sypolt <msypolt@transitguru.limited>
  *
  * This object creates or scrubs XML fragments
- *
  */
-
 class XML{
 
   /**

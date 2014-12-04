@@ -6,7 +6,6 @@
  * 
  * This object loads default site settings
  */
-
 class Settings{
   public $host = 'localhost';       /**< The host for the database connection */
   public $type = 'mysql';           /**< Type of database */
