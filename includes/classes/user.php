@@ -74,6 +74,9 @@ class coreUser{
       // Ensure it is empty
       $this->logout();
       $this->id = $id;
+      if ($id == 0){
+        $this->all_groups = $this->grouptree(1, array());
+      }
     }
   }
   
