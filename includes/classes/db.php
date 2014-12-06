@@ -222,7 +222,7 @@ class coreDb{
         $this->message = 'Records successfully fetched';
         $result = $conn->use_result();
         while ($fetch = $result->fetch_assoc()){
-          if (!is_null($id) and key_exists($id, $fetch)){
+          if (!is_null($id) && key_exists($id, $fetch)){
             $out_id = $fetch[$id];
             $this->output[$out_id] = $fetch;
           }

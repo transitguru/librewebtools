@@ -18,11 +18,13 @@ class coreUser{
   public $firstname = '';       /**< First name */
   public $lastname = '';        /**< Last name */
   public $email = '';           /**< Email address */
+  public $created = '';         /**< Date that the user was created */
   public $desc = '';            /**< Description of user */
   public $groups = array();     /**< Groups that the user is a member of */
   public $all_groups = array(); /**< Permitted groups a user can access */
   public $roles = array();      /**< Roles that a user is a member of */
   public $message = '';         /**< Message to view when editing or viewing a profile */
+  public $error = 0;            /**< Error (zero means no error) */
   
   /**
    * Constructs user based on user ID in database, or makes an empty user
@@ -39,6 +41,7 @@ class coreUser{
         $this->login = $db->output[0]['login'];
         $this->firstname = $db->output[0]['firstname'];
         $this->lastname = $db->output[0]['lastname'];
+        $this->created = $db->output[0]['created'];
         $this->email = $db->output[0]['email'];
         $this->desc = $db->output[0]['desc'];
         $db->fetch('user_roles', null, array('user_id' => $id), null, null, 'role_id');
@@ -67,12 +70,12 @@ class coreUser{
         $this->all_groups = $groups;
       }
       else{
-        $this->logout();
+        $this->clear();
       }
     }
-    elseif ($id<=0){
+    else{
       // Ensure it is empty
-      $this->logout();
+      $this->clear();
       $this->id = $id;
       if ($id == 0){
         $this->all_groups = $this->grouptree(1, array());
@@ -83,14 +86,16 @@ class coreUser{
   /**
    * Removes User information from object, but does not destroy the object
    */
-  public function logout(){
+  public function clear(){
     $this->id = 0;
     $this->login = '';
     $this->firstname = '';
     $this->lastname = '';
     $this->email = '';
+    $this->created = '';
     $this->desc = '';
     $this->groups = array();
+    $this->all_groups = array();
     $this->roles = array();
   }
   
@@ -263,18 +268,62 @@ class coreUser{
   }
   
   /**
-   * Writes a user's profile editing page (intended for one's own user)
+   * Writes a user profile
    */
-  public function writeProfile(){
+  public function write(){
+    $db = new coreDb(DB_NAME);
+    $inputs['login'] = $this->login;
+    $inputs['firstname'] = $this->firstname;
+    $inputs['lastname'] = $this->lastname;
+    $inputs['email'] = $this->email;
+    $inputs['desc'] = $this->desc;
     if ($this->id > 0){
-    // Run field checks...
-    
-    
-    // Write to database....
-    
-    
-    // Report on status
-  
+      $db->write('users', $inputs, array('id' => $this->id));
+      $this->error = $db->error;
+      $this->message = $db->message;
+    }
+    elseif ($this->id < 0){
+      $inputs['created'] = date('Y-m-d H:i:s');
+      $this->created = $inputs['created'];
+      $db->write('users', $inputs);      
+      $this->error = $db->error;
+      $this->message = $db->message;
+      if (!$db->error){
+        $this->id = $db->insert_id;
+      }
+    }
+    else{
+      $this->error = 1;
+      $this->message = 'Cannot write user number 0';
+    }
+    if (!$this->error){
+      // Empty out groups and roles database tables
+      $db->write_raw("DELETE FROM `user_groups` WHERE `user_id` = {$this->id}");
+      $db->write_raw("DELETE FROM `user_roles` WHERE `user_id` = {$this->id}");
+
+      // Write the new roles and groups
+      foreach ($this->groups as $group){
+        $db->write('user_groups', array('group_id' => $group, 'user_id' => $this->id));
+      }
+      foreach ($this->roles as $role){
+        $db->write('user_roles', array('role_id' => $role, 'user_id' => $this->id));
+      }
+    }
+  }
+
+  /**
+   * Deletes the record, then clears the object
+   */
+  public function delete(){
+    if ($this->id > 0){
+      $db = new coreDb(DB_NAME);
+      $db->write_raw("DELETE FROM `users` WHERE `id`={$this->id}");
+      if(!$db->error){
+        $this->clear();
+      }
+      $this->error = $db->error;
+      $this->message = $db->message;
     }
   }
 }
+
