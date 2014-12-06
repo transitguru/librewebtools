@@ -1,0 +1,29 @@
+LibreWebTools v0.5, 0000-00-00
+------------------------------
+- First "public" release
+- Converted most of the functions to use OOP
+- Much simpler database
+
+LibreWebTools v0.4, 2014-11-27
+------------------------------
+- Code cleanup and more robust admin interface, last non-OOP release
+
+LibreWebTools v0.3, 2014-09-24
+------------------------------
+- Minimum supported PHP is now 5.5.x
+
+LibreWebTools v0.2, 2014-07-20
+------------------------------
+- Input validation installed and mostly running
+
+LibreWebTools v0.1, 2014-03-29
+------------------------------
+- User and content management
+- Very basic means to "plug-in" modules as desired
+- Installable and runnable, but very unstable
+
+LibreWebTools v0.0, 2014-03-06
+------------------------------
+- Combined old project files to make this project, not very usable
+
+
