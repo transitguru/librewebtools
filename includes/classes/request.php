@@ -80,24 +80,21 @@ class coreRequest{
     if ($this->access){
       // Check to see if it is still published
       $time = date('Y-m-d H:i:s');
-      if (!is_null($activated) && $time < $activated){
+      if (!is_null($this->activated) && $time < $this->activated){
         $this->access = false;
       }
-      if (!is_null($activated) && $time < $activated){
+      if (!is_null($this->activated) && $time < $this->activated){
         $this->access = false;
       }
-      if(!is_null($deactivated) && $time > $deactivated){
+      if(!is_null($this->deactivated) && $time > $this->eactivated){
         $this->access = false;
       }
       
       if ($this->access){
         // Run ajax call, if it exists
-        $ajax_call = $info[0]['ajax_call'];
-        $output['title'] = $info[0]['title'];
-        if (!is_null($ajax_call) && function_exists($ajax_call)){
-          $ajax_call();
+        if (!is_null($this->ajax_call) && function_exists($this->ajax_call)){
+          $this->ajax_call();
         }
-        $output['render_call'] = $render_call;
       }
       else{
         $this->page_id = null;
@@ -131,11 +128,25 @@ class coreRequest{
     //Assume no access
     $access = FALSE;
     
+    //Load the user's grouptree
+    $all_groups = array();
+    if (count($user->groups) > 0){
+      foreach ($user->groups as $group_id){
+        $group = new coreGroup($group_id);
+        $all_groups = $group->traverse($all_groups);
+      }
+    }
+    else{
+      $group = new coreGroup(1);
+      $all_groups = $group->traverse($all_groups);
+    } 
+
+    // Get the allowable groups for the page
     $db = new coreDb(DB_NAME);
     $db->fetch('page_groups', NULL, array('page_id' => $this->page_id));
     if ($db->affected_rows > 0){
       foreach ($db->output as $record){
-        if (in_array($record['group_id'],$user->all_groups)){
+        if (in_array($record['group_id'],$all_groups)){
           $access = TRUE;
         }
       }
