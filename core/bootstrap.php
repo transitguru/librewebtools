@@ -20,6 +20,11 @@ session_start();
 $_SESSION['user_id'] = 0; /**< This will change once login part is set up! */
 $start = microtime(true); /**< This will be removed!!! */
 
+// Collect globals
+$uri = $_SERVER['REQUEST_URI'];          /**< Request URI */
+$session = $_SESSION;                    /**< User Session Data */
+$post = $_POST;                          /**< Post Data */
+
 // Load the settings file
 require_once (DOC_ROOT . '/core/settings.php');
 
@@ -32,18 +37,35 @@ foreach ($includes as $include){
   }
 }
 
-// Test content (the design diagram, for the moment)
-echo "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\" />\n    <title>LibreWebTools</title>\n</head>\n  <body>\n    <h1>Under Construction</h1><p>Please visit my <a href=\"https://github.com/transitguru/librewebtools\">GitHub</a> for more information about release plans.</p>\n";
-$svg = file_get_contents(DOC_ROOT . '/core/design/design.svg');
-echo $svg;
+// Get settings
+$settings = new coreSettings();
 
-// Boot site object
-$site = new coreSite($_SERVER['REQUEST_URI'], $_SESSION, $_POST);
-$site->boot();
+// Check to see if the site is installed
+$installer = new coreInstaller();
+if ($installer->install == true && $uri !== '/install/'){
+  header("Location: /install/");
+  exit;
+}
+elseif ($installer->install == true && $uri === '/install/'){
+  if (isset($_POST['db'])){
+    $installer->build($post['db']);
+  }
+  $installer->view();
+}
 
-// Show time count and end the HTML tags (Will be removed)
-$end = microtime(true);
-$time = 1000 * ($end - $start);
-echo $time . "ms";
-echo "\n  </body>\n</html>";
+// Get user information
+if (isset($session['user_id'])){
+  $user = new coreUser($session['user_id']);
+}
+else{
+  $user = new coreUser(0);
+}
 
+// Load page request
+$page = new coreRequest($uri, $user);
+echo "<pre>\n\nUser Information\n";
+var_dump($user);
+echo "\n\nPage Information\n";
+var_dump($page);
+
+echo '</pre>';

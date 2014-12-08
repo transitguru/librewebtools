@@ -123,7 +123,7 @@ class coreUser{
    * 
    * @param string $pass password
    */
-  public function setpassword($user_id, $pass=null){
+  public function setpassword($pass=null){
     if (is_null($pass) && $this->id > 0){
       // Create a random password
       $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -136,8 +136,8 @@ class coreUser{
     }
     $hashed = password_hash($pass, PASSWORD_DEFAULT);
     $current_date = date("Y-m-d H:i:s");
-    $db = new DB(DB_NAME);
-    $db->write('passwords', array('user_id' => $user_id, 'valid_date' => $current_date, 'hashed' => $hashed));
+    $db = new coreDb(DB_NAME);
+    $db->write('passwords', array('user_id' => $this->id, 'valid_date' => $current_date, 'hashed' => $hashed));
   }
   
   /**
@@ -147,7 +147,7 @@ class coreUser{
    *
    */
   public function resetpassword($email){
-    $db = new DB(DB_NAME);
+    $db = new coreDb(DB_NAME);
     $db->fetch('users', NULL, array('email' => $email));
     if ($db->affected_rows > 0){
       $id = $db->output[0]['id'];

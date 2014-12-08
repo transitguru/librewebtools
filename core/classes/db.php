@@ -44,6 +44,15 @@ class coreDb{
       $this->error = 9990;
       $this->message = 'Bad database settings';
     }
+    $conn = new mysqli($this->host, $this->user, $this->pass, $this->name, $this->port);
+    if ($conn->connect_errno){
+      $this->error = 9999;
+      $this->message = 'Bad database settings';
+    }
+    else{
+      $this->error = 0;
+      $conn->close();
+    }
   }
 
 
