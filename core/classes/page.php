@@ -1,18 +1,18 @@
 <?php
 
 /**
- * coreRequest Class
+ * corePage Class
  * 
  * This object handles page requests from the user
  *
- * @category Request Handling
+ * @category Page Handling
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
  * @copyright Copyright (c) 2014
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class coreRequest{
+class corePage{
   public $uri = '/';  /**< Request from the User, as a string */
   public $title = '';  /**< Title of the page, as loaded from the database */
   public $header = '200 OK';  /**< HTTP status of the request */
@@ -24,8 +24,7 @@ class coreRequest{
   public $created = ''; /**< Date created in ISO format */
   public $activated = null; /**< Date when it is desired for page to be valid */
   public $deactivated = null; /**< Date when it is desired to deactivate the page */
-  public $type = null; /**< Default template type (core or custom) */
-  public $template = null; /**< Default template to use when rendering the page */
+  public $theme_id = null; /**< Default template to use when rendering the page */
   public $root = ''; /**< Application root where database stopped */
   public $content = ''; /**< Page content to be shown if valid content */
   
@@ -56,6 +55,7 @@ class coreRequest{
           $this->activated = $db->output[0]['activated'];
           $this->deactivated = $db->output[0]['deactivated'];
           $this->title = $db->output[0]['title'];
+          $this->theme_id = $db->output[0]['theme_id'];
           $this->root .= $url_code . '/';
         }
         else{
@@ -63,6 +63,7 @@ class coreRequest{
           $this->header = "404 Not Found";
           $this->access = FALSE;
           $this->title = 'Not Found';
+          $this->theme_id = null;
           return;
         }
       }
@@ -102,6 +103,7 @@ class coreRequest{
       $this->title = 'Not Found';
       $this->ajax_call = null;
       $this->render_call = null;
+      $this->theme_id = null;
     }
     return;    
   }

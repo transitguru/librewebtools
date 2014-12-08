@@ -62,8 +62,10 @@ else{
 }
 
 // Load page request
-$page = new coreRequest($uri, $user);
+$page = new corePage($uri, $user);
 
 // Put page into template, and run!
-$template = new coreTemplate($page);
+$theme = new coreTheme($page->theme_id);
+$theme->template($page);
+
 

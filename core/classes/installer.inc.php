@@ -305,13 +305,28 @@ class coreInstaller{
       return $user->error;
     }
     $user->setpassword($post['admin_pass']);
-
+    
+    // Add the default theme
+    $this->console .= "\nThemes\n";
+    $inputs = array(
+      'core' => 1,
+      'code' => 'core',
+      'enabled' => 1,
+      'name' => 'Default Core',
+    );
+    $db->write('themes', $inputs);
+    $this->console .= "{$db->error} \n";
+    if ($db->error != 0){
+      return $db->error;
+    }
+    
     // Add the pages
     $this->console .= "\nPages\n";
     
     // Add the homepage
     $inputs = array(
       'parent_id' => null,
+      'theme_id' => 1,
       'user_id' => 1,
       'url_code' => '/',
       'title' => 'Home',
@@ -327,15 +342,15 @@ class coreInstaller{
       return $db->error;
     }
     $db->write_raw("UPDATE `pages` SET `id` = 0 , `url_code` = ''");
+    $this->console .= "{$db->error} \n";
     if ($db->error != 0){
       return $db->error;
     }
-    $this->console .= "{$db->error} \n";
     $db->write_raw("ALTER TABLE `pages` AUTO_INCREMENT=1");
+    $this->console .= "{$db->error} \n";
     if ($db->error != 0){
       return $db->error;
     }
-    $this->console .= "{$db->error} \n";
     $db->write('page_groups', array('page_id' => 0, 'group_id' => 0));
     $this->console .= "{$db->error} \n";
     if ($db->error != 0){
@@ -346,6 +361,7 @@ class coreInstaller{
     // Add the rest of the pages, starting with login
     $inputs = array(
       'parent_id' => 0,
+      'theme_id' => 1,
       'user_id' => 1,
       'url_code' => 'login',
       'title' => 'Login',

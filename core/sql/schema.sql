@@ -108,6 +108,21 @@ CREATE TABLE IF NOT EXISTS `passwords` (
 )
 ENGINE = InnoDB COMMENT = 'User hashed passwords';
 
+-- -----------------------------------------------------
+-- Table `themes`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `themes` ;
+
+CREATE TABLE IF NOT EXISTS `themes` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique identifier for theme in database',
+  `core` TINYINT NOT NULL DEFAULT 1 COMMENT 'Boolean to designate core themes. Custom is 0',
+  `code` VARCHAR(100) NOT NULL COMMENT 'Name of theme (directory name, no spaces or special chars)',
+  `name` VARCHAR(255) NOT NULL COMMENT 'Human-friendly name of the Theme',
+  `enabled` TINYINT NOT NULL DEFAULT 1 COMMENT 'Boolean determining if theme is able to be selected',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`core`,`code`)
+)
+ENGINE = InnoDB COMMENT = 'Registry of installed themes';
 
 -- -----------------------------------------------------
 -- Table `pages`
@@ -118,6 +133,7 @@ CREATE TABLE IF NOT EXISTS `pages` (
   `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique identifier for page' ,
   `parent_id` INT UNSIGNED DEFAULT NULL COMMENT 'Parent for a page, 0 is root, NULL means ready to delete (unless id=0)' ,
   `user_id` INT UNSIGNED  DEFAULT NULL COMMENT 'User who created originally the page (references users.id)',
+  `theme_id` INT UNSIGNED DEFAULT NULL COMMENT 'Theme that this page would follow (references themse.id)',
   `url_code` VARCHAR(100) NOT NULL COMMENT 'URL alias at that level (no slashes allowed)',
   `title` VARCHAR(255) NOT NULL COMMENT 'Current title of this content',
   `app_root` TINYINT NOT NULL DEFAULT 0 COMMENT 'Boolean to determine if this is the root of an application, therfore no sub-pages allowed',
@@ -130,8 +146,8 @@ CREATE TABLE IF NOT EXISTS `pages` (
   UNIQUE KEY (`parent_id`,`url_code`) ,
   PRIMARY KEY (`id`), 
   FOREIGN KEY (`parent_id`) REFERENCES `pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  FOREIGN KEY (`parent_id`) REFERENCES `pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  FOREIGN KEY (`theme_id`) REFERENCES `themes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 )
 ENGINE = InnoDB COMMENT = 'Web "pages" that can bootstrap other applications and/or contain content';
 
