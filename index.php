@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Bootstrap file for LibreWebTools
+ * Calls the bootstrap file for LibreWebTools
  *
- * This bootstraps the entire application and will provide a means to 
- * access all available modules.
+ * This calls the bootstrap file, which would load appropriate themes, classes,
+ * and modules.
  *
  * LICENSE: All LibreWebTools code is Copyright 2012 - 2014 by Michael Sypolt of 
  * TransitGuru Limited <msypolt@transitguru.limited>.
@@ -33,28 +33,7 @@
  * @version    0.5
  */
 
-// Load the core
-session_start();
-$_SESSION['user_id'] = 0; /**< This will change once login part is set up! */
-$start = microtime(true);
+// Load the core bootstrap file, nothing more, nothing less!
 define('DOC_ROOT', getcwd());
-
-$PATH = DOC_ROOT . '/includes/classes';
-$includes = scandir($PATH);
-foreach ($includes as $include){
-  if (is_file($PATH . '/' . $include) && $include != '.' && $include != '..' && fnmatch("*.php", $include)){
-    include ($PATH . '/' . $include);
-  }
-}
-echo "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\" />\n    <title>LibreWebTools</title>\n</head>\n  <body>\n    <h1>Under Construction</h1><p>Please visit my <a href=\"https://github.com/transitguru/librewebtools\">GitHub</a> for more information about release plans.</p>\n";
-$svg = file_get_contents(DOC_ROOT . '/includes/design/design.svg');
-echo $svg;
-
-$site = new coreSite($_SERVER['REQUEST_URI'], $_SESSION, $_POST);
-$site->boot();
-
-$end = microtime(true);
-$time = 1000 * ($end - $start);
-echo $time . "ms";
-echo "\n  </body>\n</html>";
+require_once(DOC_ROOT . '/core/bootstrap.php');
 
