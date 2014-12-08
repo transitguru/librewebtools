@@ -14,7 +14,8 @@
  */
 header("HTTP/1.1 " . $page->header);
 if (!is_null($page->ajax_call) && $page->ajax_call !== '' &&  function_exists($page->ajax_call)){
-  $this->ajax_call();
+  $fn = $page->ajax_call;
+  $fn();
 }
 ?>              
 <!DOCTYPE html>
@@ -26,8 +27,9 @@ if (!is_null($page->ajax_call) && $page->ajax_call !== '' &&  function_exists($p
   <body>
 <?php 
 echo $page->content;
-if (!is_null($page->function_call) && $page->function_call !== '' &&  function_exists($page->function_call)){
-  $this->function_call();
+if (!is_null($page->render_call) && $page->render_call !== '' &&  function_exists($page->render_call)){
+  $fn = $page->render_call;
+  $fn();
 }
       
 ?>

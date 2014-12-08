@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `pages` (
   `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique identifier for page' ,
   `parent_id` INT UNSIGNED DEFAULT NULL COMMENT 'Parent for a page, 0 is root, NULL means ready to delete (unless id=0)' ,
   `user_id` INT UNSIGNED  DEFAULT NULL COMMENT 'User who created originally the page (references users.id)',
-  `theme_id` INT UNSIGNED DEFAULT NULL COMMENT 'Theme that this page would follow (references themse.id)',
+  `theme_id` INT UNSIGNED DEFAULT NULL COMMENT 'Theme that this page would follow (references themes.id)',
   `url_code` VARCHAR(100) NOT NULL COMMENT 'URL alias at that level (no slashes allowed)',
   `title` VARCHAR(255) NOT NULL COMMENT 'Current title of this content',
   `app_root` TINYINT NOT NULL DEFAULT 0 COMMENT 'Boolean to determine if this is the root of an application, therfore no sub-pages allowed',
