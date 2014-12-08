@@ -462,7 +462,7 @@ class coreInstaller{
       return $db->error;
     }
 
-    //Registration page
+    //Registration page	
     $inputs['url_code'] = 'register';
     $inputs['title'] ='Register';
     $inputs['ajax_call'] = null;

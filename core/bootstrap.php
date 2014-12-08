@@ -63,9 +63,7 @@ else{
 
 // Load page request
 $page = new coreRequest($uri, $user);
-echo "<pre>\n\nUser Information\n";
-var_dump($user);
-echo "\n\nPage Information\n";
-var_dump($page);
 
-echo '</pre>';
+// Put page into template, and run!
+$template = new coreTemplate($page);
+
