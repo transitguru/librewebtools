@@ -1,3 +1,6 @@
+#Ignore potentially sensitive settings information
+/core/settings.php
+
 #Ignore generated files
 /files/
 /custom/*/
