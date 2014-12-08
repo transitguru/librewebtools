@@ -1,2 +1,4 @@
-This directory includes modules that are part of the LibreWebTools project. This
-directory and all subdirectories are tracked in this project's git repository.
+This directory includes add-on modules that are part of the LibreWebTools 
+project and are deemed as "optional". Any object-oriented classes within these
+modules can safely inherit core classes. Inheritance within the module is
+possible, but not between two modules.
