@@ -18,14 +18,17 @@
 // Start the session
 session_start();
 $_SESSION['user_id'] = 0; /**< This will change once login part is set up! */
-$start = microtime(true);
+$start = microtime(true); /**< This will be removed!!! */
+
+// Load the settings file
+require_once (DOC_ROOT . '/core/settings.php');
 
 // Load all core classes
 $PATH = DOC_ROOT . '/core/classes';
 $includes = scandir($PATH);
 foreach ($includes as $include){
   if (is_file($PATH . '/' . $include) && $include != '.' && $include != '..' && fnmatch("*.php", $include)){
-    include ($PATH . '/' . $include);
+    require_once ($PATH . '/' . $include);
   }
 }
 
@@ -38,7 +41,7 @@ echo $svg;
 $site = new coreSite($_SERVER['REQUEST_URI'], $_SESSION, $_POST);
 $site->boot();
 
-// Show time count and end the HTML tags
+// Show time count and end the HTML tags (Will be removed)
 $end = microtime(true);
 $time = 1000 * ($end - $start);
 echo $time . "ms";

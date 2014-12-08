@@ -128,7 +128,8 @@ CREATE TABLE IF NOT EXISTS `pages` (
   `activated` DATETIME DEFAULT NULL COMMENT 'Optional date for the page to go live',
   `deactivated` DATETIME DEFAULT NULL COMMENT 'Optional date for user to retract the content (or to reflect "deleted" items)',
   UNIQUE KEY (`parent_id`,`url_code`) ,
-  PRIMARY KEY (`id`), FOREIGN KEY (`parent_id`) REFERENCES `pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  PRIMARY KEY (`id`), 
+  FOREIGN KEY (`parent_id`) REFERENCES `pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   FOREIGN KEY (`parent_id`) REFERENCES `pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 )
