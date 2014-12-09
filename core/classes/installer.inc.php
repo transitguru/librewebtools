@@ -307,14 +307,24 @@ class coreInstaller{
     $user->setpassword($post['admin_pass']);
     
     // Add the default theme
-    $this->console .= "\nThemes\n";
+    $this->console .= "\nThemes and Modules\n";
     $inputs = array(
+      'type' => 'theme',
       'core' => 1,
       'code' => 'core',
       'enabled' => 1,
+      'required' => 1,
       'name' => 'Default Core',
     );
-    $db->write('themes', $inputs);
+    $db->write('modules', $inputs);
+    $this->console .= "{$db->error} \n";
+    if ($db->error != 0){
+      return $db->error;
+    }
+    
+    $inputs['type'] = 'module';
+    $inputs['name'] = 'Core';
+    $db->write('modules', $inputs);
     $this->console .= "{$db->error} \n";
     if ($db->error != 0){
       return $db->error;

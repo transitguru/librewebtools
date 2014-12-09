@@ -64,8 +64,12 @@ else{
 // Load page request
 $page = new corePage($uri, $user);
 
-// Put page into template, and run!
-$theme = new coreTheme($page->theme_id);
-$theme->template($page);
+// Load enabled modules and chosen theme
+$theme = new coreModule($page->theme_id);
+$theme->loadMods(1);
+$theme->loadMods(0);
+$theme->loadTheme($page);
+
+var_dump($theme);
 
 
