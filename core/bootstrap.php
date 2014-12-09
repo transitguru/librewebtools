@@ -70,6 +70,3 @@ $theme->loadMods(1);
 $theme->loadMods(0);
 $theme->loadTheme($page);
 
-var_dump($theme);
-
-
