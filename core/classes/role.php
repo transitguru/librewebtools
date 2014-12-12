@@ -29,7 +29,7 @@ class coreRole{
   public function __construct($id = -1){
     if ($id>=0){
       // Lookup role by ID
-      $db = new coreDb(DB_NAME);
+      $db = new coreDb();
       $db->fetch('roles', null, array('id' => $id));
       if ($db->affected_rows == 1){
         $this->id = $db->output[0]['id'];
@@ -72,7 +72,7 @@ class coreRole{
    *
    */
   public function write(){
-    $db = new coreDb(DB_NAME);
+    $db = new coreDb();
     $inputs['name'] = $this->name;
     $inputs['sortorder'] = $this->sortorder;
     $inputs['desc'] = $this->desc;
@@ -97,7 +97,7 @@ class coreRole{
    */
   public function delete(){
     if ($this->id >= 0){
-      $db = new coreDb(DB_NAME);
+      $db = new coreDb();
       $db->write_raw("DELETE FROM `roles` WHERE `id`={$this->id}");
       if (!$db->error){
         $this->clear();

@@ -33,7 +33,7 @@ class coreUser{
   public function __construct($id = 0){
     if ($id>0){
       // Lookup user by ID
-      $db = new coreDb(DB_NAME);
+      $db = new coreDb();
       $db->fetch('users', null, array('id' => $id));
       if ($db->affected_rows == 1){
         $this->id = $db->output[0]['id'];
@@ -94,7 +94,7 @@ class coreUser{
     //cleanse input
     $user = trim(strtolower($username));
     $pass = trim($password);
-    $db = new coreDb(DB_NAME);
+    $db = new coreDb();
     
     //lookup the user by ID
     $db->fetch('users', array('id'), array('login' => $user));
@@ -136,7 +136,7 @@ class coreUser{
     }
     $hashed = password_hash($pass, PASSWORD_DEFAULT);
     $current_date = date("Y-m-d H:i:s");
-    $db = new coreDb(DB_NAME);
+    $db = new coreDb();
     $db->write('passwords', array('user_id' => $this->id, 'valid_date' => $current_date, 'hashed' => $hashed));
   }
   
@@ -147,7 +147,7 @@ class coreUser{
    *
    */
   public function resetpassword($email){
-    $db = new coreDb(DB_NAME);
+    $db = new coreDb();
     $db->fetch('users', NULL, array('email' => $email));
     if ($db->affected_rows > 0){
       $id = $db->output[0]['id'];
@@ -204,7 +204,7 @@ class coreUser{
    * Writes a user profile
    */
   public function write(){
-    $db = new coreDb(DB_NAME);
+    $db = new coreDb();
     $inputs['login'] = $this->login;
     $inputs['firstname'] = $this->firstname;
     $inputs['lastname'] = $this->lastname;
@@ -249,7 +249,7 @@ class coreUser{
    */
   public function delete(){
     if ($this->id > 0){
-      $db = new coreDb(DB_NAME);
+      $db = new coreDb();
       $db->write_raw("DELETE FROM `users` WHERE `id`={$this->id}");
       if(!$db->error){
         $this->clear();

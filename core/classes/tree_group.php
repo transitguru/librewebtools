@@ -27,7 +27,7 @@ class coreGroup extends coreTree{
   public function __construct($id = 0){
     if ($id>=0){
       $this->table = 'groups';
-      $db = new coreDb(DB_NAME);
+      $db = new coreDb();
       $db->fetch($this->table, null, array('id' => $id));
       if ($db->affected_rows == 1){
         $this->id = $db->output[0]['id'];
@@ -74,7 +74,7 @@ class coreGroup extends coreTree{
    *
    */
   public function write(){
-    $db = new coreDb(DB_NAME);
+    $db = new coreDb();
     $inputs['name'] = $this->name;
     $inputs['parent_id'] = $this->parent_id;
     $inputs['sortorder'] = $this->sortorder;
@@ -100,7 +100,7 @@ class coreGroup extends coreTree{
    */
   public function delete(){
     if ($this->id >= 0){
-      $db = new coreDb(DB_NAME);
+      $db = new coreDb();
       $db->write_raw("DELETE FROM `{$this->table}` WHERE `id`={$this->id}");
       if (!$db->error){
         $this->clear();

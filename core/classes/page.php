@@ -36,7 +36,7 @@ class corePage{
    */
   public function __construct($uri, $user){
     $this->uri = $uri;
-    $db = new coreDb(DB_NAME);
+    $db = new coreDb();
     $path = explode("/",$uri);
     $i = 0;
     $this->app_root = 0;
@@ -138,7 +138,7 @@ class corePage{
     } 
 
     // Get the allowable groups for the page
-    $db = new coreDb(DB_NAME);
+    $db = new coreDb();
     $db->fetch('page_groups', NULL, array('page_id' => $this->page_id));
     if ($db->affected_rows > 0){
       foreach ($db->output as $record){

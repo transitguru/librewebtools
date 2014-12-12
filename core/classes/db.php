@@ -30,14 +30,15 @@ class coreDb{
    * 
    * @param string $name Database name
    */
-  public function __construct($name){
-    if ($name == DB_NAME){
-      $this->type = DB_TYPE;
-      $this->name = DB_NAME;
-      $this->host = DB_HOST;
-      $this->user = DB_USER;
-      $this->pass = DB_PASS;
-      $this->port = DB_PORT;
+  public function __construct($name = null){
+    $settings = new coreSettings();
+    if ($name == null || $name == $settings->db['name']){
+      $this->type = $settings->db['type'];
+      $this->name = $settings->db['name'];
+      $this->host = $settings->db['host'];
+      $this->user = $settings->db['user'];
+      $this->pass = $settings->db['pass'];
+      $this->port = $settings->db['port'];
     }
     else{
       // Eventually grab other db creds from the main database!

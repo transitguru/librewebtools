@@ -37,9 +37,6 @@ foreach ($includes as $include){
   }
 }
 
-// Get settings
-$settings = new coreSettings();
-
 // Check to see if the site is installed
 $installer = new coreInstaller();
 if ($installer->install == true && $uri !== '/install/'){

@@ -26,7 +26,7 @@ class coreModule{
    */
   public function __construct($id = null){
     if (!is_null($id) && $id > 0){
-      $db = new coreDb(DB_NAME);
+      $db = new coreDb();
       $db->fetch('modules', null, array('id' => $id));
       if ($db->affected_rows > 0){
         $this->id = $id;
@@ -92,7 +92,7 @@ class coreModule{
       $core = 0;
       $dir = 'custom';
     }
-    $db = new coreDb(DB_NAME);
+    $db = new coreDb();
     $db->fetch('modules', null, array('type' =>'module', 'core' => $core), null, array('code'));
     if ($db->affected_rows > 0 ){
       foreach ($db->output as $module){
@@ -115,7 +115,7 @@ class coreModule{
    *
    */
   public function write(){
-    $db = new coreDb(DB_NAME);
+    $db = new coreDb();
     $inputs['core'] = $this->core;
     $inputs['code'] = $this->code;
     $inputs['name'] = $this->name;
@@ -142,7 +142,7 @@ class coreModule{
    */
   public function delete(){
     if ($this->id >= 0){
-      $db = new coreDb(DB_NAME);
+      $db = new coreDb();
       $db->write_raw("DELETE FROM `modules` WHERE `id`={$this->id}");
       if (!$db->error){
         $this->clear();

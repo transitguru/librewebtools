@@ -25,7 +25,7 @@ class coreInstaller{
     $this->install = false;
     
     // Check to see if the DB can even connect
-    $db = new coreDb(DB_NAME);
+    $db = new coreDb();
     if ($db->error){
       $this->install = true;
     }
@@ -84,11 +84,12 @@ class coreInstaller{
   public function build($post){
     if (isset($post)){
       // Define DB variables
-      $db_name = DB_NAME;
-      $db_pass = DB_PASS;
-      $db_host = DB_HOST;
-      $db_user = DB_USER;
-      $db_port = DB_PORT;
+      $settings = new coreSettings();
+      $db_name = $settings->db['name'];
+      $db_pass = $settings->db['pass'];
+      $db_host = $settings->db['host'];
+      $db_user = $settings->db['user'];
+      $db_port = $settings->db['port'];
       
       // If confirmed password, attempt to install
       if ($post['admin_pass'] == $post['confirm_pass']){
@@ -182,7 +183,7 @@ class coreInstaller{
     $file = DOC_ROOT . '/core/sql/schema.sql';
     $sql = file_get_contents($file);
     
-    $db = new coreDb(DB_NAME);
+    $db = new coreDb();
     $db->multiquery($sql);
     if ($db->error != 0){
       $db->error;

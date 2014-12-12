@@ -57,7 +57,7 @@ class coreTree{
     //find parents until we reach root
     $search = $id;
     $loop = true;
-    $db = new coreDb(DB_NAME);
+    $db = new coreDb();
     while($loop){
       $db->fetch($this->table, NULL, array('id' => $search));
       if ($db->output[0]['parent_id'] == 0){
@@ -80,7 +80,7 @@ class coreTree{
    */
   public function children($parent, $ids){
     $ids[$parent] = $parent;
-    $db = new coreDb(DB_NAME);
+    $db = new coreDb();
     $db->fetch('groups', NULL, array('parent_id' => $parent));
     if ($db->affected_rows > 0){
       foreach ($db->output as $child){
