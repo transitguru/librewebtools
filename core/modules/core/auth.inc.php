@@ -187,27 +187,6 @@ function core_auth_gatekeeper($request, $maintenance = false){
 }
 
 /**
- * Renders a login page
- * 
- * @return boolean Successful completion
- */
-function core_auth_login(){
-
-?>
-        <?php echo $_SESSION['message']; ?><br />
-            <form id="login-form" method="post" action="">
-              <label for="username">Username:</label> <input type="text" name="username" /><br />
-              <label for="pwd">Password:</label> <input type="password" name="pwd" />
-              <input name="login" type="submit" id="login" value="Log In">
-            </form>
-        <p>
-          <a href="/forgot/">Forgot</a> your password?
-        </p>
-<?php
-  return TRUE;
-}
-
-/**
  * Renders a user profile editing page
  * 
  * @return boolean Successful completion
@@ -387,55 +366,4 @@ function core_auth_forgot(){
   
 }
 
-/**
- * Processes Login on login page (must be tied to a content item in the database)
- * 
- * @return void
- * 
- */
-function core_auth_authentication(){
-  if (isset($_SESSION['redirect']) && $_SESSION['redirect'] != ''){
-    $redirect = $_SESSION['redirect'];
-  }
-  elseif (!isset($_SESSION['requested_page']) || $_SESSION['requested_page'] == APP_ROOT){
-    $redirect = "/";
-  }
-  else{
-    $redirect = $_SESSION['requested_page'];
-  }
-  if (isset($_POST['login']) && $_POST['login'] == 'Log In') {
-     // strip whitespace from user input
-    $username = trim($_POST['username']);
-    $password = trim($_POST['pwd']);
-
-    // authenticate user
-    $success = core_auth_authenticate($username, $password);
-    if ($success){
-      session_regenerate_id();
-      unset($_SESSION['redirect']);
-      header("Location: {$redirect}");
-      exit;
-    }
-    else{
-      header("Location: " . APP_ROOT);
-      exit;
-    }
-  }
-}
-
-/**
- * Processes Logout on logout page (must be tied to a content item in the database)
- * 
- * @return void
- * 
- */
-function core_auth_logout(){
-  if (isset($_COOKIE[session_name()])){
-    setcookie(session_name(), '', time()-86400, '/');
-  }
-  // end session and redirect
-  session_destroy();
-  header("Location: /");
-  exit;
-}
 

@@ -17,7 +17,6 @@
 
 // Start the session
 session_start();
-$_SESSION['user_id'] = 0; /**< This will change once login part is set up! */
 $start = microtime(true); /**< This will be removed!!! */
 
 // Collect globals
@@ -60,10 +59,13 @@ else{
 
 // Load page request
 $page = new corePage($uri, $user);
+define('APP_ROOT', $page->root);
 
 // Load enabled modules and chosen theme
 $theme = new coreModule($page->theme_id);
 $theme->loadMods(1);
 $theme->loadMods(0);
 $theme->loadTheme($page);
+
+var_dump($page);
 
