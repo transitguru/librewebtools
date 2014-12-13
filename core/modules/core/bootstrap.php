@@ -88,12 +88,12 @@ function core_admin_ajax($wrapper = false){
   // Admin menu
 ?>
     <ul class="adminmenu">
-      <li class="<?php echo $class['user']; ?>"><a href="<?php echo APP_ROOT; ?>user" >Users</a></li>
-      <li class="<?php echo $class['group']; ?>"><a href="<?php echo APP_ROOT; ?>group" >Groups</a></li>
-      <li class="<?php echo $class['role']; ?>"><a href="<?php echo APP_ROOT; ?>role" >Roles</a></li>
-      <li class="<?php echo $class['page']; ?>"><a href="<?php echo APP_ROOT; ?>page" >Pages</a></li>
-      <li class="<?php echo $class['file']; ?>"><a href="<?php echo APP_ROOT; ?>file" >Files</a></li>
-      <li class="<?php echo $class['menu']; ?>"><a href="<?php echo APP_ROOT; ?>menu" >Menus</a></li>
+      <li class="<?php echo $class['user']; ?>"><a href="<?php echo APP_ROOT; ?>user/" >Users</a></li>
+      <li class="<?php echo $class['group']; ?>"><a href="<?php echo APP_ROOT; ?>group/" >Groups</a></li>
+      <li class="<?php echo $class['role']; ?>"><a href="<?php echo APP_ROOT; ?>role/" >Roles</a></li>
+      <li class="<?php echo $class['page']; ?>"><a href="<?php echo APP_ROOT; ?>page/" >Pages</a></li>
+      <li class="<?php echo $class['file']; ?>"><a href="<?php echo APP_ROOT; ?>file/" >Files</a></li>
+      <li class="<?php echo $class['menu']; ?>"><a href="<?php echo APP_ROOT; ?>menu/" >Menus</a></li>
     </ul>
 
 <?php
@@ -138,9 +138,6 @@ function core_admin_ajax($wrapper = false){
  
 /**
  * Renders the Admin user page when loading the site within wrapper
- * 
- * @return boolean Successful rendering of page
- * 
  */
 function core_admin_page(){
   $_POST['ajax'] = 1;
@@ -151,7 +148,6 @@ function core_admin_page(){
 <?php core_admin_ajax(true); ?>
   </div>
 <?php
-  return true;
 }
 
 
@@ -195,11 +191,8 @@ function core_auth_authentication(){
 
 /**
  * Renders a login page
- * 
- * @return boolean Successful completion
  */
 function core_auth_login(){
-
 ?>
         <?php echo $_SESSION['message']; ?><br />
             <form id="login-form" method="post" action="">
@@ -211,14 +204,10 @@ function core_auth_login(){
           <a href="/forgot/">Forgot</a> your password?
         </p>
 <?php
-  return TRUE;
 }
 
 /**
  * Processes Logout on logout page (must be tied to a content item in the database)
- * 
- * @return void
- * 
  */
 function core_auth_logout(){
   if (isset($_COOKIE[session_name()])){

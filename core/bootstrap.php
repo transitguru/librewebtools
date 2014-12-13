@@ -17,12 +17,9 @@
 
 // Start the session
 session_start();
-$start = microtime(true); /**< This will be removed!!! */
 
 // Collect globals
 $uri = $_SERVER['REQUEST_URI'];          /**< Request URI */
-$session = $_SESSION;                    /**< User Session Data */
-$post = $_POST;                          /**< Post Data */
 
 // Load the settings file
 require_once (DOC_ROOT . '/core/settings.php');
@@ -44,14 +41,14 @@ if ($installer->install == true && $uri !== '/install/'){
 }
 elseif ($installer->install == true && $uri === '/install/'){
   if (isset($_POST['db'])){
-    $installer->build($post['db']);
+    $installer->build($_POST['db']);
   }
   $installer->view();
 }
 
 // Get user information
-if (isset($session['user_id'])){
-  $user = new coreUser($session['user_id']);
+if (isset($_SESSION['user_id'])){
+  $user = new coreUser($_SESSION['user_id']);
 }
 else{
   $user = new coreUser(0);
