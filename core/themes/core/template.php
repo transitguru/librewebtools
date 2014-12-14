@@ -62,8 +62,10 @@ if (!is_null($page->ajax_call) && $page->ajax_call !== '' &&  function_exists($p
   <meta charset="utf-8" />
   <head>
     <title><?php echo $page->title; ?></title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
   </head>
   <body>
+    <div class="content">
 <?php 
 echo $page->content;
 if (!is_null($page->render_call) && $page->render_call !== '' &&  function_exists($page->render_call)){
@@ -72,5 +74,6 @@ if (!is_null($page->render_call) && $page->render_call !== '' &&  function_exist
 }
   core_render_copyright()    
 ?>
+    </div>
   </body>
 </html>

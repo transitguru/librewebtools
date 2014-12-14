@@ -211,27 +211,27 @@ class coreUser{
    */
   public function renderProfile(){
     if ($this->id > 0){
-      $this->message = '<span class="success"></span>';
+      $this->message = '';
       $this->error = 0;
       
       // Define form fields
       $fields = array();
-      $fields['login'] = new coreField($this->login, 'text', 'nowacky');
+      $fields['login'] = new coreField($this->login, 'text', 'nowacky', true, 40);
       $fields['login']->element = 'text';
       $fields['login']->label = 'Login';
       $fields['login']->name = 'login';
       
-      $fields['firstname'] = new coreField($this->firstname, 'text', 'oneline');
+      $fields['firstname'] = new coreField($this->firstname, 'text', 'oneline', true, 100);
       $fields['firstname']->element = 'text';
       $fields['firstname']->label = 'First Name';
       $fields['firstname']->name = 'firstname';
       
-      $fields['lastname'] = new coreField($this->lastname, 'text', 'oneline');
+      $fields['lastname'] = new coreField($this->lastname, 'text', 'oneline', true, 100);
       $fields['lastname']->element = 'text';
       $fields['lastname']->label = 'Last Name';
       $fields['lastname']->name = 'lastname';
       
-      $fields['email'] = new coreField($this->email, 'text', 'email');
+      $fields['email'] = new coreField($this->email, 'text', 'email', true, 255);
       $fields['email']->element = 'text';
       $fields['email']->label = 'Email';
       $fields['email']->name = 'email';
