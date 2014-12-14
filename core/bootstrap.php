@@ -47,7 +47,6 @@ elseif ($installer->install == true && $uri === '/install/'){
 session_start();
 $timelimit = 60 * 60; /**< time limit in seconds */
 $now = time(); /**< current time */
-$_SESSION['requested_page'] = $request;
 if (isset($_SESSION['user_id']) && $now > $_SESSION['start'] + $timelimit){
   // if timelimit has expired, destroy authenticated session
   unset($_SESSION['user_id']);

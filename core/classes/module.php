@@ -41,7 +41,7 @@ class coreModule{
         $this->id = null;
       }
     }
-    elseif(!is_null($id) && $id > 0){
+    elseif(!is_null($id) && $id < 0){
       $this->clear();
       $this->id = $id;
     }
@@ -68,6 +68,11 @@ class coreModule{
    * @param corePage $page Page information to be rendered in the template
    */
   public function loadTheme($page){
+    if (is_null($page->page_id) || $page->page_id <=0){
+      $this->core = 1;
+      $this->code = 'core';
+      $this->type = 'theme';
+    }
     if ($this->core == 1 && $this->type == 'theme'){
       $dir = 'core';
     }
