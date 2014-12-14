@@ -85,6 +85,23 @@ class coreUser{
   }
   
   /**
+   * Renders User Login Form
+   */
+  public function renderLogin(){
+?>
+    <?php echo $this->message; ?><br />
+        <form id="login-form" method="post" action="">
+          <label for="username">Username:</label> <input type="text" name="username" /><br />
+          <label for="pwd">Password:</label> <input type="password" name="pwd" />
+          <input name="login" type="submit" id="login" value="Log In">
+        </form>
+    <p>
+      <a href="/forgot/">Forgot</a> your password?
+    </p>
+<?php
+  }
+  
+  /**
    * Sets user information using login credentials
    *
    * @param string $username Login name for the user
@@ -173,7 +190,9 @@ class coreUser{
           $loop = FALSE;
         }
       }
-      $sql = "UPDATE `passwords` SET `reset` = 1 , `reset_code`='{$reset_code}' WHERE `user_id` = {$user_id} and `valid_date` = '{$valid_date}'";
+      $unix = time() + 24 * 60 * 60;
+      $reset_date = date('Y-m-d H:i:s',$unix);
+      $sql = "UPDATE `passwords` SET `reset_date` = '{$reset_date}' , `reset_code`='{$reset_code}' WHERE `user_id` = {$user_id} AND `valid_date` = '{$valid_date}'";
       $db->write_raw($sql);
       if ($db->error > 0){
         echo $db->error;
@@ -190,14 +209,209 @@ class coreUser{
   /**
    * Renders a user profile editing page (intended for one's own user)
    */
-  public function viewProfile(){
+  public function renderProfile(){
     if ($this->id > 0){
-      // Use Field object to build form...
+      $this->message = '<span class="success"></span>';
+      $this->error = 0;
       
+      // Define form fields
+      $fields = array();
+      $fields['login'] = new coreField($this->login, 'text', 'nowacky');
+      $fields['login']->element = 'text';
+      $fields['login']->label = 'Login';
+      $fields['login']->name = 'login';
       
-      // Render the form ...
+      $fields['firstname'] = new coreField($this->firstname, 'text', 'oneline');
+      $fields['firstname']->element = 'text';
+      $fields['firstname']->label = 'First Name';
+      $fields['firstname']->name = 'firstname';
       
+      $fields['lastname'] = new coreField($this->lastname, 'text', 'oneline');
+      $fields['lastname']->element = 'text';
+      $fields['lastname']->label = 'Last Name';
+      $fields['lastname']->name = 'lastname';
+      
+      $fields['email'] = new coreField($this->email, 'text', 'email');
+      $fields['email']->element = 'text';
+      $fields['email']->label = 'Email';
+      $fields['email']->name = 'email';
+      
+      if (isset($_POST['submit']) && $_POST['submit']=='Update'){
+        $this->message = '<span class="success">Success!</span>';
+        $this->error = 0;
+        
+        // Set values to User POST
+        $fields['login']->value = $_POST['login'];
+        $fields['firstname']->value = $_POST['firstname'];
+        $fields['lastname']->value = $_POST['lastname'];
+        $fields['email']->value = $_POST['email'];
+        
+        // Validate the fields
+        foreach ($fields as $key => $field){
+          $fields[$key]->validate();
+          if ($fields[$key]->error){
+            $this->error = $fields[$key]->error;
+          }
+        }
+        
+        // Check for unique login
+        if (!$this->error && $this->login != $fields['login']->value){
+          $test = new coreDb();
+          $test->fetch('users',NULL,array('login' => $fields['login']->value));
+          if ($test->affected_rows > 0){
+            $fields['login']->message = 'Already Taken: ';
+            $this->error = 9999;
+          }
+        }
+        
+        if (!$this->error){
+          $this->login = $fields['login']->value;
+          $this->firstname = $fields['firstname']->value;
+          $this->lastname = $fields['lastname']->value;
+          $this->email = $fields['email']->value;
+          $this->write();
+          if (!$this->error){
+            $this->message = '<span class="success">Success!</span>';
+          }
+        }
+        else{
+          $this->message = '<span class="error">Please fix the fields</span>';
+        }
+      }
+      elseif (isset($_POST['submit']) && $_POST['submit']=='Cancel'){
+        $this->message = '<span class="warning">Profile was not changed.</span>';
+      }
+      
+      echo $this->message; ?><br />
+      <h1>Edit your Profile</h1>
+      <form action="" method="post" name="update_profile" id="update_profile">
+<?php
+      foreach ($fields as $field){
+        $field->render();
+      }
+?>
+        <input type="submit" name="submit" value="Update" /><input type="submit" name="submit" value="Cancel" />
+      </form>      
+<?php      
     }
+  }
+  
+  /**
+   * Renders the reset password page (for those already logged in)
+   */
+  public function renderPassword(){
+    // Check if _POST is set and process form
+    $message = '';
+    if (isset($_POST['submit']) && $_POST['submit']=='Update'){
+    $message = '<span class="success">Data submitted correctly</span>';
+    $error = false;
+      $testuser = new coreUser();
+      $testuser->login($this->login, $_POST['current_pwd']);
+      if ($testuser->id < 1){
+        $message = '<span class="error">Existing password is not valid, please re-enter it.</span>';
+        $error = true;
+      }
+      elseif ($_POST['pwd'] != $_POST['conf_pwd']){
+        $message = '<span class="error">New Passwords do not match.</span>';
+        $error = true;
+      }
+      if (!$error){
+        $this->setpassword($_POST['pwd']);
+        if (!$this->error){
+          $message = '<span class="success">Password successfully updated.</span>';
+        }
+        else{
+          $message = '<span class="error">Error updating password.</span>';
+        }
+      }
+    }
+    if (isset($_POST['submit']) && $_POST['submit']=='Cancel'){
+      $message = '<span class="warning">Password was not changed.</span>';
+    }
+      
+?>
+<?php echo $message; ?><br />
+  <form action='' method='post' name='update_profile' id='update_profile'>
+    <label for="current_pwd">Current Password</label><input name="current_pwd" type="password" /><br />
+    <label for="pwd">New Password</label><input name="pwd" type="password" /><br />
+    <label for="conf_pwd">Confirm Password</label><input name="conf_pwd" type="password" /><br />
+    <input type="submit" name="submit" id="submit" value="Update" />&nbsp;&nbsp;<input type="submit" name="submit" id="cancel" value="Cancel" />
+  </form>
+<?php
+  }
+  
+  /**
+   * Renders the forgot password page
+   */
+  public function renderForgot(){
+    if($_SERVER['REQUEST_URI'] == APP_ROOT){
+      if ($_POST['submit'] == 'Reset Password'){
+        $email = $_POST["email"];
+        $this->resetpassword($email);
+        $message = '<span class="warning">The information has been submitted. You should receive password reset instructions in your email.</span>';
+      }
+  ?>
+        <?php echo $message; ?><br />
+        <form action='' method='post' name='update_profile' id='update_profile'>
+          <label for="email">Email Address: </label><input type="text" name="email" id="email" />&nbsp;&nbsp;<input type="submit" name="submit" id="cancel" value="Reset Password" /><br />
+        </form>
+  <?php
+    }
+    else{
+      $chars = strlen(APP_ROOT);
+      $reset_request = trim(substr($_SERVER['REQUEST_URI'],$chars),"/ ");
+      $date = date('Y-m-d H:i:s');
+      $db = new coreDb();
+      $db->fetch_raw("SELECT * FROM `passwords` WHERE `reset_code`='{$reset_request}' AND `reset_date` > '{$date}'");
+      if ($db->affected_rows == 0){
+  ?>
+      <p>The reset code does not match. Please visit the <a href="<?php echo APP_ROOT; ?>">Forgot Password</a> page</p>
+  <?php
+      }
+      else{
+        $_SESSION['reset_user'] = $db->output[0]['user_id'];  
+        $submit = 'Update';
+      
+        // Check if _POST is set and process form
+        $message = '';
+        if ($_POST['submit']=='Update'){
+          // Define form fields
+          $inputs['pwd'] = $_POST['pwd'];
+          $inputs['conf_pwd'] = $_POST['conf_pwd'];
+        
+          if ($inputs['pwd'] != $inputs['conf_pwd']){
+            $message = '<span class="error">New Passwords do not match.</span>';
+            $error = true;
+          }
+          if (!$error){
+            $this->__construct($_SESSION['reset_user']);
+            $this->setpassword($inputs['pwd']);
+            if (!$this->error){
+              $message = '<span class="success">Password successfully updated.</span>';
+              unset($_SESSION['reset_user']);
+              header("Location: /login/");
+            }
+            else{
+              $message = '<span class="error">Error updating password.</span>';
+            }
+          }
+        }
+        if ($_POST['submit']=='Cancel'){
+          $message = '<span class="warning">Password was not changed.</span>';
+        }
+      
+  ?>
+  <?php echo $message; ?><br />
+  <h1>Edit your Password</h1>
+  <form action='' method='post' name='update_profile' id='update_profile'>
+    <label for="pwd">Password: </label><input name="pwd"  type="password" value="" /><br />
+    <label for="conf_pwd">Confirm Password: </label><input name="conf_pwd"  type="password" value="" /><br />
+    <input type="submit" name="submit" id="submit" value="Update" />&nbsp;&nbsp;<input type="submit" name="submit" id="cancel" value="Cancel" />
+  </form>
+  <?php
+      }
+    }
+  
   }
   
   /**

@@ -13,6 +13,10 @@
  * @version Release: @package_version@
  */
 class coreField{
+  public $label = null;      /**< Human friendly name for form Label */
+  public $name = '';         /**< Name for form element */
+  public $element = '';      /**< Type of form element */
+  public $list = array();    /**< Array of list items to put in list type elements */
   public $value = '';        /**< value to be validated */
   public $message = '';      /**< message to be emitted based on validation */
   public $error = 0;         /**< int error number based on validation */
@@ -395,22 +399,42 @@ class coreField{
   /**
    * Rendering function (maybe moved to a form object)
    */
-  public function render($name, $type, $list = array()){
-    if ($type == 'button'){
-      echo '<input type="button" value="' . $this->value . '" name="' . $name . '"/>';
+  public function render(){
+    if (!is_null($this->label)){
+      $label = '<label for "' . $this->name . '">' . $this->label . '</label>';
     }
-    elseif($type == 'text'){
-      echo '<input type="text" value="' . $this->value . '" name="' . $name . '"/>';
+    else{
+      $label = '';
     }
-    elseif($type == 'textarea'){
-      echo '<textarea name="' . $name . '">'  . $this->value . '</textarea>';    
+    if ($this->error){
+      $msg = "<strong>{$this->message}</strong>";
+      $class = 'invalid ';
     }
-    elseif($type == 'select' && is_array($list) && count($list)>0){
-      echo '<select>';
-      foreach ($list as $items){
-        echo '<option value="' . $items['value']. '" >' . $items['name'] . '</option>';
+    else{
+      $msg = "";
+      $class = '';
+    }
+    if ($this->required){
+      $class .= 'required';
+    }
+    else{
+      $class .= '';
+    }
+    if ($this->element == 'button'){
+      echo "$label<input type=\"button\" value=\"{$this->value}\" name=\"{$this->name}\"/>\n";
+    }
+    elseif($this->element == 'text'){
+      echo "$label<input type=\"text\" value=\"{$this->value}\" name=\"{$this->name}\"/>\n";
+    }
+    elseif($this->element == 'textarea'){
+      echo "$label<textarea name=\"{$this->name}\">{$this->value}</textarea>\n";    
+    }
+    elseif($this->element == 'select' && is_array($this->list) && count($this->list)>0){
+      echo "$label<select name=\"{$this->name}\">\n";
+      foreach ($this->list as $items){
+        echo "  <option value=\"{$items['value']}\" >{$items['name']}</option>\n";
       }
-      echo '</select>';
+      echo "</select>\n";
     }
   }
 }

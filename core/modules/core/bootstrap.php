@@ -169,9 +169,9 @@ function core_auth_authentication(){
     $redirect = $_SESSION['requested_page'];
   }
   if (isset($_POST['login']) && $_POST['login'] == 'Log In') {
-     // strip whitespace from user input
-    $username = trim($_POST['username']);
-    $password = trim($_POST['pwd']);
+    // Get user input
+    $username = $_POST['username'];
+    $password = $_POST['pwd'];
 
     // authenticate user
     $user = new coreUser();
@@ -179,6 +179,7 @@ function core_auth_authentication(){
     if ($user->id > 0){
       session_regenerate_id();
       $_SESSION['user_id'] = $user->id;
+      $_SESSION['start'] = time();
       unset($_SESSION['redirect']);
       header("Location: {$redirect}");
       exit;
@@ -193,17 +194,32 @@ function core_auth_authentication(){
  * Renders a login page
  */
 function core_auth_login(){
-?>
-        <?php echo $_SESSION['message']; ?><br />
-            <form id="login-form" method="post" action="">
-              <label for="username">Username:</label> <input type="text" name="username" /><br />
-              <label for="pwd">Password:</label> <input type="password" name="pwd" />
-              <input name="login" type="submit" id="login" value="Log In">
-            </form>
-        <p>
-          <a href="/forgot/">Forgot</a> your password?
-        </p>
-<?php
+  $user = new coreUser();
+  $user->renderLogin();
+}
+
+/**
+ * Renders a user profile editing page
+ */
+function core_auth_profile(){
+  $user = new coreUser($_SESSION['user_id']);
+  $user->renderProfile();
+}
+
+/**
+ * Renders a password change form (for those already logged in)
+ */
+function core_auth_password(){
+  $user = new coreUser($_SESSION['user_id']);
+  $user->renderPassword();
+}
+
+/**
+ * Renders the forgotten password page
+ */
+function core_auth_forgot(){
+  $user = new coreUser();
+  $user->renderForgot();
 }
 
 /**

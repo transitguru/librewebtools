@@ -15,9 +15,6 @@
  * @version    @package_version@
  */
 
-// Start the session
-session_start();
-
 // Collect globals
 $uri = $_SERVER['REQUEST_URI'];          /**< Request URI */
 
@@ -46,6 +43,22 @@ elseif ($installer->install == true && $uri === '/install/'){
   $installer->view();
 }
 
+// Start the session
+session_start();
+$timelimit = 60 * 60; /**< time limit in seconds */
+$now = time(); /**< current time */
+$_SESSION['requested_page'] = $request;
+if (isset($_SESSION['user_id']) && $now > $_SESSION['start'] + $timelimit){
+  // if timelimit has expired, destroy authenticated session
+  unset($_SESSION['user_id']);
+  $_SESSION['start'] = time() - 86400;
+  $_SESSION['message'] = "Your session has expired, please logon.";
+}
+elseif (isset($_SESSION['authenticated']['user'])){
+  // if it's got this far, it's OK, so update start time
+  $_SESSION['start'] = time();
+}
+
 // Get user information
 if (isset($_SESSION['user_id'])){
   $user = new coreUser($_SESSION['user_id']);
@@ -63,6 +76,4 @@ $theme = new coreModule($page->theme_id);
 $theme->loadMods(1);
 $theme->loadMods(0);
 $theme->loadTheme($page);
-
-var_dump($page);
 
