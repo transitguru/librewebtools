@@ -68,7 +68,7 @@ class coreModule{
    * @param corePage $page Page information to be rendered in the template
    */
   public function loadTheme($page){
-    if (is_null($page->page_id) || $page->page_id <=0){
+    if (is_null($page->page_id) || $page->page_id < 0){
       $this->core = 1;
       $this->code = 'core';
       $this->type = 'theme';

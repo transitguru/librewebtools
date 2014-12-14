@@ -69,14 +69,19 @@ if (!is_null($page->ajax_call) && $page->ajax_call !== '' &&  function_exists($p
       <div class="content">
         <h1><?php echo $page->title; ?></h1>
 <?php 
-echo $page->content;
-if (!is_null($page->render_call) && $page->render_call !== '' &&  function_exists($page->render_call)){
-  $fn = $page->render_call;
-  $fn();
+if (!is_null($page->page_id) && $page->page_id >= 0){
+  echo $page->content;
+  if (!is_null($page->render_call) && $page->render_call !== '' &&  function_exists($page->render_call)){
+    $fn = $page->render_call;
+    $fn();
+  }
 }
-  core_render_copyright()    
-?>
+else{
+  core_render_404();
+}
+?>     
       </div>
+<?php core_render_copyright(); ?>
     </div>
   </body>
 </html>
