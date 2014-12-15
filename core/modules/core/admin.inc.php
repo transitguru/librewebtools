@@ -445,11 +445,21 @@ function core_admin_process_page($forms){
     else{
       $inputs['app_root'] = 0;
     }
-     if (isset($_POST['page']['core_page']) && is_numeric($_POST['page']['core_page']) && ($_POST['page']['core_page'] == 0 || $_POST['page']['core_page'] == 1)){
+    if (isset($_POST['page']['core_page']) && is_numeric($_POST['page']['core_page']) && ($_POST['page']['core_page'] == 0 || $_POST['page']['core_page'] == 1)){
       $inputs['core_page'] = $_POST['page']['core_page'];
     }
     else{
       $inputs['core_page'] = 0;
+    }
+    
+    // Make sure the theme is an int
+    $inputs['theme_id'] = null;
+    if (isset($_POST['page']['theme_id']) && is_numeric($_POST['page']['theme_id'])){
+      $field = new coreField($_POST['page']['theme_id'], 'num', 'int');
+      $field->validate();
+      if (!$field->error){
+        $inputs['theme_id'] = $field->value;
+      }
     }
     
     $roles = array();
@@ -1067,6 +1077,7 @@ function core_admin_render_page($paths){
         $page = array(
           'id' => $id,
           'parent_id' => 0,
+          'theme_id' => null,
           'url_code' => '',
           'title' => '',
           'app_root' => 0,
@@ -1152,9 +1163,14 @@ function core_admin_render_page($paths){
       else{
         // Set messages and classes to empty strings
         $class = $msg = array(
-          'sortorder' => '',
-          'name' => '',
-          'desc' => '',
+          'url_code' => '',
+          'title' => '',
+          'activated' => '',
+          'deactivated' => '',
+          'summary' => '',
+          'content' => '',
+          'ajax_call' => '',
+          'render_call' => '',
         );
 
         // Check for error/repost
@@ -1167,12 +1183,32 @@ function core_admin_render_page($paths){
             }
           }
         }
+        
+        // Load theme list
+        $db->fetch_raw("SELECT * FROM `modules` WHERE `type`='theme' ORDER BY `core` DESC, `name` ASC");
+        $themes = $db->output;
 ?>   
   <h3>Page administration Form</h3>   
   <form method="post" action="" id="admin/page" >
     <input type="hidden" name="formid" value="admin/page" />
     <input type="hidden" name="command" value="write" />
-    <input type="hidden" name="page[id]" value="<?php echo $page['id']; ?>" />    
+    <input type="hidden" name="page[id]" value="<?php echo $page['id']; ?>" />   
+    <label for="page[theme_id]">Theme</label><select name="page[theme_id]">
+      <option value="">None</option>
+<?php
+        foreach ($themes as $theme){
+          if ($theme['id'] == $page['theme_id']){
+            $selected = 'selected';
+          }
+          else{
+            $selected = '';
+          }
+?>
+      <option value="<?php echo $theme['id']; ?>" <?php echo $selected; ?>><?php echo $theme['name'];?></option>
+<?php        
+        }
+?>
+    </select>
     <label for="page[url_code]">URL code (for that level, no slashes!)<?php echo $msg['url_code']; ?></label><input class="required <?php echo $class['url_code']; ?>" name="page[url_code]" type="text" maxlength="100" value="<?php echo $page['url_code']; ?>" />
     <label for="page[title]">Page Title<?php echo $msg['title']; ?></label><input class="required <?php echo $class['title']; ?>" name="page[title]" type="text" maxlength="100" value="<?php echo $page['title']; ?>" />
     <label for="page[parent_id]">Parent Page</label>

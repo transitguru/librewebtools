@@ -489,11 +489,11 @@ class coreInstaller{
       return $db->error;
     }
 
-    //Registration page	
-    $inputs['url_code'] = 'register';
-    $inputs['title'] ='Register';
-    $inputs['ajax_call'] = null;
-    $inputs['render_call'] = 'core_auth_register';
+    //Javascript CSS Loader
+    $inputs['url_code'] = 'scripts';
+    $inputs['title'] ='Not Found';
+    $inputs['ajax_call'] = 'core_send_scripts';
+    $inputs['render_call'] = 'core_render_404';
     $db->write('pages', $inputs);
     $this->console .= "{$db->error} \n";
     if ($db->error != 0){

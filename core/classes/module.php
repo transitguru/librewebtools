@@ -20,6 +20,8 @@ class coreModule{
   public $name = 'Default Core'; /**< Human Readable name of module */
   public $enabled = 1;  /**< Determines if the module is enabled */
   public $required = 1; /**< Determines if a module is required to be enabled */
+  public $javascripts = array(); /**< Array of javascripts loaded from modules and themes */
+  public $stylesheets = array(); /**< Array of stylesheets loaded from modules and themes */
   /**
    * Construct the theme
    * $param int $id ID for the theme
@@ -68,7 +70,7 @@ class coreModule{
    * @param corePage $page Page information to be rendered in the template
    */
   public function loadTheme($page){
-    if (is_null($page->page_id) || $page->page_id < 0){
+    if (is_null($page->page_id) || $page->page_id < 0 || is_null($this->id)){
       $this->core = 1;
       $this->code = 'core';
       $this->type = 'theme';
@@ -78,6 +80,15 @@ class coreModule{
     }
     elseif($this->type == 'theme'){
       $dir = 'custom';
+    }
+    $files = scandir(DOC_ROOT . '/' . $dir . '/themes/' . $this->code);
+    foreach ($files as $file){
+      if(is_file(DOC_ROOT . '/' . $dir . '/themes/' . $this->code . '/' . $file) && fnmatch('*.js', $file)){
+        $this->javascripts[] = "{$dir}/themes/{$this->code}/{$file}";
+      }
+      elseif(is_file(DOC_ROOT . '/' . $dir . '/themes/' . $this->code . '/' . $file) && fnmatch('*.css', $file)){
+        $this->stylesheets[] = "{$dir}/themes/{$this->code}/{$file}";
+      }
     }
     $file = DOC_ROOT . '/' . $dir . '/themes/' . $this->code . '/template.php';
     if (is_file($file)){
@@ -109,8 +120,37 @@ class coreModule{
             if (is_file($PATH . '/' . $file) && fnmatch('*.php', $file)){
               require_once($PATH . '/' . $file);
             }
+            elseif(is_file($PATH . '/' . $file) && fnmatch('*.js', $file)){
+              $this->javascripts[] = "{$dir}/modules/{$code}/{$file}";
+            }
+            elseif(is_file($PATH . '/' . $file) && fnmatch('*.css', $file)){
+              $this->stylesheets[] = "{$dir}/modules/{$code}/{$file}";
+            }
           }
         }
+      }
+    }
+  }
+  
+  /**
+   * Load all Javascripts and CSS in the template
+   */
+  public function loadScripts(){
+    $db = new coreDb();
+    $db->fetch('pages', array('url_code', 'parent_id'), array('ajax_call' => 'core_send_scripts'));
+    $path = $db->output[0]['url_code']; 
+    while ($db->output[0]['parent_id'] != 0){
+      $db->fetch('pages', array('url_code', 'parent_id'), array('id' => $db->output[0]['parent_id']));
+      $path = $db->output[0]['url_code'] . '/' . $path; 
+    }
+    if (count($this->javascripts)>0){
+      foreach ($this->javascripts as $script){
+        echo "    <script type=\"application/javascript\" src=\"/{$path}/{$script}\"></script>\n";
+      }
+    }
+    if (count($this->stylesheets)>0){
+      foreach ($this->stylesheets as $sheet){
+        echo "    <link rel=\"stylesheet\" type=\"text/css\" href=\"/{$path}/{$sheet}\" />\n";
       }
     }
   }

@@ -13,44 +13,6 @@
  * @version    @package_version@
  */
 
-/**
- * Renders the copyright disclaimer
- * 
- * @return string HTML Markup
- */
-function core_render_copyright(){
-  $start_year = 2012;
-  $current_year = date('Y');
-  $owner = "TransitGuru Limited";
-
-  // If the start year is not the current year: display start-current in copyright
-  if ($start_year != $current_year){
-?>
-        <p class="copy">&copy;<?php echo "{$start_year} &ndash; {$current_year} {$owner}"; ?></p>
-<?php
-  }
-  // Only display current year.
-  else{
-?>
-        <p class="copy">&copy;<?php echo "{$current_year} {$owner}"; ?></p>
-<?php
-  }
-  return TRUE;
-}
-
-
-/**
- * Renders the 404 Not Found page
- * 
- * @return boolean Successful completion
- */
-function core_render_404(){
-  $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
-?>
-  <p>Page not found. Please go <a href="/">Home</a>.</p>
-<?php
-}
-
 header("HTTP/1.1 " . $page->header);
 if (!is_null($page->ajax_call) && $page->ajax_call !== '' &&  function_exists($page->ajax_call)){
   $fn = $page->ajax_call;
@@ -59,10 +21,10 @@ if (!is_null($page->ajax_call) && $page->ajax_call !== '' &&  function_exists($p
 ?>              
 <!DOCTYPE html>
 <html>
-  <meta charset="utf-8" />
   <head>
+    <meta charset="utf-8" />
     <title><?php echo $page->title; ?></title>
-    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <?php $this->loadScripts();?>
   </head>
   <body>
     <div class="container">

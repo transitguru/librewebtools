@@ -235,3 +235,77 @@ function core_auth_logout(){
   exit;
 }
 
+/**
+ * Renders the copyright disclaimer
+ * 
+ * @return string HTML Markup
+ */
+function core_render_copyright(){
+  $start_year = 2012;
+  $current_year = date('Y');
+  $owner = "TransitGuru Limited";
+
+  // If the start year is not the current year: display start-current in copyright
+  if ($start_year != $current_year){
+?>
+        <p class="copy">&copy;<?php echo "{$start_year} &ndash; {$current_year} {$owner}"; ?></p>
+<?php
+  }
+  // Only display current year.
+  else{
+?>
+        <p class="copy">&copy;<?php echo "{$current_year} {$owner}"; ?></p>
+<?php
+  }
+  return TRUE;
+}
+
+
+/**
+ * Renders the 404 Not Found page
+ * 
+ * @return boolean Successful completion
+ */
+function core_render_404(){
+  $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
+?>
+  <p>Page not found. Please go <a href="/">Home</a>.</p>
+<?php
+}
+
+/**
+ * Fetches and and sends CSS or JS to the user
+ */
+function core_send_scripts(){
+  // Find out the application's URL path
+  $begin = strlen(APP_ROOT);
+  if (strlen($_SERVER['REQUEST_URI']) > $begin){
+    $pathstring = substr($_SERVER['REQUEST_URI'], $begin);
+  }
+  else{
+    $pathstring = '';
+  }
+
+  // Check to see if the path is a valid file
+  if (is_file(DOC_ROOT . '/' . $pathstring) && (fnmatch('core/*',$pathstring) || fnmatch('custom/*',$pathstring)) && (fnmatch('*.css', $pathstring) || (fnmatch('*.js', $pathstring)))){
+    //This is the only information that gets sent back!
+    $included = DOC_ROOT . '/' .$pathstring;
+    $size = filesize($included);
+    $finfo = new finfo();
+    $type = $finfo->file($included, FILEINFO_MIME_TYPE);
+    if (fnmatch('*.css', $pathstring)){
+      $type = 'text/css';
+    }
+    elseif (fnmatch('*.js', $pathstring)){
+      $type = 'application/javascript';
+    }
+    header('Pragma: ');         // leave blank to avoid IE errors
+    header('Cache-Control: ');  // leave blank to avoid IE errors
+    header('Content-Length: ' . $size);
+    header('Content-Type: ' .$type);
+    sleep(0); // gives browser a second to digest headers
+    readfile($included);  
+    exit;  
+  }
+}
+
