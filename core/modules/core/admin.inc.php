@@ -151,8 +151,9 @@ function core_admin_process_user($forms){
  */
 function core_admin_process_group($forms){
   if (isset($_POST['command']) && $_POST['command'] == 'delete' && isset($_POST['group']['id']) && is_numeric($_POST['group']['id']) && $_POST['group']['id'] > 0 && isset($_POST['confirmed']) && $_POST['confirmed'] == 1){
-    $status = core_db_write_raw(DB_NAME, "DELETE FROM `groups` WHERE `id` = {$_POST['group']['id']}");
-    if ($status['error']){
+    $db = new coreDb();
+    $db->write_raw("DELETE FROM `groups` WHERE `id` = {$_POST['group']['id']}");
+    if ($db->error){
       $_SESSION['message'] = '<span class="error" >Could not delete the group.</span>';
     }
     else{
@@ -161,6 +162,7 @@ function core_admin_process_group($forms){
     }
   }
   elseif (isset($_POST['command']) && $_POST['command'] == 'write' && isset($_POST['group']['id']) && is_numeric($_POST['group']['id'])){
+    $db = new coreDb();
     $id = $_POST['group']['id'];
     $inputs = array();
     $success = true;
@@ -173,77 +175,54 @@ function core_admin_process_group($forms){
       $where = array('id' => $id);
     }
     
-    // validate inputs
-    $expected = array(
-      'sortorder' => array(
-        'type' => 'num', 
-        'format' => 'int', 
-        'required' => false, 
-        'chars'=> 40, 
-        'notrim' => false, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'name' => array(
-        'type' => 'text', 
-        'format' => 'oneline', 
-        'required' => true, 
-        'chars'=> 100, 
-        'notrim' => false, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'desc' => array(
-        'type' => 'memo', 
-        'format' => 'all', 
-        'required' => false, 
-        'chars'=> 1000, 
-        'notrim' => true, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-    );
+    // Define form fields (for validation only)
+    $fields = array();
+    $fields['sortorder'] = new coreField('', 'num', 'int', false, 40);
+    $fields['name'] = new coreField('', 'text', 'oneline', true, 100);
+    $fields['desc'] = new coreField('', 'memo', 'all', false, 1000);
+    
+    foreach ($fields as $key => $data){
+      if (isset($_POST['group'][$key])){
+        $fields[$key]->value = $_POST['group'][$key];
+      }
+      $fields[$key]->validate();
+      $inputs[$key] = $fields[$key]->value;
+      if ($fields[$key]->error){
+        $success = false;
+      }
+      $payload[$key] = array(
+        'error' => $fields[$key]->error,
+        'message' => $fields[$key]->message,
+        'value' => $fields[$key]->value,
+      );
+    }
     
     // Validate the parent ID
     if ($id == 0){
       $inputs['parent_id'] = null;
     }
     else{
-      $result = core_validate_inputs($_POST['group']['parent_id'], 'num', 'int');
-      if ($result['error']){
+      $field = new coreField($_POST['group']['parent_id'], 'num', 'int');
+      $field->validate();
+      if ($field->error){
         $inputs['parent_id'] = 0;
       }
       else{
-        $inputs['parent_id'] = $result['value'];
-        $parent_info = core_db_fetch(DB_NAME, 'groups', array('id'), array('id' => $inputs['parent_id']));
+        $inputs['parent_id'] = $field->value;
+        $db->fetch('groups', array('id'), array('id' => $inputs['parent_id']));
         $disabled_ids = array();
-        $disabled_ids = core_process_get_children($id, $disabled_ids);
-        if (in_array($inputs['parent_id'], $disabled_ids) || count($parent_info)==0){
+        $groupobj = new coreGroup($id);
+        $disabled_ids = $groupobj->children($id, $disabled_ids);
+        if (in_array($inputs['parent_id'], $disabled_ids) || $db->affected_rows == 0){
           $inputs['parent_id'] = 0;
         }
       }
     }
     
-    foreach ($expected as $key => $data){
-      if (isset($_POST['group'][$key])){
-        $input = $_POST['group'][$key];
-      }
-      else{
-        $input = '';
-      }
-      $result = core_validate_inputs($input, $data['type'], $data['format'], $data['required'], $data['chars'], $data['notrim'], $data['range'], $data['range_flags']);
-      $inputs[$key] = $result['value'];
-      if ($result['error']){
-        $success = false;
-      }
-      $payload[$key] = $result;
-    }
-    
-    
     // Check for unique indexes
     if ($success){
-      $test = core_db_fetch(DB_NAME, 'groups', array('id'), array('name' => $inputs['name']));
-      if (count($test)>0 && $test[0]['id'] != $id){
+      $db->fetch('groups', array('id'), array('name' => $inputs['name']));
+      if ($db->affected_rows > 0 && $db->output[0]['id'] != $id){
         $success = false;
         $payload['name']['message'] = 'Already taken: Value needs to be unique, please choose another';
         $payload['name']['error'] = 5000;
@@ -252,11 +231,11 @@ function core_admin_process_group($forms){
     
     //write inputs
     if ($success){
-      $status = core_db_write(DB_NAME, 'groups', $inputs, $where);
-      if (!$status['error']){
+      $db->write('groups', $inputs, $where);
+      if (!$db->error){
         if ($id < 0){
-          $id = $status['insert_id'];
-          $_POST['path'] = "group/{$id}";
+          $id = $db->insert_id;
+          $_POST['path'] = "group/{$id}/";
         }
         $_SESSION['message'] = '<span class="success">The group has been successfully saved</span>';
       }
@@ -876,6 +855,7 @@ function core_admin_render_group($paths){
 ?>
   <?php echo $_SESSION['message']; ?>
 <?php
+    $db = new coreDb();
     $group = array();
     if (is_numeric($paths[1])){
       $id = $paths[1]; 
@@ -891,27 +871,27 @@ function core_admin_render_group($paths){
       }
       // Lookup to see if there is an existing group
       else{
-        $groups = core_db_fetch(DB_NAME, 'groups', null, array('id' => $id));
-        if (is_array($groups) && count($groups)>0){
+        $db->fetch('groups', null, array('id' => $id));
+        if ($db->affected_rows>0){
           // Set group to database record
-          $group = $groups[0];
+          $group = $db->output[0];
         }
       }
     }
     if (is_array($group) && count($group)>0){
       if (isset($paths[2]) && $paths[2] == 'delete' && $id >= 0){
-        $children = core_db_fetch(DB_NAME, 'groups', array('id'), array('parent_id' => $id));
+        $db->fetch('groups', array('id'), array('parent_id' => $id));
         if ($id == 0){
           // Don't allow deleting the root group
 ?>
       <p>It is not possible to delete <strong><?php echo $group['name']; ?></strong> as it reflects the root of the group tree.</p>
-      <a class="button" href="<?php echo APP_ROOT; ?>group/<?php echo $id; ?>" >Cancel</a>
+      <a class="button" href="<?php echo APP_ROOT; ?>group/<?php echo $id; ?>/" >Cancel</a>
 <?php        
         }
-        elseif(is_array($children) && count($children)>0){
+        elseif($db->affected_rows > 0){
 ?>
       <p>It is not possible to delete <strong><?php echo $group['name']; ?></strong> as it has subgroups attached to it.</p>
-      <a class="button" href="<?php echo APP_ROOT; ?>group/<?php echo $id; ?>" >Cancel</a> 
+      <a class="button" href="<?php echo APP_ROOT; ?>group/<?php echo $id; ?>/" >Cancel</a> 
 <?php       
         }
         else{
@@ -924,7 +904,7 @@ function core_admin_render_group($paths){
     <input type="hidden" name="group[id]" value="<?php echo $group['id']; ?>" />
     <input type="hidden" name="confirmed" value="1" />
     <input type="hidden" name="command" value="delete" />
-    <a class="button" href="<?php echo APP_ROOT; ?>group/<?php echo $group['id']; ?>" >Cancel</a> 
+    <a class="button" href="<?php echo APP_ROOT; ?>group/<?php echo $group['id']; ?>/" >Cancel</a> 
     <input class="button alert" type="submit" name="send" value="Delete" />   
   </form>
 <?php        
@@ -961,7 +941,8 @@ function core_admin_render_group($paths){
     <label for="group[parent_id]">Parent Group</label>
 <?php   
         $disabled_ids = array();
-        $disabled_ids = core_process_get_children($group['id'], $disabled_ids);
+        $groupobj = new coreGroup($group['id']);
+        $disabled_ids = $groupobj->children($group['id'], $disabled_ids);
         core_admin_render_grouptree(array($group['parent_id']), 'group[parent_id]', 'radio', null, $disabled_ids);  
 ?>
     <input class="button" type="submit" name="send" value="Save" />
@@ -990,10 +971,11 @@ function core_admin_render_group($paths){
 ?>
   <h2>Groups</h2>
 <?php
-    $groups = core_db_fetch(DB_NAME, 'groups', array('id'));
-    if (is_array($groups) && count($groups)>0){
+    $db = new coreDb();
+    $db->fetch('groups', array('id'));
+    if ($db->affected_rows > 0){
 ?>
-    <p><a href="<?php echo APP_ROOT; ?>group/-1">[+]</a><p>
+    <p><a href="<?php echo APP_ROOT; ?>group/-1/">[+]</a><p>
 <?php
       core_admin_render_groupnav();
     }
@@ -1454,12 +1436,13 @@ function core_admin_render_grouptree($selected, $varname='group', $type='checkbo
  */ 
 function core_admin_render_groupnav($parent_id=null){
   // Do stuff at top level
-  $groups = core_db_fetch(DB_NAME, 'groups', array('id', 'name'), array('parent_id' => $parent_id), null, array('sortorder', 'name'));
-  if (is_array($groups) && count($groups)>0){
+  $db = new coreDb();
+  $db->fetch('groups', array('id', 'name'), array('parent_id' => $parent_id), null, array('sortorder', 'name'));
+  if ($db->affected_rows > 0){
 ?>
   <ul>
 <?php
-    foreach($groups as $group){
+    foreach($db->output as $group){
 ?>
     <li><a href="<?php echo APP_ROOT; ?>group/<?php echo $group['id']; ?>/"><?php echo $group['name'];?></a></li>
 <?php
