@@ -261,8 +261,9 @@ function core_admin_process_group($forms){
  */
 function core_admin_process_role($forms){
   if (isset($_POST['command']) && $_POST['command'] == 'delete' && isset($_POST['role']['id']) && is_numeric($_POST['role']['id']) && $_POST['role']['id'] > 2 && isset($_POST['confirmed']) && $_POST['confirmed'] == 1){
-    $status = core_db_write_raw(DB_NAME, "DELETE FROM `roles` WHERE `id` = {$_POST['role']['id']}");
-    if ($status['error']){
+    $db = new coreDb();
+    $db->write_raw("DELETE FROM `roles` WHERE `id` = {$_POST['role']['id']}");
+    if ($db->error){
       $_SESSION['message'] = '<span class="error" >Could not delete the role.</span>';
     }
     else{
@@ -271,6 +272,7 @@ function core_admin_process_role($forms){
     }
   }
   elseif (isset($_POST['command']) && $_POST['command'] == 'write' && isset($_POST['role']['id']) && is_numeric($_POST['role']['id'])){
+    $db = new coreDb();
     $id = $_POST['role']['id'];
     $inputs = array();
     $success = true;
@@ -284,57 +286,32 @@ function core_admin_process_role($forms){
       $where = array('id' => $id);
     }
     
-    // validate inputs
-    $expected = array(
-      'sortorder' => array(
-        'type' => 'num', 
-        'format' => 'int', 
-        'required' => false, 
-        'chars'=> 40, 
-        'notrim' => false, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'name' => array(
-        'type' => 'text', 
-        'format' => 'oneline', 
-        'required' => true, 
-        'chars'=> 100, 
-        'notrim' => false, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'desc' => array(
-        'type' => 'memo', 
-        'format' => 'all', 
-        'required' => false, 
-        'chars'=> 1000, 
-        'notrim' => true, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-    );
+    // Define form fields (for validation only)
+    $fields = array();
+    $fields['sortorder'] = new coreField('', 'num', 'int', false, 40);
+    $fields['name'] = new coreField('', 'text', 'oneline', true, 100);
+    $fields['desc'] = new coreField('', 'memo', 'all', false, 1000);
     
-    foreach ($expected as $key => $data){
+    foreach ($fields as $key => $data){
       if (isset($_POST['role'][$key])){
-        $input = $_POST['role'][$key];
+        $fields[$key]->value = $_POST['role'][$key];
       }
-      else{
-        $input = '';
-      }
-      $result = core_validate_inputs($input, $data['type'], $data['format'], $data['required'], $data['chars'], $data['notrim'], $data['range'], $data['range_flags']);
-      $inputs[$key] = $result['value'];
-      if ($result['error']){
+      $fields[$key]->validate();
+      $inputs[$key] = $fields[$key]->value;
+      if ($fields[$key]->error){
         $success = false;
       }
-      $payload[$key] = $result;
+      $payload[$key] = array(
+        'error' => $fields[$key]->error,
+        'message' => $fields[$key]->message,
+        'value' => $fields[$key]->value,
+      );
     }
-    
     
     // Check for unique indexes
     if ($success){
-      $test = core_db_fetch(DB_NAME, 'roles', array('id'), array('name' => $inputs['name']));
-      if (count($test)>0 && $test[0]['id'] != $id){
+      $db->fetch('roles', array('id'), array('name' => $inputs['name']));
+      if ($db->affected_rows > 0 && $db->output[0]['id'] != $id){
         $success = false;
         $payload['name']['message'] = 'Already taken: Value needs to be unique, please choose another';
         $payload['name']['error'] = 5000;
@@ -343,10 +320,10 @@ function core_admin_process_role($forms){
     
     //write inputs
     if ($success){
-      $status = core_db_write(DB_NAME, 'roles', $inputs, $where);
-      if (!$status['error']){
+      $db->write('roles', $inputs, $where);
+      if (!$db->error){
         if ($id < 0){
-          $id = $status['insert_id'];
+          $id = $db->insert_id;
           $_POST['path'] = "role/{$id}";
         }
         $_SESSION['message'] = '<span class="success">The group has been successfully saved</span>';
@@ -998,6 +975,7 @@ function core_admin_render_role($paths){
 ?>
   <?php echo $_SESSION['message']; ?>
 <?php
+    $db = new coreDb();
     $role = array();
     if (is_numeric($paths[1])){
       $id = $paths[1]; 
@@ -1012,10 +990,10 @@ function core_admin_render_role($paths){
       }
       // Lookup to see if there is an existing role
       else{
-        $roles = core_db_fetch(DB_NAME, 'roles', null, array('id' => $id));
-        if (is_array($roles) && count($roles)>0){
+        $db->fetch('roles', null, array('id' => $id));
+        if ($db->affected_rows > 0){
           // Set role to database record
-          $role = $roles[0];
+          $role = $db->output[0];
         }
       }
     }
@@ -1099,15 +1077,16 @@ function core_admin_render_role($paths){
 ?>
   <h2>Roles</h2>
 <?php
-    $roles = core_db_fetch(DB_NAME, 'roles', array('id', 'name'),null,null, array('sortorder', 'name'));
-    if (is_array($roles) && count($roles)>0){
+    $db = new coreDb();
+    $db->fetch('roles', array('id', 'name'),null,null, array('sortorder', 'name'));
+    if ($db->affected_rows > 0){
 ?>
     <ul>
-      <li><a href="<?php echo APP_ROOT; ?>role/-1">[+]</a></li>
+      <li><a href="<?php echo APP_ROOT; ?>role/-1/">[+]</a></li>
 <?php
-      foreach ($roles as $role){
+      foreach ($db->output as $role){
 ?>
-      <li><a href="<?php echo APP_ROOT; ?>role/<?php echo $role['id']; ?>"><?php echo $role['name']; ?></a></li>
+      <li><a href="<?php echo APP_ROOT; ?>role/<?php echo $role['id']; ?>/"><?php echo $role['name']; ?></a></li>
 <?php
       }
 ?>
