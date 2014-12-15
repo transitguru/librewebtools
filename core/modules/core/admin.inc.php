@@ -692,6 +692,7 @@ function core_admin_render_user($paths){
 ?>
   <?php echo $_SESSION['message']; ?>
 <?php
+    $db = new coreDb();
     $user = array();
     if (is_numeric($paths[1])){
       $id = $paths[1]; 
@@ -710,7 +711,6 @@ function core_admin_render_user($paths){
       }
       // Lookup to see if there is an existing user
       else{
-        $db = new coreDb();
         $db->fetch('users', null, array('id' => $id));
         if ($db->affected_rows > 0){
           // Set user to database record
@@ -846,7 +846,7 @@ function core_admin_render_user($paths){
     if ($db->affected_rows > 0){
 ?>
   <ul>
-    <li><a href="<?php echo APP_ROOT; ?>user/-1" >[+]</a></li>
+    <li><a href="<?php echo APP_ROOT; ?>user/-1/" >[+]</a></li>
 <?php
       foreach ($db->output as $user){
 ?>
