@@ -19,8 +19,9 @@
  */
 function core_admin_process_user($forms){
   if (isset($_POST['command']) && $_POST['command'] == 'delete' && isset($_POST['user']['id']) && is_numeric($_POST['user']['id']) && isset($_POST['confirmed']) && $_POST['confirmed'] == 1){
-    $status = core_db_write_raw(DB_NAME, "DELETE FROM `users` WHERE `id` = {$_POST['user']['id']}");
-    if ($status['error']){
+    $db = new coreDb();
+    $db->write_raw("DELETE FROM `users` WHERE `id` = {$_POST['user']['id']}");
+    if ($db->error){
       $_SESSION['message'] = '<span class="error" >Could not delete the user.</span>';
     }
     else{
@@ -42,127 +43,90 @@ function core_admin_process_user($forms){
       $where = array('id' => $id);
     }
     
-    // validate inputs
-    $expected = array(
-      'login' => array(
-        'type' => 'text', 
-        'format' => 'nowacky', 
-        'required' => true, 
-        'chars'=> 40, 
-        'notrim' => false, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'firstname' => array(
-        'type' => 'text', 
-        'format' => 'oneline', 
-        'required' => true, 
-        'chars'=> 100, 
-        'notrim' => false, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'lastname' => array(
-        'type' => 'text', 
-        'format' => 'oneline', 
-        'required' => true, 
-        'chars'=> 100, 
-        'notrim' => false, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'email' => array(
-        'type' => 'text', 
-        'format' => 'email', 
-        'required' => true, 
-        'chars'=> 255, 
-        'notrim' => false, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'desc' => array(
-        'type' => 'memo', 
-        'format' => 'all', 
-        'required' => false, 
-        'chars'=> 1000, 
-        'notrim' => true, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-    );
+    // Define form fields (for validation only)
+    $fields = array();
+    $fields['login'] = new coreField('', 'text', 'nowacky', true, 40);
+    $fields['firstname'] = new coreField('', 'text', 'oneline', true, 100);
+    $fields['lastname'] = new coreField('', 'text', 'oneline', true, 100);
+    $fields['email'] = new coreField('', 'text', 'email', true, 255);
+    $fields['desc'] = new coreField('', 'memo', 'all', false, 1000);
     
-    foreach ($expected as $key => $data){
+    foreach ($fields as $key => $data){
       if (isset($_POST['user'][$key])){
-        $input = $_POST['user'][$key];
+        $fields[$key]->value = $_POST['user'][$key];
       }
-      else{
-        $input = '';
-      }
-      $result = core_validate_inputs($input, $data['type'], $data['format'], $data['required'], $data['chars'], $data['notrim'], $data['range'], $data['range_flags']);
-      $inputs[$key] = $result['value'];
-      if ($result['error']){
+      $fields[$key]->validate();
+      $inputs[$key] = $fields[$key]->value;
+      if ($fields[$key]->error){
         $success = false;
       }
-      $payload[$key] = $result;
+      $payload[$key] = array(
+        'error' => $fields[$key]->error,
+        'message' => $fields[$key]->message,
+        'value' => $fields[$key]->value,
+      );
     }
     $roles = array();
     foreach ($_POST['roles'] as $role){
-      $result = core_validate_inputs($role, 'num', 'int');
-      if (!$result['error']){
+      $field = new coreField($role, 'num', 'int');
+      $field->validate();
+      if (!$field->error){
         $roles[] = $role;
       }
     }
     $groups = array();
     foreach ($_POST['groups'] as $group){
-      $result = core_validate_inputs($group, 'num', 'int');
-      if (!$result['error']){
+      $field = new coreField($role, 'num', 'int');
+      $field->validate();
+      if (!$field->error){
         $groups[] = $group;
       }
     }
     
     // Check for unique indexes
     if ($success){
-      $test = core_db_fetch(DB_NAME, 'users', array('id'), array('login' => $inputs['login']));
-      if (count($test)>0 && $test[0]['id'] != $id){
+      $db = new coreDb();
+      $db->fetch('users', array('id'), array('login' => $inputs['login']));
+      if ($db->affected_rows > 0 && $db->output[0]['id'] != $id){
         $success = false;
         $payload['login']['message'] = 'Already taken: Value needs to be unique, please choose another';
         $payload['login']['error'] = 5000;
       }
-      $test = core_db_fetch(DB_NAME, 'users', array('id'), array('email' => $inputs['email']));
-      if (count($test)>0 && $test[0]['id'] != $id){
+      $db->fetch('users', array('id'), array('email' => $inputs['email']));
+      if ($db->affected_rows > 0 && $db->output[0]['id'] != $id){
         $success = false;
         $payload['email']['message'] = 'Already taken: Value needs to be unique, please choose another';
         $payload['email']['error'] = 5000;
       }
     }
     
-    $inputs['created'] = date('Y-m-d H:i:s');
-
     //write inputs
     if ($success){
-      $status = core_db_write(DB_NAME, 'users', $inputs, $where);
-      if (!$status['error']){
+      $db->write('users', $inputs, $where);
+      if (!$db->error){
         if ($id < 0){
-          $id = $status['insert_id'];
-          core_auth_setpassword($id);
+          $id = $db->insert_id;
+          $user = new coreUser($id);
+          $user->setpassword();
           $_POST['path'] = "user/{$id}";
         }
         
         // Apply roles
-        core_db_write_raw(DB_NAME, "DELETE FROM `user_roles` WHERE `user_id` = {$id}");
+        $db->write_raw("DELETE FROM `user_roles` WHERE `user_id` = {$id}");
         foreach ($roles as $role){
-          core_db_write(DB_NAME, 'user_roles', array('role_id' => $role, 'user_id' => $id));
+          $db->write('user_roles', array('role_id' => $role, 'user_id' => $id));
         }
         
         //Apply groups
-        core_db_write_raw(DB_NAME, "DELETE FROM `user_groups` WHERE `user_id` = {$id}");
+        $db->write_raw("DELETE FROM `user_groups` WHERE `user_id` = {$id}");
         foreach ($groups as $group){
-          core_db_write(DB_NAME, 'user_groups', array('group_id' => $group, 'user_id' => $id));
+          $db->write('user_groups', array('group_id' => $group, 'user_id' => $id));
         }
         
         //Reset if requested
         if (isset($_POST['reset']) && $_POST['reset'] == 1){
-          core_auth_resetpassword($inputs['email']);
+          $user = new coreUser($id);
+          $user->resetpassword($inputs['email']);
         }
         $_SESSION['message'] = '<span class="success">The user has been successfully saved</span>';
       }
@@ -746,25 +710,26 @@ function core_admin_render_user($paths){
       }
       // Lookup to see if there is an existing user
       else{
-        $users = core_db_fetch(DB_NAME, 'users', null, array('id' => $id));
-        if (is_array($users) && count($users)>0){
+        $db = new coreDb();
+        $db->fetch('users', null, array('id' => $id));
+        if ($db->affected_rows > 0){
           // Set user to database record
-          $user = $users[0];
+          $user = $db->output[0];
           
           // Load current user roles
           $user['roles'] = array();
-          $roles = core_db_fetch(DB_NAME, 'user_roles', null, array('user_id' => $id));
-          if (is_array($roles) && count($roles)>0){
-            foreach($roles as $role){
+          $db->fetch('user_roles', null, array('user_id' => $id));
+          if ($db->affected_rows > 0){
+            foreach($db->output as $role){
               $user['roles'][] = $role['role_id'];
             }
           }
           
           // Load current user groups
           $user['groups'] = array();
-          $groups = core_db_fetch(DB_NAME, 'user_groups', null, array('user_id' => $id));
-          if (is_array($groups) && count($groups)>0){
-            foreach($groups as $group){
+          $db->fetch('user_groups', null, array('user_id' => $id));
+          if ($db->affected_rows > 0){
+            foreach($db->output as $group){
               $user['groups'][] = $group['group_id'];
             }
           }
@@ -832,8 +797,8 @@ function core_admin_render_user($paths){
     <label for="roles[]">Roles</label>
     <ul>
 <?php
-        $roles = core_db_fetch(DB_NAME, 'roles', null, null, null, array('sortorder', 'name'));
-        foreach ($roles as $role){
+        $db->fetch('roles', null, null, null, array('sortorder', 'name'));
+        foreach ($db->output as $role){
           if (in_array(($role['id']), $user['roles'])){
             $checked = 'checked';
           }
@@ -876,15 +841,16 @@ function core_admin_render_user($paths){
 ?>
   <h2>Users</h2>
 <?php
-    $users = core_db_fetch(DB_NAME, 'users', null, null, null, array('login'));
-    if (is_array($users) && count($users)>0){
+    $db = new coreDb();
+    $db->fetch('users', null, null, null, array('login'));
+    if ($db->affected_rows > 0){
 ?>
   <ul>
     <li><a href="<?php echo APP_ROOT; ?>user/-1" >[+]</a></li>
 <?php
-      foreach ($users as $user){
+      foreach ($db->output as $user){
 ?>
-    <li><a href="<?php echo APP_ROOT; ?>user/<?php echo $user['id']; ?>" ><?php echo $user['login']; ?></a> <em><?php echo "{$user['firstname']} {$user['lastname']}"; ?></em></li>
+    <li><a href="<?php echo APP_ROOT; ?>user/<?php echo $user['id']; ?>/" ><?php echo $user['login']; ?></a> <em><?php echo "{$user['firstname']} {$user['lastname']}"; ?></em></li>
 <?php
       }
 ?>
@@ -1443,12 +1409,13 @@ function core_admin_render_menu($paths){
  */ 
 function core_admin_render_grouptree($selected, $varname='group', $type='checkbox', $parent_id=null, $disabled_ids=array()){
   // Do stuff at top level
-  $groups = core_db_fetch(DB_NAME, 'groups', array('id', 'name'), array('parent_id' => $parent_id), null, array('sortorder', 'name'));
-  if (is_array($groups) && count($groups)>0){
+  $db = new coreDb();
+  $db->fetch('groups', array('id', 'name'), array('parent_id' => $parent_id), null, array('sortorder', 'name'));
+  if ($db->affected_rows >0){
 ?>
   <ul>
 <?php
-    foreach($groups as $group){
+    foreach($db->output as $group){
       if ($type == 'checkbox'){
         $bracket = 's[]';
       }
