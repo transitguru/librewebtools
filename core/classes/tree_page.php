@@ -12,7 +12,8 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class corePage{
+class corePage extends coreTree{
+  public $table = 'pages'; /**< Table name in Database */
   public $uri = '/';  /**< Request from the User, as a string */
   public $title = '';  /**< Title of the page, as loaded from the database */
   public $header = '200 OK';  /**< HTTP status of the request */

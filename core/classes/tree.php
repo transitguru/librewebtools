@@ -81,7 +81,7 @@ class coreTree{
   public function children($parent, $ids){
     $ids[$parent] = $parent;
     $db = new coreDb();
-    $db->fetch('groups', NULL, array('parent_id' => $parent));
+    $db->fetch($this->table, NULL, array('parent_id' => $parent));
     if ($db->affected_rows > 0){
       foreach ($db->output as $child){
         $ids = $this->children($child['id'],$ids);

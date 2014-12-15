@@ -1113,6 +1113,7 @@ function core_admin_render_page($paths){
 ?>
   <?php echo $_SESSION['message']; ?>
 <?php
+    $db = new coreDb();
     $page = array();
     if (is_numeric($paths[1])){
       $id = $paths[1]; 
@@ -1137,33 +1138,33 @@ function core_admin_render_page($paths){
       }
       // Lookup to see if there is an existing page
       else{
-        $pages = core_db_fetch(DB_NAME, 'pages', null, array('id' => $id));
-        if (is_array($pages) && count($pages)>0){
+        $db->fetch('pages', null, array('id' => $id));
+        if ($db->affected_rows > 0){
           // Set page to database record(s)
-          $page = $pages[0];
-          $page_content = core_db_fetch(DB_NAME, 'page_content', null, array('page_id' => $id), null, array('created'));
-          if (!is_array($page_content) || count($page_content) == 0){
+          $page = $db->output[0];
+          $db->fetch('page_content', null, array('page_id' => $id), null, array('created'));
+          if ($db->affected_rows == 0){
             $page['summary'] = '';
             $page['content'] = '';
           }
           else{
-            foreach ($page_content as $content){
+            foreach ($db->output as $content){
               // Set values to latest records in content history
               $page['summary'] = $content['summary'];
               $page['content'] = $content['content'];
             }
           }
           $page['roles'] = array();
-          $roles = core_db_fetch(DB_NAME, 'page_roles', array('role_id'), array('page_id' => $id));
-          if (is_array($roles) && count($roles)>0){
-            foreach ($roles as $role){
+          $db->fetch('page_roles', array('role_id'), array('page_id' => $id));
+          if ($db->affected_rows > 0){
+            foreach ($db->output as $role){
               $page['roles'][] = $role['role_id'];
             }
           }
           $page['groups'] = array();
-          $groups = core_db_fetch(DB_NAME, 'page_groups', array('group_id'), array('page_id' => $id));
-          if (is_array($groups) && count($groups)>0){
-            foreach ($groups as $group){
+          $db->fetch('page_groups', array('group_id'), array('page_id' => $id));
+          if ($db->affected_rows > 0){
+            foreach ($db->output as $group){
               $page['groups'][] = $group['group_id'];
             }
           }
@@ -1173,18 +1174,18 @@ function core_admin_render_page($paths){
     }
     if (is_array($page) && count($page)>0){
       if (isset($paths[2]) && $paths[2] == 'delete' && $id >= 0){
-        $children = core_db_fetch(DB_NAME, 'pages', array('id'), array('parent_id' => $id));
+        $db->fetch('pages', array('id'), array('parent_id' => $id));
         if ($page['core_page'] == 1){
           // Don't allow deleting a core page
 ?>
       <p>It is not possible to delete <strong><?php echo $page['title']; ?></strong> as it is a core page.</p>
-      <a class="button" href="<?php echo APP_ROOT; ?>page/<?php echo $id; ?>" >Cancel</a>
+      <a class="button" href="<?php echo APP_ROOT; ?>page/<?php echo $id; ?>/" >Cancel</a>
 <?php        
         }
-        elseif(is_array($children) && count($children)>0){
+        elseif($db->affected_rows > 0){
 ?>
       <p>It is not possible to delete <strong><?php echo $page['title']; ?></strong> as it has subpages attached to it.</p>
-      <a class="button" href="<?php echo APP_ROOT; ?>page/<?php echo $id; ?>" >Cancel</a> 
+      <a class="button" href="<?php echo APP_ROOT; ?>page/<?php echo $id; ?>/" >Cancel</a> 
 <?php       
         }
         else{
@@ -1197,7 +1198,7 @@ function core_admin_render_page($paths){
     <input type="hidden" name="page[id]" value="<?php echo $page['id']; ?>" />
     <input type="hidden" name="confirmed" value="1" />
     <input type="hidden" name="command" value="delete" />
-    <a class="button" href="<?php echo APP_ROOT; ?>page/<?php echo $page['id']; ?>" >Cancel</a> 
+    <a class="button" href="<?php echo APP_ROOT; ?>page/<?php echo $page['id']; ?>/" >Cancel</a> 
     <input class="button alert" type="submit" name="send" value="Delete" />   
   </form>
 <?php        
@@ -1232,7 +1233,8 @@ function core_admin_render_page($paths){
     <label for="page[parent_id]">Parent Page</label>
 <?php   
         $disabled_ids = array();
-        $disabled_ids = core_process_get_pagechildren($page['id'], $disabled_ids);
+        $pageobj = new corePage($page['id']);
+        $disabled_ids = $pageobj->children($page['id'], $disabled_ids);
         core_admin_render_pagetree(array($page['parent_id']), 'page[parent_id]', 'radio', null, $disabled_ids);  
 ?>
     <h4>Publishing</h4>
@@ -1255,8 +1257,8 @@ function core_admin_render_page($paths){
     <label for="roles[]">Roles</label>
     <ul>
 <?php
-        $roles = core_db_fetch(DB_NAME, 'roles', null, null, null, array('sortorder', 'name'));
-        foreach ($roles as $role){
+        $db->fetch('roles', null, null, null, array('sortorder', 'name'));
+        foreach ($db->output as $role){
           if (in_array(($role['id']), $page['roles'])){
             $checked = 'checked';
           }
@@ -1300,10 +1302,11 @@ function core_admin_render_page($paths){
 ?>
   <h2>Pages</h2>
 <?php
-    $pages = core_db_fetch(DB_NAME, 'pages', array('id'));
-    if (is_array($pages) && count($pages)>0){
+    $db = new coreDb();
+    $db->fetch('pages', array('id'));
+    if ($db->affected_rows > 0){
 ?>
-    <p><a href="<?php echo APP_ROOT; ?>page/-1">[+]</a><p>
+    <p><a href="<?php echo APP_ROOT; ?>page/-1/">[+]</a><p>
 <?php
       core_admin_render_pagenav();
     }
@@ -1446,12 +1449,13 @@ function core_admin_render_groupnav($parent_id=null){
  */ 
 function core_admin_render_pagetree($selected, $varname='page', $type='checkbox', $parent_id=null, $disabled_ids=array()){
   // Do stuff at top level
-  $pages = core_db_fetch(DB_NAME, 'pages', array('id', 'url_code', 'title', 'app_root'), array('parent_id' => $parent_id), null, array('url_code'));
-  if (is_array($pages) && count($pages)>0){
+  $db = new coreDb();
+  $db->fetch('pages', array('id', 'url_code', 'title', 'app_root'), array('parent_id' => $parent_id), null, array('url_code'));
+  if ($db->affected_rows > 0){
 ?>
   <ul>
 <?php
-    foreach($pages as $page){
+    foreach($db->output as $page){
       if ($type == 'checkbox'){
         $bracket = 's[]';
       }
@@ -1494,12 +1498,13 @@ function core_admin_render_pagetree($selected, $varname='page', $type='checkbox'
  */ 
 function core_admin_render_pagenav($parent_id=null){
   // Do stuff at top level
-  $pages = core_db_fetch(DB_NAME, 'pages', array('id', 'url_code', 'title'), array('parent_id' => $parent_id), null, array('url_code'));
-  if (is_array($pages) && count($pages)>0){
+  $db = new coreDb();
+  $db->fetch('pages', array('id', 'url_code', 'title'), array('parent_id' => $parent_id), null, array('url_code'));
+  if ($db->affected_rows > 0){
 ?>
   <ul>
 <?php
-    foreach($pages as $page){
+    foreach($db->output as $page){
 ?>
     <li>
       <a href="<?php echo APP_ROOT; ?>page/<?php echo $page['id']; ?>/"><?php echo $page['url_code'];?>/</a> <em><?php echo $page['title'];?></em>
