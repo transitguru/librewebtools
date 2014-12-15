@@ -348,13 +348,14 @@ function core_admin_process_role($forms){
  */
 function core_admin_process_page($forms){
   if (isset($_POST['command']) && $_POST['command'] == 'delete' && isset($_POST['page']['id']) && is_numeric($_POST['page']['id']) && $_POST['page']['id'] > 0 && isset($_POST['confirmed']) && $_POST['confirmed'] == 1){
-    $pages = core_db_fetch(DB_NAME, 'pages', array('app_root', 'core_page'), array('id' => $id));
-    if (count($pages)>0 && ($pages[0]['app_root'] == 1 || $pages[0]['core_page'] == 1)){
+    $db = new coreDb();
+    $db->fetch('pages', array('app_root', 'core_page'), array('id' => $id));
+    if ($db->affected_rows>0 && ($db->output[0]['app_root'] == 1 || $db->output[0]['core_page'] == 1)){
       $_SESSION['message'] = '<span class="warning" >Page is protected, please set <em>app_root</em> and <em>core_page</em> to <strong>no</strong>.</span>';
     }
     else{
-      $status = core_db_write_raw(DB_NAME, "DELETE FROM `pages` WHERE `id` = {$_POST['page']['id']}");
-      if ($status['error']){
+      $db->write_raw("DELETE FROM `pages` WHERE `id` = {$_POST['page']['id']}");
+      if ($db->error){
         $_SESSION['message'] = '<span class="error" >Could not delete the page.</span>';
       }
       else{
@@ -364,6 +365,7 @@ function core_admin_process_page($forms){
     }
   }
   elseif (isset($_POST['command']) && $_POST['command'] == 'write' && isset($_POST['page']['id']) && is_numeric($_POST['page']['id'])){
+    $db = new coreDb();
     $id = $_POST['page']['id'];
     $inputs = array();
     $success = true;
@@ -375,98 +377,62 @@ function core_admin_process_page($forms){
     else{
       $where = array('id' => $id);
     }
-
-    // validate inputs
-    $expected = array(
-      'url_code' => array(
-        'type' => 'text', 
-        'format' => 'nowacky', 
-        'required' => true, 
-        'chars'=> 100, 
-        'notrim' => false, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'title' => array(
-        'type' => 'text', 
-        'format' => 'oneline', 
-        'required' => true, 
-        'chars'=> 255, 
-        'notrim' => false, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'ajax_call' => array(
-        'type' => 'text', 
-        'format' => 'nowacky', 
-        'required' => false, 
-        'chars'=> 255, 
-        'notrim' => false, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'render_call' => array(
-        'type' => 'text', 
-        'format' => 'nowacky', 
-        'required' => false, 
-        'chars'=> 255, 
-        'notrim' => false, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'activated' => array(
-        'type' => 'date', 
-        'format' => 'Y-m-d H:i:s', 
-        'required' => false, 
-        'chars'=> 20, 
-        'notrim' => false, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'deactivated' => array(
-        'type' => 'date', 
-        'format' => 'Y-m-d H:i:s', 
-        'required' => false, 
-        'chars'=> 20, 
-        'notrim' => false, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'summary' => array(
-        'type' => 'memo', 
-        'format' => 'all', 
-        'required' => false, 
-        'chars'=> 100000, 
-        'notrim' => true, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-      'content' => array(
-        'type' => 'memo', 
-        'format' => 'all', 
-        'required' => false, 
-        'chars'=> 100000, 
-        'notrim' => true, 
-        'range' => array(null, null, null), 
-        'range_flags' => array(false, false, false),
-      ),
-    );
+    
+    // Define form fields (for validation only)
+    $fields = array();
+    $fields['url_code'] = new coreField('', 'text', 'nowacky', true, 100);
+    $fields['title'] = new coreField('', 'text', 'oneline', true, 255);
+    $fields['ajax_call'] = new coreField('', 'text', 'nowacky', false, 255);
+    $fields['render_call'] = new coreField('', 'text', 'nowacky', false, 255);
+    $fields['activated'] = new coreField('', 'date', 'Y-m-d H:i:s', false, 20);
+    $fields['deactivated'] = new coreField('', 'date', 'Y-m-d H:i:s', false, 20);
+    $fields['summary'] = new coreField('', 'memo', 'all', false, 100000);
+    $fields['content'] = new coreField('', 'memo', 'all', false, 100000);
+    
+    foreach ($fields as $key => $data){
+      if (isset($_POST['page'][$key])){
+        $fields[$key]->value = $_POST['page'][$key];
+      }
+      if ($key == 'url_code' && $id == 0){
+        // URL code must be empty for 0 id
+        $payload[$key] = array(
+          'error' => 0,
+          'value' => '',
+          'message' => '',
+        );
+        $inputs[$key] = '';
+      }
+      else{
+        $fields[$key]->validate();
+        $inputs[$key] = $fields[$key]->value;
+        if ($fields[$key]->error){
+          $success = false;
+        }
+        $payload[$key] = array(
+          'error' => $fields[$key]->error,
+          'message' => $fields[$key]->message,
+          'value' => $fields[$key]->value,
+        );
+      }
+    }
     
     // Validate the parent ID
     if ($id == 0){
       $inputs['parent_id'] = null;
     }
     else{
-      $result = core_validate_inputs($_POST['page']['parent_id'], 'num', 'int');
-      if ($result['error']){
+      $field = new coreField($_POST['page']['parent_id'], 'num', 'int');
+      $field->validate();
+      if ($field->error){
         $inputs['parent_id'] = 0;
       }
       else{
-        $inputs['parent_id'] = $result['value'];
-        $parent_info = core_db_fetch(DB_NAME, 'pages', array('app_root'), array('id' => $inputs['parent_id']));
+        $inputs['parent_id'] = $field->value;
+        $db->fetch('pages', array('app_root'), array('id' => $inputs['parent_id']));
         $disabled_ids = array();
-        $disabled_ids = core_process_get_pagechildren($id, $disabled_ids);
-        if (in_array($inputs['parent_id'], $disabled_ids) || count($parent_info)==0 || (count($parent_info)>0 && $parent_info['app_root'] == 1)){
+        $pageobj = new corePage($id, 1);
+        $disabled_ids = $pageobj->children($id, $disabled_ids);
+        if (in_array($inputs['parent_id'], $disabled_ids) || $db->affected_rows==0 || ($db->affected_rows>0 && $db->output[0]['app_root'] == 1)){
           $inputs['parent_id'] = 0;
         }
       }
@@ -486,50 +452,27 @@ function core_admin_process_page($forms){
       $inputs['core_page'] = 0;
     }
     
-    // Loop through expected inputs
-    foreach ($expected as $key => $data){
-      if (isset($_POST['page'][$key])){
-        $input = $_POST['page'][$key];
-      }
-      else{
-        $input = '';
-      }
-      if ($key == 'url_code' && 'id' == 0){
-        // URL code must be empty for 0 id
-        $result = array(
-          'error' => 0,
-          'value' => '',
-          'message' => '',
-        );
-      }
-      else{
-        $result = core_validate_inputs($input, $data['type'], $data['format'], $data['required'], $data['chars'], $data['notrim'], $data['range'], $data['range_flags']);
-      }
-      $inputs[$key] = $result['value'];
-      if ($result['error']){
-        $success = false;
-      }
-      $payload[$key] = $result;
-    }
     $roles = array();
     foreach ($_POST['roles'] as $role){
-      $result = core_validate_inputs($role, 'num', 'int');
-      if (!$result['error']){
+      $field = new coreField($role, 'num', 'int');
+      $field->validate();
+      if (!$field->error){
         $roles[] = $role;
       }
     }
     $groups = array();
     foreach ($_POST['groups'] as $group){
-      $result = core_validate_inputs($group, 'num', 'int');
-      if (!$result['error']){
+      $field = new coreField($group, 'num', 'int');
+      $field->validate();
+      if (!$field->error){
         $groups[] = $group;
       }
     }
     
     // Check for unique indexes
     if ($success){
-      $test = core_db_fetch(DB_NAME, 'pages', array('id'), array('url_code' => $inputs['url_code'], 'parent_id' => $inputs['parent_id']));
-      if (count($test)>0 && $test[0]['id'] != $id){
+      $db->fetch('pages', array('id'), array('url_code' => $inputs['url_code'], 'parent_id' => $inputs['parent_id']));
+      if ($db->affected_rows > 0 && $db->output[0]['id'] != $id){
         $success = false;
         $payload['login']['message'] = 'Already taken: URL code at this level needs to be unique, please choose another';
         $payload['login']['error'] = 5000;
@@ -546,36 +489,37 @@ function core_admin_process_page($forms){
         'title' => $inputs['title'],
         'app_root' => $inputs['app_root'],
         'core_page' => $inputs['core_page'],
-        'ajax_call' => $inputs['render_call'],
+        'ajax_call' => $inputs['ajax_call'],
+        'render_call' => $inputs['render_call'],
         'activated' => $inputs['activated'],
         'deactivated' => $inputs['deactivated'],
       );
       if ($id < 0){
         $page_inputs['created'] = $date;
-        $page_inputs['created'] = $_SESSION['authenticated']['id'];
+        $page_inputs['user_id'] = $_SESSION['user_id'];
       }
       elseif($id == 0){
         unset($page_inputs['url_code']);
       }
 
-      $status = core_db_write(DB_NAME, 'pages', $page_inputs, $where);
-      if (!$status['error']){
+      $db->write('pages', $page_inputs, $where);
+      if (!$db->error){
         if ($id < 0){
-          $id = $status['insert_id'];
+          $id = $db->insert_id;
           $_POST['path'] = "page/{$id}";
         }
         
         
         // Apply roles
-        core_db_write_raw(DB_NAME, "DELETE FROM `page_roles` WHERE `page_id` = {$id}");
+        $db->write_raw("DELETE FROM `page_roles` WHERE `page_id` = {$id}");
         foreach ($roles as $role){
-          core_db_write(DB_NAME, 'page_roles', array('role_id' => $role, 'page_id' => $id));
+          $db->write('page_roles', array('role_id' => $role, 'page_id' => $id));
         }
         
         //Apply groups
-        core_db_write_raw(DB_NAME, "DELETE FROM `page_groups` WHERE `page_id` = {$id}");
+        $db->write_raw("DELETE FROM `page_groups` WHERE `page_id` = {$id}");
         foreach ($groups as $group){
-          core_db_write(DB_NAME, 'page_groups', array('group_id' => $group, 'page_id' => $id));
+          $db->write('page_groups', array('group_id' => $group, 'page_id' => $id));
         }
         
         // Apply page content (only if necessary)
@@ -588,12 +532,13 @@ function core_admin_process_page($forms){
           'content' => $inputs['content'],
         );
         
-        $content_pages = core_db_fetch_raw(DB_NAME, "SELECT * FROM `page_content` WHERE `page_id` = {$id} ORDER BY `created` DESC LIMIT 1");
+        $db->fetch_raw("SELECT * FROM `page_content` WHERE `page_id` = {$id} ORDER BY `created` DESC LIMIT 1");
+        $content_pages = $db->output;
         if (
           ((!is_array($content_pages) || count($content_pages)==0) && ($content_inputs['summary'] != '' || $content_inputs['content'] != '')) ||
           (is_array($content_pages) && count($content_pages)>0 && ($content_inputs['summary'] != $content_pages[0]['summary'] || $content_inputs['content'] != $content_pages[0]['content']))
         ){
-          core_db_write(DB_NAME, 'page_content', $content_inputs);
+          $db->write('page_content', $content_inputs);
         }
         
         $_SESSION['message'] = '<span class="success">The page has been successfully saved</span>';
@@ -1233,7 +1178,7 @@ function core_admin_render_page($paths){
     <label for="page[parent_id]">Parent Page</label>
 <?php   
         $disabled_ids = array();
-        $pageobj = new corePage($page['id']);
+        $pageobj = new corePage($page['id'], 1);
         $disabled_ids = $pageobj->children($page['id'], $disabled_ids);
         core_admin_render_pagetree(array($page['parent_id']), 'page[parent_id]', 'radio', null, $disabled_ids);  
 ?>

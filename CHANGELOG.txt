@@ -1,7 +1,7 @@
-LibreWebTools v0.5, 0000-00-00
+LibreWebTools v0.5.0, 2014-12-15
 ------------------------------
 - First "public" release
-- Converted most of the functions to use OOP
+- Converted most of the functions to use OOP style
 - Much simpler database
 
 LibreWebTools v0.4, 2014-11-27

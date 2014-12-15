@@ -53,7 +53,7 @@ if (isset($_SESSION['user_id']) && $now > $_SESSION['start'] + $timelimit){
   $_SESSION['start'] = time() - 86400;
   $_SESSION['message'] = "Your session has expired, please logon.";
 }
-elseif (isset($_SESSION['authenticated']['user'])){
+elseif (isset($_SESSION['user_id'])){
   // if it's got this far, it's OK, so update start time
   $_SESSION['start'] = time();
 }
