@@ -5,4 +5,4 @@ object-oriented classes within these modules can safely inherit core classes.
 Inheritance within any module is possible, but not between two modules. It is 
 also not recommended to attempt to inherit classes from core modules (as 
 opposed to the core classes) as optional modules may not be enabled, which can
-potentially cause an unrecoverable error upon loading of the class.
+potentially cause an unrecoverable error upon attempted loading of the class.
