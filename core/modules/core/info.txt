@@ -1,0 +1,4 @@
+name: Core
+description: Administration functions
+version: 0.5.0
+required: 1

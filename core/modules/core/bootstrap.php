@@ -63,6 +63,9 @@ function core_admin_ajax($wrapper = false){
         elseif ($forms[1] === 'menu'){
           core_admin_process_menu($forms);
         }
+        elseif ($forms[1] === 'module'){
+          core_admin_process_menu($forms);
+        }
       }
     }
     else{
@@ -94,6 +97,7 @@ function core_admin_ajax($wrapper = false){
       <li class="<?php echo $class['page']; ?>"><a href="<?php echo APP_ROOT; ?>page/" >Pages</a></li>
       <li class="<?php echo $class['file']; ?>"><a href="<?php echo APP_ROOT; ?>file/" >Files</a></li>
       <li class="<?php echo $class['menu']; ?>"><a href="<?php echo APP_ROOT; ?>menu/" >Menus</a></li>
+      <li class="<?php echo $class['menu']; ?>"><a href="<?php echo APP_ROOT; ?>menu/" >Modules</a></li>
     </ul>
 
 <?php
@@ -116,6 +120,9 @@ function core_admin_ajax($wrapper = false){
         core_admin_render_file($paths);
       }
       elseif ($paths[0] === 'menu'){
+        core_admin_render_menu($paths);
+      }
+      elseif ($paths[0] === 'modules'){
         core_admin_render_menu($paths);
       }
       else{

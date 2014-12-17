@@ -586,6 +586,15 @@ function core_admin_process_menu($forms){
 
 }
 
+/**
+ * Processes module admin form submission
+ * 
+ * @param string $forms Forms path data
+ * 
+ */
+function core_admin_process_module($forms){
+
+}
 
 
 /**************************************************
@@ -1308,6 +1317,24 @@ function core_admin_render_page($paths){
  * 
  */
 function core_admin_render_file($paths){
+  // Navigation to select files
+  
+  
+  
+  // File delete confirmation
+  
+  
+  // File form
+
+}
+
+/**
+ * Renders module admin form
+ * 
+ * @param array $paths Navigation path data
+ * 
+ */
+function core_admin_render_module($paths){
   // Navigation to select files
   
   
