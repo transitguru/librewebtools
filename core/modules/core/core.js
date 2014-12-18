@@ -1,8 +1,13 @@
 /**
  * @file
- * @author <msypolt@transitguru.info>
+ * Core Javascript for the LibreWebTools
  *
- * Core JavaScript
+ * @category   User Interface
+ * @package    LibreWebTools
+ * @author     Michael Sypolt <msypolt@transitguru.limited>
+ * @copyright  Copyright (c) 2014
+ * @license    http://www.gnu.org/licenses/gpl-3.0.txt
+ * @version    @package_version@
  */
 "use strict";
 

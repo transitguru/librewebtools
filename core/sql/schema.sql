@@ -1,6 +1,6 @@
 /**
  * @file
- * @author Michael Sypolt <msypolt@transitguru.info>
+ * @author Michael Sypolt <msypolt@transitguru.limited>
  * 
  * Core database set up for empty tables in LWT
  */

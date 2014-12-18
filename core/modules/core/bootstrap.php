@@ -9,7 +9,7 @@
  *
  * @category   Bootstrap
  * @package    LibreWebTools
- * @author     Michael Sypolt <msypolt@transitguru.info>
+ * @author     Michael Sypolt <msypolt@transitguru.limited>
  * @copyright  Copyright (c) 2014
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt
  * @version    @package_version@

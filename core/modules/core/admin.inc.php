@@ -2,9 +2,14 @@
 
 /**
  * @file
- * @author Michael Sypolt <msypolt@transitguru.info>
+ * Administrative functions for core LibreWebTools
  * 
- * Renders pages that are usually only seen by an admin
+ * @category   Bootstrap
+ * @package    LibreWebTools
+ * @author     Michael Sypolt <msypolt@transitguru.limited>
+ * @copyright  Copyright (c) 2014
+ * @license    http://www.gnu.org/licenses/gpl-3.0.txt
+ * @version    @package_version@
  */
 
 /**************************************************
