@@ -201,7 +201,7 @@ class coreUser{
       else{
         $headers = "From: LibreWebTools <noreply@transitguru.limited>\r\n";
         $headers .= "Content-Type: text/plain; charset=utf-8";
-        mail($email, "Password Reset", "Username: {$login}\r\nPlease visit the following url to reset your password:\r\nhttp://LibreWebTools.org/forgot/{$reset_code}/", $headers);
+        mail($email, "Password Reset", "Username: {$login}\r\nPlease visit the following url to reset your password:\r\nhttp://librewebtools.org/forgot/{$reset_code}/", $headers);
       }
     }
   }

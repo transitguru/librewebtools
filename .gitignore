@@ -3,4 +3,6 @@
 
 #Ignore generated files
 /files/
+
+#Ignore custom modules
 /custom/*/
