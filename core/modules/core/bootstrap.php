@@ -64,7 +64,7 @@ function core_admin_ajax($wrapper = false){
           core_admin_process_menu($forms);
         }
         elseif ($forms[1] === 'module'){
-          core_admin_process_menu($forms);
+          core_admin_process_module($forms);
         }
       }
     }
@@ -83,6 +83,7 @@ function core_admin_ajax($wrapper = false){
       'page' => '',
       'file' => '',
       'menu' => '',
+      'module' => '',
     );
     
     if (isset($paths[0])){
@@ -97,7 +98,7 @@ function core_admin_ajax($wrapper = false){
       <li class="<?php echo $class['page']; ?>"><a href="<?php echo APP_ROOT; ?>page/" >Pages</a></li>
       <li class="<?php echo $class['file']; ?>"><a href="<?php echo APP_ROOT; ?>file/" >Files</a></li>
       <li class="<?php echo $class['menu']; ?>"><a href="<?php echo APP_ROOT; ?>menu/" >Menus</a></li>
-      <li class="<?php echo $class['menu']; ?>"><a href="<?php echo APP_ROOT; ?>menu/" >Modules</a></li>
+      <li class="<?php echo $class['module']; ?>"><a href="<?php echo APP_ROOT; ?>module/" >Modules</a></li>
     </ul>
 
 <?php
@@ -122,8 +123,8 @@ function core_admin_ajax($wrapper = false){
       elseif ($paths[0] === 'menu'){
         core_admin_render_menu($paths);
       }
-      elseif ($paths[0] === 'modules'){
-        core_admin_render_menu($paths);
+      elseif ($paths[0] === 'module'){
+        core_admin_render_module(paths);
       }
       else{
         core_render_404();

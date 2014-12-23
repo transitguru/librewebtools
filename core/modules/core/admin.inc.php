@@ -1334,24 +1334,6 @@ function core_admin_render_file($paths){
 }
 
 /**
- * Renders module admin form
- * 
- * @param array $paths Navigation path data
- * 
- */
-function core_admin_render_module($paths){
-  // Navigation to select files
-  
-  
-  
-  // File delete confirmation
-  
-  
-  // File form
-
-}
-
-/**
  * Renders menu admin form
  * 
  * @param array $paths Navigation path data
@@ -1369,7 +1351,66 @@ function core_admin_render_menu($paths){
 
 }
 
+/**
+ * Renders module admin form
+ * 
+ * @param array $paths Navigation path data
+ * 
+ */
+function core_admin_render_module($paths){
+  $db = new coreDb();
+  $db->fetch('modules', null, array('core' => 1, 'type' => 'module'), null, null, 'code');
+  $core_mod = $db->output;
+  $db->fetch('modules', null, array('core' => 1, 'type' => 'theme'), null, null, 'code');
+  $core_theme = $db->output;
+  $db->fetch('modules', null, array('core' => 0, 'type' => 'module'), null, null, 'code');
+  $custom_theme = $db->output;
+  $db->fetch('modules', null, array('core' => 0, 'type' => 'theme'), null, null, 'code');
+  $custom_mod = $db->output;
+  echo "<pre>";
+  var_dump($core_mod);
+  var_dump($core_theme);
+  var_dump($custom_mod);
+  var_dump($custom_theme);
+  echo "</pre>";
+  //find core modules
+  echo "Core Modules <br />";
+  $DIR = DOC_ROOT . '/core/modules/';
+  $modules = scandir($DIR);
+  foreach ($modules as $module){
+    if (is_dir($DIR . '/' . $module) && $module != '..' && $module != '.'){ 
+      echo $module . "<br />";
+    }
+  }
+  echo "Custom Modules <br />";
+  $DIR = DOC_ROOT . '/custom/modules/';
+  $modules = scandir($DIR);
+  foreach ($modules as $module){
+    if (is_dir($DIR . '/' . $module) && $module != '..' && $module != '.'){ 
+      echo $module . "<br />";
+    }
+  }
+  echo "Core Themes <br />";
+  $DIR = DOC_ROOT . '/core/themes/';
+  $modules = scandir($DIR);
+  foreach ($modules as $module){
+    if (is_dir($DIR . '/' . $module) && $module != '..' && $module != '.'){ 
+      echo $module . "<br />";
+    }
+  }
+  echo "Custom Themes <br />";
+  $DIR = DOC_ROOT . '/custom/themes/';
+  $modules = scandir($DIR);
+  foreach ($modules as $module){
+    if (is_dir($DIR . '/' . $module) && $module != '..' && $module != '.'){ 
+      echo $module . "<br />";
+    }
+  }
+  echo "Done";
+  
+  // User can activate, update, or deactivate (keep core modules locked, update only)
 
+}
 /**************************************************
  * Helpers
  **************************************************/
