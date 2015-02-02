@@ -130,6 +130,7 @@ class coreDb{
   public function write_raw($sql){
     if (!is_null($this->name)){
       $conn = new mysqli($this->host, $this->user, $this->pass, $this->name, $this->port);
+      $conn->query('SET CHARACTER SET utf8');
       $conn->real_query($sql);
       if ($conn->errno > 0){
         $this->error = $conn->errno;
@@ -219,6 +220,7 @@ class coreDb{
   public function fetch_raw($sql, $id=NULL){
     if (!is_null($this->name)){
       $conn = new mysqli($this->host, $this->user, $this->pass, $this->name, $this->port);
+      $conn->query('SET CHARACTER SET utf8');
       $conn->real_query($sql);
       $this->output = array();
       if ($conn->errno > 0){
@@ -256,6 +258,7 @@ class coreDb{
   public function multiquery($sql){
     if (!is_null($this->name)){
       $conn = new mysqli($this->host, $this->user, $this->pass, $this->name, $this->port);
+      $conn->query('SET CHARACTER SET utf8');
       $conn->multi_query($sql);
       if ($conn->errno > 0){
         $this->error = $conn->errno;
