@@ -381,10 +381,10 @@ class coreField{
           $offset = $this->value - $this->min;
           $steps = $offset/$this->step;
           if (fmod($steps, 1) < 0.5){
-            $this->value = floor($steps) + $this->min;
+            $this->value = floor($steps) * $this->step + $this->min;
           }
           else{
-            $this->value = ceil($steps) + $this->min;
+            $this->value = ceil($steps) * $this->step + $this->min;
           }
         }
       }
