@@ -15,6 +15,6 @@
 
 /* SITE */
   Doctype: HTML5
-  IDE: Geany
+  Text Editor: Vim
   OSes: Debian GNU/Linux, Linux Mint
   Software: Inkscape, GIMP, Git
