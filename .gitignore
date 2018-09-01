@@ -1,5 +1,5 @@
 #Ignore potentially sensitive settings information
-/core/settings.php
+/app/settings.php
 
 #Ignore generated files
 /files/

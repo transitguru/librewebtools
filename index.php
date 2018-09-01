@@ -35,5 +35,5 @@
 
 // Load the core bootstrap file, nothing more, nothing less!
 define('DOC_ROOT', getcwd());
-require_once(DOC_ROOT . '/core/bootstrap.php');
+require_once(DOC_ROOT . '/app/bootstrap.php');
 

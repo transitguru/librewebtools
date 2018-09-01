@@ -1,0 +1,65 @@
+<?php
+namespace LWT
+/**
+ * @file
+ * Settings Class
+ * 
+ * This object loads default site settings
+ *
+ * @category Configuration
+ * @package CCCT
+ * @author Michael Sypolt <msypolt@transitguru.limited>
+ * @copyright Copyright (c) 2015
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt
+ * @version Release: @package_version@
+ *
+ * Below is an example on what to use for each type of database
+ *
+ * @code
+ *   public $db = array(
+ *     'host' => 'localhost',
+ *     'type' => 'mysql',
+ *     'name' => 'databasename',
+ *     'user' => 'username',
+ *     'pass' => 'password',
+ *     'port' => 3306,
+ *   );
+ *   public $db = array(
+ *     'host' => 'localhost',
+ *     'type' => 'pgsql',
+ *     'name' => 'databasename',
+ *     'user' => 'username',
+ *     'pass' => 'password',
+ *     'port' => 5432,
+ *   );
+ *   public $db = array(
+ *     'host' => null,
+ *     'type' => 'sqlite',
+ *     'name' => DOC_ROOT . '/path/to/sqlitefile.db',
+ *     'user' => null,
+ *     'pass' => null,
+ *     'port' => null,
+ *   );
+ * @endcode
+ *
+ * For null or non-applicable values, you may enter null or safely omit
+ * them from the array.
+ *
+ */
+class phuSettings{
+  /** DB Settings array */
+  public $db = array(
+    /** Host for Database connection (mysql or pgsql) */
+    'host' => 'localhost',
+    /** Type of database (sqlite3, mysql, or pgsql) */
+    'type' => 'mysql', 
+    /** Name for application's database (mysql, pgsql) or filename (sqlite3) */
+    'name' => 'librewebtools',
+    /** Username for application's database (please don't use root!) */ 
+    'user' => 'librewebtools',
+    /** Password for the application's user (Please change this!!!) */
+    'pass' => 'correcthorsebatterystaple', 
+    /** Port for the application's database (null would use defaults) */
+    'port' => null,
+  );
+}
