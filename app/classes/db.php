@@ -32,19 +32,25 @@ Proposed LibreWebTools data types and mapping to Database Engines
 
   LWT Type   Description        MariaDb            PostgreSQL          SQLite3
   bool       true or false      TINYINT            SMALLINT            INT
-  int1       1 byte integer     TINYINT            SMALLINT            INT
-  int2       2 byte integer     SMALLINT           SMALLINT            INT
+  smallint   2 byte integer     SMALLINT           SMALLINT            INT
   int        4 byte integer     INT                INT                 INT
   bigint     8 byte integer     BIGINT             BIGINT              INT
   serial     4 byte auto_inc    INT AUTO_INCREMENT SERIAL              AUTOINCREMENT
   bigserial  8 byte auto_inc    SERIAL             BIGSERIAL           AUTOINCREMENT
-  fixed(x,y) fixed decimal      NUMERIC(x,y)       NUMERIC(x,y)        DECIMAL(x,y)
+  fixed(x,y) fixed decimal      NUMERIC(x,y)       NUMERIC(x,y)        NUMERIC(x,y)
+  float      4 byte float       FLOAT              REAL                REAL
+  double     8 byte float       DOUBLE             DOUBLE PRECISION    REAL
 
   var(x)     varchar(x)         VARCHAR(x)         VARCHAR(x)          TEXT
   text       text 65k chars     TEXT               TEXT                TEXT
   longtext   text 4B chars      LONGTEXT           TEXT                TEXT
   blob       65k binary data    BLOB               BYTEA               BLOB
   longblob   4GB binary data    LONGBLOB           BYTEA               BLOB
+
+  datetime   date+time          DATETIME           TIMESTAMP           TEXT
+  date       date               DATE               DATE                TEXT
+  time       time 24hr          TIME               TIME                TEXT
+  interval   time interval      TIME               INTERVAL            TEXT
 
 Other notes:
 
