@@ -6,7 +6,7 @@ namespace LWT;
  * reads and writes to the database
  *
  * @category Database Access
- * @package CCCT
+ * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
  * @copyright Copyright (c) 2015
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
@@ -28,6 +28,23 @@ Nearly all types are supported on each RDBMS except the following
 - BOOLEANs don't seem to be compatible
 - DATETIME only exists in MySQL, DATE and TIME exist on all three
 
+Proposed LibreWebTools data types and mapping to Database Engines
+
+  LWT Type   Description        MariaDb            PostgreSQL          SQLite3
+  bool       true or false      TINYINT            SMALLINT            INT
+  int1       1 byte integer     TINYINT            SMALLINT            INT
+  int2       2 byte integer     SMALLINT           SMALLINT            INT
+  int        4 byte integer     INT                INT                 INT
+  bigint     8 byte integer     BIGINT             BIGINT              INT
+  serial     4 byte auto_inc    INT AUTO_INCREMENT SERIAL              AUTOINCREMENT
+  bigserial  8 byte auto_inc    SERIAL             BIGSERIAL           AUTOINCREMENT
+  fixed(x,y) fixed decimal      NUMERIC(x,y)       NUMERIC(x,y)        DECIMAL(x,y)
+
+  var(x)     varchar(x)         VARCHAR(x)         VARCHAR(x)          TEXT
+  text       text 65k chars     TEXT               TEXT                TEXT
+  longtext   text 4B chars      LONGTEXT           TEXT                TEXT
+  blob       65k binary data    BLOB               BYTEA               BLOB
+  longblob   4GB binary data    LONGBLOB           BYTEA               BLOB
 
 Other notes:
 
@@ -144,7 +161,7 @@ class Db{
           $this->pdo->exec("PRAGMA foreign_keys = 1");
         }
         if ($this->db['type'] == 'mysql'){
-          $this->pdo->exec("SET sql_mode='ANSI_QUOTES'");
+          $this->pdo->exec("SET sql_mode='ANSI_QUOTES,NO_AUTO_VALUE_ON_ZERO'");
         }
         $this->pdo->exec("SET NAMES utf8");
       }
