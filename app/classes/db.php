@@ -139,9 +139,12 @@ class Db{
         $this->message = 'Unsupported DB type';
       }
       try{
-        $this->pdo = new \PDO($dsn, $username, $password, $options);
+        $this->pdo = new PDO($dsn, $username, $password, $options);
         if ($this->db['type'] == 'sqlite'){
           $this->pdo->exec("PRAGMA foreign_keys = 1");
+        }
+        if ($this->db['type'] == 'mysql'){
+          $this->pdo->exec("SET sql_mode='ANSI_QUOTES'");
         }
         $this->pdo->exec("SET NAMES utf8");
       }
@@ -183,14 +186,14 @@ class Db{
       }
     }
     if (is_null($where)){
-      $field_string = implode($this->closetick . ' , ' . $this->opentick,$fields);
+      $field_string = implode( '" , "',$fields);
       $value_string = implode(',', $values);
-      $sql = "INSERT INTO {$this->opentick}{$table}{$this->closetick} ({$this->opentick}{$field_string}{$this->closetick}) VALUES ($value_string)";
+      $sql = "INSERT INTO \"{$table}\" (\"{$field_string}\") VALUES ({$value_string})";
     }
     else{
       $queries = array();
       foreach ($values as $field => $value){
-        $queries[] = "{$this->opentick}{$field}{$this->closetick}=$value";
+        $queries[] = "\"{$field}\"=$value";
       }
       $wheres = array();
       foreach ($where as $field => $value){
@@ -208,9 +211,9 @@ class Db{
           $status['message'] = 'Bad input settings';
           return $status;
         }
-        $wheres[] = "{$this->opentick}{$field}{$this->closetick}=$value";
+        $wheres[] = "\"{$field}\"={$value}";
       }
-      $sql = "UPDATE {$this->opentick}{$table}{$this->closetick} SET " . implode(" , ",$queries) . " WHERE " . implode(" AND ", $wheres);
+      $sql = "UPDATE \"{$table}\" SET " . implode(" , ",$queries) . " WHERE " . implode(" AND ", $wheres);
     }
     $this->write_raw($sql);
   }
@@ -237,48 +240,6 @@ class Db{
   }
 
   /**
-   * "Half-baked" database query (way to use same code for all DB engines)
-   *
-   * @param string $sql Half-baked SQL Query (using specified format for conversion)
-   * @param string $tick Delimiter to separate environment variables and table names
-   */
-  public function query_hb($sql, $tick = '`', $type = 'write', $id=NULL){
-    if ($tick != null && $tick != ''){
-      $fragments = explode($tick, $sql);
-      $count = count($fragments);
-      $query = '';
-      if ($count > 1){
-        foreach($fragments as $i => $fragment){
-          if ($i % 2 == 0 && $i < $count - 1){
-            $query .= $fragment . $this->opentick;
-          }
-          elseif($i % 2 ==1 && $i < $count - 1){
-            $query .= $fragment . $this->closetick;
-          }
-          else{
-            $query .= $fragment;
-          }
-        }
-      }
-      else{
-        $query = $sql;
-      }
-    }
-    else{
-      $query = $sql;
-    }
-    if($type == 'write'){
-      $this->write_raw($query);
-    }
-    elseif($type == 'fetch'){
-      $this->fetch_raw($query);
-    }
-    else{
-      $this->fetch_raw("SOMETHING BAD");
-    }
-  }
-
-  /**
    * Fetches array of table data (uses the raw fetch to do the actual db fetch)
    * 
    * @param string $table Table where info is coming from
@@ -293,7 +254,7 @@ class Db{
       $field_string = '*';
     }
     else{
-      $field_string = $this->opentick . implode( $this->closetick . ' , ' . $this->opentick,$fields) . $this->closetick;
+      $field_string = '"' . implode( '" , "',$fields) . '"';
     }
     if (!is_array($where)){
       $where_string = '';
@@ -317,10 +278,10 @@ class Db{
           return $status;
         }
         if (is_null($value)){
-          $where_elements[] = "{$this->opentick}{$key}{$this->closetick} IS NULL";
+          $where_elements[] = "\"{$key}\" IS NULL";
         }
         else{
-          $where_elements[] = "{$this->opentick}{$key}{$this->closetick}={$value}";
+          $where_elements[] = "\"{$key}\"={$value}";
         }
       }
       $where_string = "WHERE " . implode(' AND ', $where_elements);
@@ -329,15 +290,15 @@ class Db{
       $groupby_string = '';
     }
     else{
-      $groupby_string = "GROUP BY {$this->opentick}".implode($this->closetick . ' , ' . $this->opentick , $groupby). $this->closetick;
+      $groupby_string = 'GROUP BY "' .implode('" , "' , $groupby). '"';
     }
     if (!is_array($sortby)){
       $sortby_string = '';
     }
     else{
-      $sortby_string = "ORDER BY {$this->opentick}" . implode($this->closetick . ' , ' . $this->opentick, $sortby) . $this->closetick;
+      $sortby_string = 'ORDER BY "' . implode('" , "', $sortby) . '"';
     }
-    $sql = "SELECT {$field_string} FROM {$this->opentick}{$table}{$this->closetick} {$where_string} {$groupby_string} {$sortby_string}";
+    $sql = "SELECT {$field_string} FROM \"{$table}\" {$where_string} {$groupby_string} {$sortby_string}";
     $this->fetch_raw($sql, $id);
   }
 
