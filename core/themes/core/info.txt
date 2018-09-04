@@ -1,3 +1,0 @@
-name: Core
-description: Default Theme
-version: 0.5.0
