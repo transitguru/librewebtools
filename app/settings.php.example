@@ -7,7 +7,7 @@ namespace LWT
  * This object loads default site settings
  *
  * @category Configuration
- * @package CCCT
+ * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
  * @copyright Copyright (c) 2015
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
@@ -49,17 +49,11 @@ namespace LWT
 class phuSettings{
   /** DB Settings array */
   public $db = array(
-    /** Host for Database connection (mysql or pgsql) */
-    'host' => 'localhost',
-    /** Type of database (sqlite3, mysql, or pgsql) */
-    'type' => 'mysql', 
-    /** Name for application's database (mysql, pgsql) or filename (sqlite3) */
-    'name' => 'librewebtools',
-    /** Username for application's database (please don't use root!) */ 
-    'user' => 'librewebtools',
-    /** Password for the application's user (Please change this!!!) */
-    'pass' => 'correcthorsebatterystaple', 
-    /** Port for the application's database (null would use defaults) */
-    'port' => null,
+    'host' => 'localhost',        /**< Host for Database connection (mysql or pgsql) */
+    'type' => 'mysql',            /**< Type of database (sqlite3, mysql, or pgsql) */ 
+    'name' => 'librewebtools',    /**< Name for application's database (mysql, pgsql) or filename (sqlite3) */
+    'user' => 'librewebtools',    /**< Username for application's database (please don't use root!) */
+    'pass' => 'somesillystring',  /**< Password for the application's user (Please change this!!!) */
+    'port' => null,               /**< Port for the application's database (null would use defaults) */
   );
 }
