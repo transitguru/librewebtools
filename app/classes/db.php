@@ -31,12 +31,12 @@ Nearly all types are supported on each RDBMS except the following
 Proposed LibreWebTools data types and mapping to Database Engines
 
   LWT Type   Description        MariaDb            PostgreSQL          SQLite3
-  bool       true or false      TINYINT            SMALLINT            INT
-  smallint   2 byte integer     SMALLINT           SMALLINT            INT
-  int        4 byte integer     INT                INT                 INT
-  bigint     8 byte integer     BIGINT             BIGINT              INT
-  serial     4 byte auto_inc    INT AUTO_INCREMENT SERIAL              AUTOINCREMENT
-  bigserial  8 byte auto_inc    SERIAL             BIGSERIAL           AUTOINCREMENT
+  bool       true or false      TINYINT            SMALLINT            INTEGER
+  smallint   2 byte integer     SMALLINT           SMALLINT            INTEGER
+  int        4 byte integer     INT                INT                 INTEGER
+  bigint     8 byte integer     BIGINT             BIGINT              INTEGER
+  serial     4 byte auto_inc    INT AUTO_INCREMENT SERIAL              INTEGER PRIMARY KEY AUTOINCREMENT
+  bigserial  8 byte auto_inc    SERIAL             BIGSERIAL           INTEGER PRIMARY KEY AUTOINCREMENT
   fixed(x,y) fixed decimal      NUMERIC(x,y)       NUMERIC(x,y)        NUMERIC(x,y)
   float      4 byte float       FLOAT              REAL                REAL
   double     8 byte float       DOUBLE             DOUBLE PRECISION    REAL
@@ -49,8 +49,8 @@ Proposed LibreWebTools data types and mapping to Database Engines
 
   datetime   date+time          DATETIME           TIMESTAMP           TEXT
   date       date               DATE               DATE                TEXT
-  time       time 24hr          TIME               TIME                TEXT
-  interval   time interval      TIME               INTERVAL            TEXT
+  time       time 0h to 24h     TIME               TIME                TEXT
+  timex      time-800h to +800h TIME               INTERVAL            TEXT
 
 Other notes:
 
@@ -189,6 +189,11 @@ class Db{
     $fields = array();
     $values = array();
     foreach ($inputs as $field => $value){
+      if (fnmatch('*"*', $field)){
+        $status['error'] = 9999;
+        $status['message'] = 'Bad input settings';
+        return $status;
+      }
       $type = gettype($value);
       if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
         $values[$field] = $value;
@@ -220,6 +225,11 @@ class Db{
       }
       $wheres = array();
       foreach ($where as $field => $value){
+        if (fnmatch('*"*', $field)){
+          $status['error'] = 9999;
+          $status['message'] = 'Bad input settings';
+          return $status;
+        }
         $type = gettype($value);
         if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
         }
