@@ -11,7 +11,6 @@ namespace LWT;
  * @copyright Copyright (c) 2015
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
- * TODO: Allow cross-platform functionality for SQLite, MariaDB, and PostgreSQL
 
 Initial notes from https://en.wikibooks.org/wiki/SQL_Dialects_Reference
 
@@ -19,14 +18,6 @@ Auto Increment:
 Mysql:  CREATE TABLE t1 (col1 INT NOT NULL PRIMARY KEY AUTO_INCREMENT); 
 pgsql:  CREATE TABLE t1 (col1 SERIAL PRIMARY KEY);
 sqlite: CREATE TABLE t1 (col1 INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY);
-
-Data Types:
-Nearly all types are supported on each RDBMS except the following
-
-- UNSIGNED is only supported in MySQL/MariaDB
-- BLOB is used in MySQL/MariaDB and SQLite where bytea is used for PostgreSQL
-- BOOLEANs don't seem to be compatible
-- DATETIME only exists in MySQL, DATE and TIME exist on all three
 
 Proposed LibreWebTools data types and mapping to Database Engines
 
@@ -335,8 +326,6 @@ class Db{
     $this->fetch_raw($sql, $id);
   }
 
-
-
   /**
    * Raw Database fetch: creating an array of table data
    * 
@@ -377,3 +366,4 @@ class Db{
     }
   }
 }
+
