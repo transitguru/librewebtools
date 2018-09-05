@@ -1,5 +1,5 @@
 <?php
-namespace LWT
+namespace LWT;
 /**
  * @file
  * Settings Class
@@ -46,7 +46,7 @@ namespace LWT
  * them from the array.
  *
  */
-class phuSettings{
+class Settings{
   /** DB Settings array */
   public $db = array(
     'host' => 'localhost',        /**< Host for Database connection (mysql or pgsql) */

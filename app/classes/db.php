@@ -153,7 +153,7 @@ class Db{
         $this->message = 'Unsupported DB type';
       }
       try{
-        $this->pdo = new PDO($dsn, $username, $password, $options);
+        $this->pdo = new \PDO($dsn, $username, $password, $options);
         if ($this->db['type'] == 'sqlite'){
           $this->pdo->exec("PRAGMA foreign_keys = 1");
         }
@@ -185,13 +185,13 @@ class Db{
         $status['message'] = 'Bad input settings';
         return $status;
       }
-      $type = gettype($value);
+      $type = \gettype($value);
       if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
         $values[$field] = $value;
         $fields[] = $field;
       }
       elseif ($type == 'string' && $value !== ''){
-        $values[$field] = "'" . str_replace("'", "\\'",str_replace("\\", "\\\\", $value)) . "'";
+        $values[$field] = "'" . \str_replace("'", "\\'",\str_replace("\\", "\\\\", $value)) . "'";
         $fields[] = $field;
       }
       elseif ($type == 'null' || $value == NULL || $value === ''){
@@ -205,8 +205,8 @@ class Db{
       }
     }
     if (is_null($where)){
-      $field_string = implode( '" , "',$fields);
-      $value_string = implode(',', $values);
+      $field_string = \implode( '" , "',$fields);
+      $value_string = \implode(',', $values);
       $sql = "INSERT INTO \"{$table}\" (\"{$field_string}\") VALUES ({$value_string})";
     }
     else{
@@ -221,11 +221,11 @@ class Db{
           $status['message'] = 'Bad input settings';
           return $status;
         }
-        $type = gettype($value);
+        $type = \gettype($value);
         if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
         }
         elseif ($type == 'string' && $value !== ''){
-          $value = "'" . str_replace("'", "\\'",str_replace("\\", "\\\\", $value)) . "'";
+          $value = "'" . \str_replace("'", "\\'",\str_replace("\\", "\\\\", $value)) . "'";
         }
         elseif ($type == 'null' || $value == NULL || $value === ''){
           $value = 'NULL';
@@ -237,11 +237,74 @@ class Db{
         }
         $wheres[] = "\"{$field}\"={$value}";
       }
-      $sql = "UPDATE \"{$table}\" SET " . implode(" , ",$queries) . " WHERE " . implode(" AND ", $wheres);
+      $sql = "UPDATE \"{$table}\" SET " . \implode(" , ",$queries) . " WHERE " . \implode(" AND ", $wheres);
     }
     $this->write_raw($sql);
   }
   
+  /**
+   * Fetches array of table data (uses the raw fetch to do the actual db fetch)
+   * 
+   * @param string $table Table where info is coming from
+   * @param array $fields Fields that are needed from database (if null, all)
+   * @param array $where Optional associative array of WHERE ids/values to filter info
+   * @param array $groupby Optional GROUP BY variables
+   * @param array $sortby Optional SORT BY variables
+   * @param string $id Optional field to use as index instead of numeric index
+   */
+  public function fetch($table, $fields=NULL,  $where=NULL, $groupby=NULL, $sortby=NULL, $id=NULL){
+    if (!is_array($fields)){
+      $field_string = '*';
+    }
+    else{
+      $field_string = '"' . \implode( '" , "',$fields) . '"';
+    }
+    if (!is_array($where)){
+      $where_string = '';
+    }
+    else{
+      $where_elements = array();
+      foreach ($where as $key => $value){
+        $type = \gettype($value);
+        if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
+          $value = $value;
+        }
+        elseif ($type == 'string'){
+          $value = "'" . \str_replace("'", "\\'",\str_replace("\\", "\\\\", $value)) . "'";
+        }
+        elseif ($type == 'null' || $value == NULL){
+          $value = NULL;
+        }
+        else{
+          $status['error'] = 9999;
+          $status['message'] = 'Bad input settings';
+          return $status;
+        }
+        if (is_null($value)){
+          $where_elements[] = "\"{$key}\" IS NULL";
+        }
+        else{
+          $where_elements[] = "\"{$key}\"={$value}";
+        }
+      }
+      $where_string = "WHERE " . \implode(' AND ', $where_elements);
+    }
+    if (!is_array($groupby)){
+      $groupby_string = '';
+    }
+    else{
+      $groupby_string = 'GROUP BY "' .\implode('" , "' , $groupby). '"';
+    }
+    if (!is_array($sortby)){
+      $sortby_string = '';
+    }
+    else{
+      $sortby_string = 'ORDER BY "' . \implode('" , "', $sortby) . '"';
+    }
+    $sql = "SELECT {$field_string} FROM \"{$table}\" {$where_string} {$groupby_string} {$sortby_string}";
+    $this->fetch_raw($sql, $id);
+  }
+
   /**
    * Raw database Write
    * 
@@ -261,69 +324,6 @@ class Db{
       }
       $this->insert_id = $this->pdo->lastInsertId();
     }
-  }
-
-  /**
-   * Fetches array of table data (uses the raw fetch to do the actual db fetch)
-   * 
-   * @param string $table Table where info is coming from
-   * @param array $fields Fields that are needed from database (if null, all)
-   * @param array $where Optional associative array of WHERE ids/values to filter info
-   * @param array $groupby Optional GROUP BY variables
-   * @param array $sortby Optional SORT BY variables
-   * @param string $id Optional field to use as index instead of numeric index
-   */
-  public function fetch($table, $fields=NULL,  $where=NULL, $groupby=NULL, $sortby=NULL, $id=NULL){
-    if (!is_array($fields)){
-      $field_string = '*';
-    }
-    else{
-      $field_string = '"' . implode( '" , "',$fields) . '"';
-    }
-    if (!is_array($where)){
-      $where_string = '';
-    }
-    else{
-      $where_elements = array();
-      foreach ($where as $key => $value){
-        $type = gettype($value);
-        if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
-          $value = $value;
-        }
-        elseif ($type == 'string'){
-          $value = "'" . str_replace("'", "\\'",str_replace("\\", "\\\\", $value)) . "'";
-        }
-        elseif ($type == 'null' || $value == NULL){
-          $value = NULL;
-        }
-        else{
-          $status['error'] = 9999;
-          $status['message'] = 'Bad input settings';
-          return $status;
-        }
-        if (is_null($value)){
-          $where_elements[] = "\"{$key}\" IS NULL";
-        }
-        else{
-          $where_elements[] = "\"{$key}\"={$value}";
-        }
-      }
-      $where_string = "WHERE " . implode(' AND ', $where_elements);
-    }
-    if (!is_array($groupby)){
-      $groupby_string = '';
-    }
-    else{
-      $groupby_string = 'GROUP BY "' .implode('" , "' , $groupby). '"';
-    }
-    if (!is_array($sortby)){
-      $sortby_string = '';
-    }
-    else{
-      $sortby_string = 'ORDER BY "' . implode('" , "', $sortby) . '"';
-    }
-    $sql = "SELECT {$field_string} FROM \"{$table}\" {$where_string} {$groupby_string} {$sortby_string}";
-    $this->fetch_raw($sql, $id);
   }
 
   /**
@@ -352,7 +352,7 @@ class Db{
       else{
         $this->error = 0;
         $this->message = 'Records successfully fetched';
-        while($fetch = $query->fetch(PDO::FETCH_ASSOC)){
+        while($fetch = $query->fetch(\PDO::FETCH_ASSOC)){
           if (!is_null($id) && key_exists($id, $fetch)){
             $out_id = $fetch[$id];
             $this->output[$out_id] = $fetch;
