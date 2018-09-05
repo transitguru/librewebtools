@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Bootstrap file for CCCT
+ * Bootstrap file for LibreWebTools
  *
  * This bootstraps the entire application by collecting inputs and using them
  * to access the router, which will then access appropriate classes
  *
  * @category   Bootstrap
- * @package    CCCT
+ * @package    LibreWebTools
  * @author     Michael Sypolt <msypolt@transitguru.limited>
  * @copyright  Copyright (c) 2015
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt
@@ -62,8 +62,8 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
   if (isset($_GET)){
     $get = $_GET;
   }
-  if (isset($_COOKIE) && isset($_COOKIE['serverphu'])){
-    $session = new phuSession($_COOKIE['serverphu']);
+  if (isset($_COOKIE) && isset($_COOKIE['librewebtools'])){
+    $session = new phuSession($_COOKIE['librewebtools']);
   }
 }
 // Collect information when invoking it via commandline
@@ -82,8 +82,8 @@ elseif (isset($_SERVER['argv'][1])){
   }
   if (isset($_SERVER['argv'][3])){
     parse_str($_SERVER['argv'][3], $cookie);
-    if (isset($cookie) && isset($cookie['serverphu'])){
-      $session = new phuSession($cookie['serverphu']);
+    if (isset($cookie) && isset($cookie['librewebtools'])){
+      $session = new phuSession($cookie['librewebtools']);
     }
   }
 }
