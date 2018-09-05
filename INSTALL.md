@@ -16,7 +16,8 @@ Here are a few simple steps for installing LibreWebTools
  2. Navigate to files/ in your webroot, then invoke `chown www-data ./` to make
     sure your web browser may edit add any directories within this directory. 
     If you are using `libapache2-mpm-itk`, your user and group will likely be
-    properly set to the user and group that ownes the webroot.
+    different than `www-data` and must be properly set to the user and group 
+    that ownes the webroot in the apache configuration.
     
  3. Navigate to your website using your web browser. It will do a few checks
     and it is determined that the database is not installed, a form will appear
@@ -24,4 +25,4 @@ Here are a few simple steps for installing LibreWebTools
     instructions in the app/settings.php and your form data regarding the 
     administrative website user. At this moment, it will remove the database
     user if it exists, then add it back with the password that you supplied
-    in app/settings.php.
+    in `app/settings.php`.
