@@ -1,18 +1,18 @@
 <?php
-
+namespace LWT;
 /**
- * coreXML class
+ * Xml class
  *
  * creates or scrubs XML fragments
  *
  * @category Data Abstraction
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
- * @copyright Copyright (c) 2014
+ * @copyright Copyright (c) 2014-2018
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class coreXml{
+class Xml{
 
   /**
    * Markup that will be scrubbed
@@ -237,7 +237,7 @@ class coreXml{
    * @param string $type Qualitative name of format type
    * @param array $elements Allowable elements
    * @param array $attributes Allowable attributes
-   * $param boolean $comments Allow comments nodes
+   * @param boolean $comments Allow comments nodes
    */
   public function __construct($markup, $type, $elements = array(), $attributes = array(), $comments=false){
     // Construct the object
@@ -290,7 +290,7 @@ class coreXml{
   /**
    * Sets comments
    * 
-   * $param boolean $comments Allow comments nodes
+   * @param boolean $comments Allow comments nodes
    */
   public function setComments($comments){
     if (is_bool($comments)){
@@ -327,7 +327,7 @@ class coreXml{
    */
   public function scrub(){
     // Load input into dom document and find the Body
-    $input_doc = new DOMDocument('1.0');
+    $input_doc = new \DOMDocument('1.0');
     libxml_use_internal_errors(true);
     $success = $input_doc->loadXML("<root>{$this->markup}</root>");
     libxml_clear_errors();
@@ -335,7 +335,7 @@ class coreXml{
       $input_root = $input_doc->getElementsByTagName('root')->item(0);
       
       // Begin to build output document
-      $output_doc = new DOMDocument('1.0');
+      $output_doc = new \DOMDocument('1.0');
       $output_doc->formatOutput = true;
       $root = $output_doc->createElement('root');
       $output_doc->appendChild($root);

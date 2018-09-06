@@ -8,9 +8,9 @@ namespace LWT;
  * TODO add in some permissions and such
  *
  * @category Request Handling
- * @package CCCT
+ * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
- * @copyright Copyright (c) 2015
+ * @copyright Copyright (c) 2015-2018
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  *

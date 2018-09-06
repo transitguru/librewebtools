@@ -1,18 +1,18 @@
 <?php
-
+namespace LWT;
 /**
- * coreTree Class
+ * Tree Class
  * 
  * provides a way to get tree information (there are inherited classes)
  * 
  * @category Data Abstraction
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
- * @copyright Copyright (c) 2014
+ * @copyright Copyright (c) 2014-2018
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class coreTree{
+class Tree{
   public $table = '';  /**< DB Table name, must be set by inherited object */
   public $id = 0;
   
@@ -57,7 +57,7 @@ class coreTree{
     //find parents until we reach root
     $search = $id;
     $loop = true;
-    $db = new coreDb();
+    $db = new Db();
     while($loop){
       $db->fetch($this->table, NULL, array('id' => $search));
       if ($db->output[0]['parent_id'] == 0){
@@ -80,7 +80,7 @@ class coreTree{
    */
   public function children($parent, $ids){
     $ids[$parent] = $parent;
-    $db = new coreDb();
+    $db = new Db();
     $db->fetch($this->table, NULL, array('parent_id' => $parent));
     if ($db->affected_rows > 0){
       foreach ($db->output as $child){

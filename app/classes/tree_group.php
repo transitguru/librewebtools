@@ -1,18 +1,18 @@
 <?php
-
+namespace LWT;
 /**
- * coreGroup Class
+ * Group Class
  * 
  * displays and modifies group information
  * 
  * @category Data Abstraction
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
- * @copyright Copyright (c) 2014
+ * @copyright Copyright (c) 2014-2018
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class coreGroup extends coreTree{
+class Group extends Tree{
   public $table = 'groups'; /**< Table name in Database */
   public $id=0;             /**< Group ID */
   public $parent_id=null;   /**< Parent ID for group hierarchy*/
@@ -27,7 +27,7 @@ class coreGroup extends coreTree{
   public function __construct($id = 0){
     if ($id>=0){
       $this->table = 'groups';
-      $db = new coreDb();
+      $db = new Db();
       $db->fetch($this->table, null, array('id' => $id));
       if ($db->affected_rows == 1){
         $this->id = $db->output[0]['id'];
@@ -74,7 +74,7 @@ class coreGroup extends coreTree{
    *
    */
   public function write(){
-    $db = new coreDb();
+    $db = new Db();
     $inputs['name'] = $this->name;
     $inputs['parent_id'] = $this->parent_id;
     $inputs['sortorder'] = $this->sortorder;
@@ -100,7 +100,7 @@ class coreGroup extends coreTree{
    */
   public function delete(){
     if ($this->id >= 0){
-      $db = new coreDb();
+      $db = new Db();
       $db->write_raw("DELETE FROM `{$this->table}` WHERE `id`={$this->id}");
       if (!$db->error){
         $this->clear();

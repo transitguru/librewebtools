@@ -1,18 +1,18 @@
 <?php
-
+namespace LWT;
 /**
- * coreUser Class
+ * User Class
  * 
  * allows for loading and editing of user information and authentication
  * 
  * @category Data Abstraction
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
- * @copyright Copyright (c) 2014
+ * @copyright Copyright (c) 2014-2018
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class coreUser{
+class User{
   public $id = 0;               /**< User ID (0 if not logged in) */
   public $login = '';           /**< User Login */
   public $firstname = '';       /**< First name */
@@ -33,7 +33,7 @@ class coreUser{
   public function __construct($id = 0){
     if ($id>0){
       // Lookup user by ID
-      $db = new coreDb();
+      $db = new Db();
       $db->fetch('users', null, array('id' => $id));
       if ($db->affected_rows == 1){
         $this->id = $db->output[0]['id'];
@@ -111,7 +111,7 @@ class coreUser{
     //cleanse input
     $user = trim(strtolower($username));
     $pass = trim($password);
-    $db = new coreDb();
+    $db = new Db();
     
     //lookup the user by ID
     $db->fetch('users', array('id'), array('login' => $user));
@@ -153,7 +153,7 @@ class coreUser{
     }
     $hashed = password_hash($pass, PASSWORD_DEFAULT);
     $current_date = date("Y-m-d H:i:s");
-    $db = new coreDb();
+    $db = new Db();
     $db->write('passwords', array('user_id' => $this->id, 'valid_date' => $current_date, 'hashed' => $hashed));
   }
   
@@ -164,7 +164,7 @@ class coreUser{
    *
    */
   public function resetpassword($email){
-    $db = new coreDb();
+    $db = new Db();
     $db->fetch('users', NULL, array('email' => $email));
     if ($db->affected_rows > 0){
       $id = $db->output[0]['id'];
@@ -216,22 +216,22 @@ class coreUser{
       
       // Define form fields
       $fields = array();
-      $fields['login'] = new coreField($this->login, 'text', 'nowacky', true, 40);
+      $fields['login'] = new Field($this->login, 'text', 'nowacky', true, 40);
       $fields['login']->element = 'text';
       $fields['login']->label = 'Login';
       $fields['login']->name = 'login';
       
-      $fields['firstname'] = new coreField($this->firstname, 'text', 'oneline', true, 100);
+      $fields['firstname'] = new Field($this->firstname, 'text', 'oneline', true, 100);
       $fields['firstname']->element = 'text';
       $fields['firstname']->label = 'First Name';
       $fields['firstname']->name = 'firstname';
       
-      $fields['lastname'] = new coreField($this->lastname, 'text', 'oneline', true, 100);
+      $fields['lastname'] = new Field($this->lastname, 'text', 'oneline', true, 100);
       $fields['lastname']->element = 'text';
       $fields['lastname']->label = 'Last Name';
       $fields['lastname']->name = 'lastname';
       
-      $fields['email'] = new coreField($this->email, 'text', 'email', true, 255);
+      $fields['email'] = new Field($this->email, 'text', 'email', true, 255);
       $fields['email']->element = 'text';
       $fields['email']->label = 'Email';
       $fields['email']->name = 'email';
@@ -256,7 +256,7 @@ class coreUser{
         
         // Check for unique login
         if (!$this->error && $this->login != $fields['login']->value){
-          $test = new coreDb();
+          $test = new Db();
           $test->fetch('users',NULL,array('login' => $fields['login']->value));
           if ($test->affected_rows > 0){
             $fields['login']->message = 'Already Taken: ';
@@ -305,7 +305,7 @@ class coreUser{
     if (isset($_POST['submit']) && $_POST['submit']=='Update'){
     $message = '<span class="success">Data submitted correctly</span>';
     $error = false;
-      $testuser = new coreUser();
+      $testuser = new User();
       $testuser->login($this->login, $_POST['current_pwd']);
       if ($testuser->id < 1){
         $message = '<span class="error">Existing password is not valid, please re-enter it.</span>';
@@ -361,7 +361,7 @@ class coreUser{
       $chars = strlen(APP_ROOT);
       $reset_request = trim(substr($_SERVER['REQUEST_URI'],$chars),"/ ");
       $date = date('Y-m-d H:i:s');
-      $db = new coreDb();
+      $db = new Db();
       $db->fetch_raw("SELECT * FROM `passwords` WHERE `reset_code`='{$reset_request}' AND `reset_date` > '{$date}'");
       if ($db->affected_rows == 0){
   ?>
@@ -418,7 +418,7 @@ class coreUser{
    * Writes a user profile
    */
   public function write(){
-    $db = new coreDb();
+    $db = new Db();
     $inputs['login'] = $this->login;
     $inputs['firstname'] = $this->firstname;
     $inputs['lastname'] = $this->lastname;
@@ -463,7 +463,7 @@ class coreUser{
    */
   public function delete(){
     if ($this->id > 0){
-      $db = new coreDb();
+      $db = new Db();
       $db->write_raw("DELETE FROM `users` WHERE `id`={$this->id}");
       if(!$db->error){
         $this->clear();

@@ -1,18 +1,18 @@
 <?php
-
+namespace LWT;
 /**
- * coreInstaller Class
+ * Installer Class
  * 
  * Checks for installation, then installs the site
  * 
  * @category Bootstrap
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
- * @copyright Copyright (c) 2014
+ * @copyright Copyright (c) 2014-2018
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class coreInstaller{
+class Installer{
   public $install = false; /**< Set to true if site needs to be installed */
   public $error = 0; /**< set to non-zero if an error occurs */
   public $message = ''; /**< Message to show error if it occurs */
@@ -25,7 +25,7 @@ class coreInstaller{
     $this->install = false;
     
     // Check to see if the DB can even connect
-    $db = new coreDb();
+    $db = new Db();
     if ($db->error){
       $this->install = true;
     }
@@ -61,7 +61,7 @@ class coreInstaller{
   <body>
     <?php echo $this->message; ?>
     <?php echo $this->console; ?>
-    <p>The site appears to not be installed, Please fill out the fields below to begin installing the LibreWebTools. Before you do so, make sure to adjust the site's <strong>/core/settings.inc.php</strong> file to your desired settings.</p>
+    <p>The site appears to not be installed, Please fill out the fields below to begin installing the LibreWebTools. Before you do so, make sure to adjust the site's <strong>/app/settings.inc.php</strong> file to your desired settings.</p>
     <form action="" method="post" >
       <label for="db[root_user]">DB Root User</label><input type="text" name="db[root_user]" />
       <label for="db[root_pass]">DB Root Password</label><input type="password" name="db[root_pass]" />
@@ -84,7 +84,7 @@ class coreInstaller{
   public function build($post){
     if (isset($post)){
       // Define DB variables
-      $settings = new coreSettings();
+      $settings = new Settings();
       $db_name = $settings->db['name'];
       $db_pass = $settings->db['pass'];
       $db_host = $settings->db['host'];
@@ -180,10 +180,10 @@ class coreInstaller{
    *
    */
   private function install_db($post){
-    $file = DOC_ROOT . '/core/sql/schema.sql';
+    $file = DOC_ROOT . '/app/sql/schema.sql';
     $sql = file_get_contents($file);
     
-    $db = new coreDb();
+    $db = new Db();
     $db->multiquery($sql);
     if ($db->error != 0){
       $db->error;
@@ -293,7 +293,7 @@ class coreInstaller{
     
     // Add the Admin User
     $this->console .= "\nAdmin User\n";
-    $user = new coreUser(-1);
+    $user = new User(-1);
     $user->login = $post['admin_user'];
     $user->firstname = 'Site';
     $user->lastname = 'Administrator';

@@ -1,18 +1,18 @@
 <?php
-
+namespace LWT;
 /**
- * coreField Class
+ * Field Class
  * 
  * creates, collectes, and validates user inputs for data fields
  *
  * @category Processing and Validation
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
- * @copyright Copyright (c) 2014
+ * @copyright Copyright (c) 2014-2018
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class coreField{
+class Field{
   public $label = null;      /**< Human friendly name for form Label */
   public $name = '';         /**< Name for form element */
   public $element = '';      /**< Type of form element */
@@ -95,6 +95,7 @@ class coreField{
   public function setFormat($format){
     $this->format = $format;
   }
+
   /**
    * Sets whether the field is required
    * @param boolean $required Optional: set to true if the value is required
@@ -107,8 +108,8 @@ class coreField{
   
   /**
    * Sets maximum, and optionally minimum number of characters
-   * $param int $max_chars Optional: Limit number of characters
-   * $param int $min_chars Optional: Lower limit for number of characters
+   * @param int $max_chars Optional: Limit number of characters
+   * @param int $min_chars Optional: Lower limit for number of characters
    */
   public function setChars($max_chars=0, $min_chars=0){
     if (is_numeric($max_chars) && $max_chars >= 0){
@@ -255,7 +256,7 @@ class coreField{
           // Allow the nearly no tags, and definitely no links or styling
           $qualifier = 'simple';
         }
-        $xml = new coreXml($input, $qualifier);
+        $xml = new Xml($input, $qualifier);
         $xml->scrub();
         $this->value = $xml->markup;
 

@@ -1,18 +1,18 @@
 <?php
-
+namespace LWT;
 /**
- * corePage Class
+ * Page Class
  * 
  * This object handles page requests from the user
  *
  * @category Page Handling
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
- * @copyright Copyright (c) 2014
+ * @copyright Copyright (c) 2014-2018
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class corePage extends coreTree{
+class Page extends Tree{
   public $table = 'pages'; /**< Table name in Database */
   public $uri = '/';  /**< Request from the User, as a string */
   public $title = '';  /**< Title of the page, as loaded from the database */
@@ -37,7 +37,7 @@ class corePage extends coreTree{
    */
   public function __construct($uri, $user){
     $this->uri = $uri;
-    $db = new coreDb();
+    $db = new Db();
     $path = explode("/",$uri);
     $i = 0;
     $this->app_root = 0;
@@ -112,7 +112,7 @@ class corePage extends coreTree{
   /**
    * Processes permissions to content based on group and role
    *
-   * @param coreUser $user User object containing authentication information
+   * @param User $user User object containing authentication information
    *
    * @return boolean $access Whether the user is allowed to access the location
    */ 
@@ -129,17 +129,17 @@ class corePage extends coreTree{
     $all_groups = array();
     if (count($user->groups) > 0){
       foreach ($user->groups as $group_id){
-        $group = new coreGroup($group_id);
+        $group = new Group($group_id);
         $all_groups = $group->traverse($all_groups);
       }
     }
     else{
-      $group = new coreGroup(1);
+      $group = new Group(1);
       $all_groups = $group->traverse($all_groups);
     } 
 
     // Get the allowable groups for the page
-    $db = new coreDb();
+    $db = new Db();
     $db->fetch('page_groups', NULL, array('page_id' => $this->page_id));
     if ($db->affected_rows > 0){
       foreach ($db->output as $record){

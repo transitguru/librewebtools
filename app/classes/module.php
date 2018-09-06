@@ -1,18 +1,18 @@
 <?php
-
+namespace LWT;
 /**
- * coreModule Class
+ * Module Class
  * 
  * This object keeps track of the modules
  *
  * @category Data Abstraction
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
- * @copyright Copyright (c) 2014
+ * @copyright Copyright (c) 2014-2018
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class coreModule{
+class Module{
   public $id = null; /**< Module's ID in the database */
   public $type = 'theme'; /**< Module type ('theme' or 'module') */
   public $core = 1;  /**< Set to 1 if it is a core module, 0 if Custom */
@@ -24,11 +24,11 @@ class coreModule{
   public $stylesheets = array(); /**< Array of stylesheets loaded from modules and themes */
   /**
    * Construct the theme
-   * $param int $id ID for the theme
+   * @param int $id ID for the theme
    */
   public function __construct($id = null){
     if (!is_null($id) && $id > 0){
-      $db = new coreDb();
+      $db = new Db();
       $db->fetch('modules', null, array('id' => $id));
       if ($db->affected_rows > 0){
         $this->id = $id;
@@ -67,7 +67,7 @@ class coreModule{
   
   /**
    * Load the theme's template for rendering
-   * @param corePage $page Page information to be rendered in the template
+   * @param Page $page Page information to be rendered in the template
    */
   public function loadTheme($page){
     if (is_null($page->page_id) || $page->page_id < 0 || is_null($this->id)){
@@ -108,7 +108,7 @@ class coreModule{
       $core = 0;
       $dir = 'custom';
     }
-    $db = new coreDb();
+    $db = new Db();
     $db->fetch('modules', null, array('type' =>'module', 'core' => $core), null, array('code'));
     if ($db->affected_rows > 0 ){
       foreach ($db->output as $module){
@@ -136,7 +136,7 @@ class coreModule{
    * Load all Javascripts and CSS in the template
    */
   public function loadScripts(){
-    $db = new coreDb();
+    $db = new Db();
     $db->fetch('pages', array('url_code', 'parent_id'), array('ajax_call' => 'core_send_scripts'));
     $path = $db->output[0]['url_code']; 
     while ($db->output[0]['parent_id'] != 0){
@@ -160,7 +160,7 @@ class coreModule{
    *
    */
   public function write(){
-    $db = new coreDb();
+    $db = new Db();
     $inputs['core'] = $this->core;
     $inputs['code'] = $this->code;
     $inputs['name'] = $this->name;
@@ -187,7 +187,7 @@ class coreModule{
    */
   public function delete(){
     if ($this->id >= 0){
-      $db = new coreDb();
+      $db = new Db();
       $db->write_raw("DELETE FROM `modules` WHERE `id`={$this->id}");
       if (!$db->error){
         $this->clear();

@@ -28,9 +28,9 @@
  * @category   Bootstrap
  * @package    LibreWebTools
  * @author     Michael Sypolt <msypolt@transitguru.info>
- * @copyright  Copyright (c) 2014
+ * @copyright  Copyright (c) 2014-2018
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt
- * @version    0.5
+ * @version    0.7
  */
 
 // Load the core bootstrap file, nothing more, nothing less!

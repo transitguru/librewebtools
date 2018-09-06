@@ -1,18 +1,18 @@
 <?php
-
+namespace LWT;
 /**
- * coreRole Class
+ * Role Class
  *
  * allows for loading and editing of role information
  * 
  * @category Data Abstraction
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
- * @copyright Copyright (c) 2014
+ * @copyright Copyright (c) 2014-2018
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class coreRole{
+class Role{
   public $id = 0;         /**< Role ID (0 is for unauthenticated role)*/
   public $name = '';      /**< Role Name */
   public $sortorder = 0;  /**< Sort order, small number "floats to top" */
@@ -29,7 +29,7 @@ class coreRole{
   public function __construct($id = -1){
     if ($id>=0){
       // Lookup role by ID
-      $db = new coreDb();
+      $db = new Db();
       $db->fetch('roles', null, array('id' => $id));
       if ($db->affected_rows == 1){
         $this->id = $db->output[0]['id'];
@@ -72,7 +72,7 @@ class coreRole{
    *
    */
   public function write(){
-    $db = new coreDb();
+    $db = new Db();
     $inputs['name'] = $this->name;
     $inputs['sortorder'] = $this->sortorder;
     $inputs['desc'] = $this->desc;
@@ -97,7 +97,7 @@ class coreRole{
    */
   public function delete(){
     if ($this->id >= 0){
-      $db = new coreDb();
+      $db = new Db();
       $db->write_raw("DELETE FROM `roles` WHERE `id`={$this->id}");
       if (!$db->error){
         $this->clear();

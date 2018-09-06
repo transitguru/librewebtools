@@ -1,18 +1,18 @@
 <?php
-
+namespace LWT;
 /**
- * coreFile Class
+ * File Class
  * 
  * This object processes files
  *
  * @category Data Abstraction
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
- * @copyright Copyright (c) 2014
+ * @copyright Copyright (c) 2014-2018
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class coreFile{
+class File{
 
   public $id = 0; /**< File id as found in the database */
   public $user_id = 1; /**< User ID that uploaded the file */
@@ -30,7 +30,7 @@ class coreFile{
   function __construct($id = -1){
     if ($id>0){
       // Lookup file by ID
-      $db = new coreDb();
+      $db = new Db();
       $db->fetch('files', null, array('id' => $id));
       if ($db->affected_rows == 1){
         $this->id = $db->output[0]['id'];
@@ -107,7 +107,7 @@ class coreFile{
    *
    */
   public function write(){
-    $db = new coreDb();
+    $db = new Db();
     $inputs['user_id'] = $this->user_id;
     $inputs['basename'] = $this->basename;
     $inputs['path'] = $this->path;
@@ -136,7 +136,7 @@ class coreFile{
    */
   public function delete(){
     if ($this->id >= 0){
-      $db = new coreDb();
+      $db = new Db();
       $db->write_raw("DELETE FROM `files` WHERE `id`={$this->id}");
       if (!$db->error){
         $this->clear();
