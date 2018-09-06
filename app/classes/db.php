@@ -185,13 +185,13 @@ class Db{
         $status['message'] = 'Bad input settings';
         return $status;
       }
-      $type = \gettype($value);
+      $type = gettype($value);
       if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
         $values[$field] = $value;
         $fields[] = $field;
       }
       elseif ($type == 'string' && $value !== ''){
-        $values[$field] = "'" . \str_replace("'", "\\'",\str_replace("\\", "\\\\", $value)) . "'";
+        $values[$field] = "'" . str_replace("'", "\\'",str_replace("\\", "\\\\", $value)) . "'";
         $fields[] = $field;
       }
       elseif ($type == 'null' || $value == NULL || $value === ''){
@@ -205,8 +205,8 @@ class Db{
       }
     }
     if (is_null($where)){
-      $field_string = \implode( '" , "',$fields);
-      $value_string = \implode(',', $values);
+      $field_string = implode( '" , "',$fields);
+      $value_string = implode(',', $values);
       $sql = "INSERT INTO \"{$table}\" (\"{$field_string}\") VALUES ({$value_string})";
     }
     else{
@@ -221,11 +221,11 @@ class Db{
           $status['message'] = 'Bad input settings';
           return $status;
         }
-        $type = \gettype($value);
+        $type = gettype($value);
         if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
         }
         elseif ($type == 'string' && $value !== ''){
-          $value = "'" . \str_replace("'", "\\'",\str_replace("\\", "\\\\", $value)) . "'";
+          $value = "'" . str_replace("'", "\\'",str_replace("\\", "\\\\", $value)) . "'";
         }
         elseif ($type == 'null' || $value == NULL || $value === ''){
           $value = 'NULL';
@@ -237,7 +237,7 @@ class Db{
         }
         $wheres[] = "\"{$field}\"={$value}";
       }
-      $sql = "UPDATE \"{$table}\" SET " . \implode(" , ",$queries) . " WHERE " . \implode(" AND ", $wheres);
+      $sql = "UPDATE \"{$table}\" SET " . implode(" , ",$queries) . " WHERE " . implode(" AND ", $wheres);
     }
     $this->write_raw($sql);
   }
@@ -257,7 +257,7 @@ class Db{
       $field_string = '*';
     }
     else{
-      $field_string = '"' . \implode( '" , "',$fields) . '"';
+      $field_string = '"' . implode( '" , "',$fields) . '"';
     }
     if (!is_array($where)){
       $where_string = '';
@@ -265,12 +265,12 @@ class Db{
     else{
       $where_elements = array();
       foreach ($where as $key => $value){
-        $type = \gettype($value);
+        $type = gettype($value);
         if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
           $value = $value;
         }
         elseif ($type == 'string'){
-          $value = "'" . \str_replace("'", "\\'",\str_replace("\\", "\\\\", $value)) . "'";
+          $value = "'" . str_replace("'", "\\'",str_replace("\\", "\\\\", $value)) . "'";
         }
         elseif ($type == 'null' || $value == NULL){
           $value = NULL;
@@ -287,19 +287,19 @@ class Db{
           $where_elements[] = "\"{$key}\"={$value}";
         }
       }
-      $where_string = "WHERE " . \implode(' AND ', $where_elements);
+      $where_string = "WHERE " . implode(' AND ', $where_elements);
     }
     if (!is_array($groupby)){
       $groupby_string = '';
     }
     else{
-      $groupby_string = 'GROUP BY "' .\implode('" , "' , $groupby). '"';
+      $groupby_string = 'GROUP BY "' .implode('" , "' , $groupby). '"';
     }
     if (!is_array($sortby)){
       $sortby_string = '';
     }
     else{
-      $sortby_string = 'ORDER BY "' . \implode('" , "', $sortby) . '"';
+      $sortby_string = 'ORDER BY "' . implode('" , "', $sortby) . '"';
     }
     $sql = "SELECT {$field_string} FROM \"{$table}\" {$where_string} {$groupby_string} {$sortby_string}";
     $this->fetch_raw($sql, $id);

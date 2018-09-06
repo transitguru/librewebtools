@@ -34,6 +34,6 @@
  */
 
 // Load the core bootstrap file, nothing more, nothing less!
-define('DOC_ROOT', getcwd());
+define('DOC_ROOT', __DIR__);
 require_once(DOC_ROOT . '/app/bootstrap.php');
 
