@@ -1,22 +1,22 @@
 <?php
-
+namespace LWT
 /**
  * @file
- * AffirmCurl Class
+ * Curl Class
  *
- * Handles requests going out to Affirm using cURL
+ * Handles requests going out using cURL
  *
  * @category Request Handling
- * @package Affirm API
- * @author Michael Sypolt <michael.sypolt@nurelm.com>
- * @copyright Copyright (c) 2015
+ * @package LibreWebToold
+ * @author Michael Sypolt <michael.sypolt@transitguru.limited>
+ * @copyright Copyright (c) 2015-2018
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  *
  */
-class AffirmCurl {
+class Curl {
   public $url; /**< URL to send the request */
-  public $post_body; /**< Post body to send to Affirm */
+  public $post_body; /**< Post body to send out */
   public $method; /**< HTTP Method to send */
   public $curl; /**< cURL handle keeping track of this */
   public $status; /**< stores the HTTP status from cURL response */
@@ -30,7 +30,7 @@ class AffirmCurl {
    *
    * @param string $url URL to request
    * @param string $method HTTP Method
-   * @param array|string $data Data to pack and send to Affirm
+   * @param array|string $data Data to pack and send out
    */
   public function __construct($url, $method='GET', $data=''){
     if(is_null($data)){
