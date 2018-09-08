@@ -11,45 +11,6 @@ namespace LWT;
  * @copyright Copyright (c) 2015-2018
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
-
-Initial notes from https://en.wikibooks.org/wiki/SQL_Dialects_Reference
-
-Auto Increment:
-Mysql:  CREATE TABLE t1 (col1 INT NOT NULL PRIMARY KEY AUTO_INCREMENT); 
-pgsql:  CREATE TABLE t1 (col1 SERIAL PRIMARY KEY);
-sqlite: CREATE TABLE t1 (col1 INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY);
-
-Proposed LibreWebTools data types and mapping to Database Engines
-
-  LWT Type   Description        MariaDb            PostgreSQL          SQLite3
-  bool       true or false      TINYINT            SMALLINT            INTEGER
-  smallint   2 byte integer     SMALLINT           SMALLINT            INTEGER
-  int        4 byte integer     INT                INT                 INTEGER
-  bigint     8 byte integer     BIGINT             BIGINT              INTEGER
-  serial     4 byte auto_inc    INT AUTO_INCREMENT SERIAL              INTEGER PRIMARY KEY AUTOINCREMENT
-  bigserial  8 byte auto_inc    SERIAL             BIGSERIAL           INTEGER PRIMARY KEY AUTOINCREMENT
-  fixed(x,y) fixed decimal      NUMERIC(x,y)       NUMERIC(x,y)        NUMERIC(x,y)
-  float      4 byte float       FLOAT              REAL                REAL
-  double     8 byte float       DOUBLE             DOUBLE PRECISION    REAL
-
-  var(x)     varchar(x)         VARCHAR(x)         VARCHAR(x)          TEXT
-  text       text 65k chars     TEXT               TEXT                TEXT
-  longtext   text 4B chars      LONGTEXT           TEXT                TEXT
-  blob       65k binary data    BLOB               BYTEA               BLOB
-  longblob   4GB binary data    LONGBLOB           BYTEA               BLOB
-
-  datetime   date+time          DATETIME           TIMESTAMP           TEXT
-  date       date               DATE               DATE                TEXT
-  time       time 0h to 24h     TIME               TIME                TEXT
-  timex      time-800h to +800h TIME               INTERVAL            TEXT
-
-Other notes:
-
-FOREIGN KEYS are done differently in each RDBMS:
-  MySQL: While creating or in a separate statment
-  Postgres: In a separate statement ONLY
-  SQLite:  While creating the table ONLY
-
  */
 class Db{
   public $output = array();   /**< Results that would be returned from query */

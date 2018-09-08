@@ -1,5 +1,5 @@
 <?php
-namespace LWT
+namespace LWT;
 /**
  * @file
  * Curl Class
