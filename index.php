@@ -30,7 +30,7 @@
  * @author     Michael Sypolt <msypolt@transitguru.info>
  * @copyright  Copyright (c) 2014-2018
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt
- * @version    0.7
+ * @version    0.6.0
  */
 
 // Load the core bootstrap file, nothing more, nothing less!
