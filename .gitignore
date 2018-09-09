@@ -5,4 +5,4 @@
 /files/
 
 #Ignore custom modules
-/custom/*/
+/app/custom/*/
