@@ -13,114 +13,30 @@ namespace LWT;
  * @version Release: @package_version@
  */
 class Table{
+
+  /** Defines data types for the database engines
+   *  Keys of associative array map to LWT datatypes and contain plain arrays
+   *  [0] for mysql, [1] for pgsql, [2] for sqlite
+   */
   protected $rosetta_stone = array(
-    'bool' => array(
-      'mysql'  => 'TINYINT', 
-      'pgsql'  => 'SMALLINT', 
-      'sqlite' => 'INTEGER'
-    ),
-    
-    'smallint' => array(
-      'mysql'  => 'SMALLINT', 
-      'pgsql'  => 'SMALLINT', 
-      'sqlite' => 'INTEGER'
-    ),
-    
-    'int' => array(
-      'mysql'  => 'INT', 
-      'pgsql'  => 'INT', 
-      'sqlite' => 'INTEGER'
-    ),
-
-    'bigint' => array(
-      'mysql'  => 'INT', 
-      'pgsql'  => 'INT', 
-      'sqlite' => 'INTEGER'
-    ),
-
-    'serial' => array(
-      'mysql'  => 'INT PRIMARY KEY AUTO_INCREMENT', 
-      'pgsql'  => 'SERIAL', 
-      'sqlite' => 'INTEGER PRIMARY KEY AUTO_INCREMENT'
-    ),
-
-    'bigserial' => array(
-      'mysql'  => 'SERIAL', 
-      'pgsql'  => 'BIGSERIAL', 
-      'sqlite' => 'INTEGER PRIMARY KEY AUTO_INCREMENT'
-    ),
-
-    'fixed' => array(
-      'mysql'  => 'NUMERIC', 
-      'pgsql'  => 'NUMERIC', 
-      'sqlite' => 'NUMERIC'
-    ),
-
-    'float' => array(
-      'mysql'  => 'FLOAT', 
-      'pgsql'  => 'REAL', 
-      'sqlite' => 'REAL'
-    ),
-  
-    'double' => array(
-      'mysql'  => 'DOUBLE', 
-      'pgsql'  => 'DOUBLE PRECISION', 
-      'sqlite' => 'REAL'
-    ),
-
-    'varchar' => array(
-      'mysql'  => 'VARCHAR', 
-      'pgsql'  => 'VARCHAR', 
-      'sqlite' => 'TEXT'
-    ),
-
-    'text' => array(
-      'mysql'  => 'TEXT', 
-      'pgsql'  => 'TEXT', 
-      'sqlite' => 'TEXT'
-    ),
-
-    'longtext' => array(
-      'mysql'  => 'LONGTEXT', 
-      'pgsql'  => 'TEXT', 
-      'sqlite' => 'TEXT'
-    ),
-
-    'blob' => array(
-      'mysql'  => 'BLOB', 
-      'pgsql'  => 'BYTEA', 
-      'sqlite' => 'BLOB'
-    ),
-
-    'longblob' => array(
-      'mysql'  => 'LONGBLOB', 
-      'pgsql'  => 'BYTEA', 
-      'sqlite' => 'BLOB'
-    ),
-
-    'datetime' => array(
-      'mysql'  => 'DATETIME', 
-      'pgsql'  => 'TIMESTAMP', 
-      'sqlite' => 'TEXT'
-    ),
-
-    'date' => array(
-      'mysql'  => 'DATE', 
-      'pgsql'  => 'DATE', 
-      'sqlite' => 'TEXT'
-    ),
-
-    'time' => array(
-      'mysql'  => 'TIME', 
-      'pgsql'  => 'TIME', 
-      'sqlite' => 'TEXT'
-    ),
-
-    'timex' => array(
-      'mysql'  => 'TIME', 
-      'pgsql'  => 'INTERVAL', 
-      'sqlite' => 'TEXT'
-    ),
-
+    'bool' => [ 'TINYINT', 'SMALLINT', 'INTEGER'],
+    'smallint' => [ 'SMALLINT', 'SMALLINT', 'INTEGER'],
+    'int' => [ 'INT', 'INT', 'INTEGER'],
+    'bigint' => [ 'INT', 'INT', 'INTEGER'],
+    'serial' => [ 'INT PRIMARY KEY AUTO_INCREMENT', 'SERIAL', 'INTEGER PRIMARY KEY AUTO_INCREMENT'],
+    'bigserial' => [ 'SERIAL', 'BIGSERIAL', 'INTEGER PRIMARY KEY AUTO_INCREMENT'],
+    'fixed' => [ 'NUMERIC', 'NUMERIC', 'NUMERIC'],
+    'float' => [ 'FLOAT', 'REAL', 'REAL'],
+    'double' => [ 'DOUBLE', 'DOUBLE PRECISION', 'REAL'],
+    'varchar' => [ 'VARCHAR', 'VARCHAR', 'TEXT'],
+    'text' => [ 'TEXT', 'TEXT', 'TEXT'],
+    'longtext' => [ 'LONGTEXT', 'TEXT', 'TEXT'],
+    'blob' => [ 'BLOB', 'BYTEA', 'BLOB'],
+    'longblob' => [ 'LONGBLOB', 'BYTEA', 'BLOB'],
+    'datetime' => [ 'DATETIME', 'TIMESTAMP', 'TEXT'],
+    'date' => [ 'DATE', 'DATE', 'TEXT'],
+    'time' => [ 'TIME', 'TIME', 'TEXT'],
+    'timex' => [ 'TIME', 'INTERVAL', 'TEXT']
   );
+
 }
