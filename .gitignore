@@ -6,3 +6,6 @@
 
 #Ignore custom modules
 /app/custom/*/
+
+#Vim swapfiles
+*.swp
