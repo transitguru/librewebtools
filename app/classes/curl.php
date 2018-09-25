@@ -81,7 +81,7 @@ class Curl {
    *
    */
   public function unpack(){
-    if ($this->headers['content_type'] == 'application/json' && $this->status > 0){
+    if (fnmatch('application/json*', $this->headers['content_type']) && $this->status > 0){
       $this->response_object = json_decode($this->response);
     }
     else{

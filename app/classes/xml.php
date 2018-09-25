@@ -124,6 +124,7 @@ class Xml{
       'xml:lang' => array(),
       'xml:space' => array(),
       'class' => array(),
+      'href' => array(),
       'style' => array(),
      
       //Presentation attributes

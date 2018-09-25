@@ -36,7 +36,7 @@ class Table{
     'datetime' => [ 'DATETIME', 'TIMESTAMP', 'TEXT'],
     'date' => [ 'DATE', 'DATE', 'TEXT'],
     'time' => [ 'TIME', 'TIME', 'TEXT'],
-    'timex' => [ 'TIME', 'INTERVAL', 'TEXT']
+    'timex' => [ 'TIME', 'INTERVAL', 'TEXT'],
   );
 
   /** Defines numeric columns (allowing no quotes for inserting */
@@ -56,7 +56,7 @@ class Table{
   protected $constraint_types = array(
     'foreign' => 'FOREIGN KEY',
     'unique'  => 'UNIQUE',
-    'primary' => 'PRIMARY KEY'
+    'primary' => 'PRIMARY KEY',
   );
 
   /** Defines Foreign Key actions */
@@ -65,7 +65,7 @@ class Table{
     'null'      => 'SET NULL',
     'default'   => 'SET DEFAULT',
     'restrict'  => 'RESTRICT',
-    'no'        => 'NO ACTION'
+    'no'        => 'NO ACTION',
   );
 
   protected $name = '';         /**< Table name */
@@ -96,7 +96,7 @@ class Table{
    *         'scale' => 2,        //used only with numeric for decimal scale
    *         'null' => false,
    *         'default' => 'default_value',
-   *         'comment' => 'Comment to include with the column'
+   *         'comment' => 'Comment to include with the column',
    *       ),
    *     ),
    *     'constraints' => array(
@@ -107,7 +107,7 @@ class Table{
    *         'ref_table' => 'foreign_key_referenced_table',
    *         'ref_columns' => ['fk_ref_col1', 'fk_ref_col2'],
    *         'delete' => 'cascade', // Use cascade, null, default, restrict, no
-   *         'update' => 'cascade'  // Use cascade, null, default, restrict, no
+   *         'update' => 'cascade', // Use cascade, null, default, restrict, no
    *       )
    *     )
    *   );

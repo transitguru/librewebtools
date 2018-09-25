@@ -119,11 +119,11 @@ class Page extends Tree{
   private function permissions($user){
     //First, never ever lockout THE Admin user
     if ($user->id == 1){
-      return TRUE;
+      return true;
     }
 
     //Assume no access
-    $access = FALSE;
+    $access = false;
     
     //Load the user's grouptree
     $all_groups = array();
@@ -144,7 +144,7 @@ class Page extends Tree{
     if ($db->affected_rows > 0){
       foreach ($db->output as $record){
         if (in_array($record['group_id'],$all_groups)){
-          $access = TRUE;
+          $access = true;
         }
       }
     }
@@ -153,10 +153,10 @@ class Page extends Tree{
     $db->fetch('page_roles', NULL, array('page_id' => $this->page_id));
     if ($db->affected_rows > 0){
       //Reset access to false
-      $access = FALSE;
+      $access = false;
       foreach ($db->output as $record){
         if (in_array($record['role_id'],$user->roles)){
-          $access = TRUE;
+          $access = true;
         }
       }
     }
