@@ -65,12 +65,12 @@ class Field{
    * @param boolean $trim Optional: set to true if you want to enable auto trimming
    */
   public function __construct($value, $type, $format, $required=false, $max_chars=0, $trim=true){
-    $this->value = $value;
-    $this->type = $type;
-    $this->format = $format;
-    $this->required = $required;
-    $this->max_chars = $max_chars;
-    $this->trim = $trim;
+    $this->setValue($value);
+    $this->setType($type);
+    $this->setFormat($format);
+    $this->setRequired($required);
+    $this->setChars($max_chars);
+    $this->seTrim($trim);
   }
   /**
    * Sets value of Field

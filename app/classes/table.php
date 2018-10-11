@@ -80,7 +80,17 @@ class Table{
   public $message = '';  /**< Error or success message */
 
   /**
-   * Create the table object
+   * Create the table object by calling the create sql method
+   *
+   * @param array $table_defs Table definitions (see create_sql method)
+   *
+   */
+  public function __construct($table_defs = array()){
+    $this->create_sql($table_defs);
+  }
+
+  /**
+   * Create the sql statement based on table definitions
    *
    * @param array $table_defs Table definitions in the form of the array below
    *
@@ -113,9 +123,6 @@ class Table{
    *   );
    * @endcode
    */
-  public function __construct($table_defs = array()){
-    $this->create_sql($table_defs);
-  }
   public function create_sql($table_defs = array()){
     if (is_array($table_defs) && !is_null($table_defs['name']) && !fnmatch('*"*', $table_defs['name'])){
       $this->name = $table_defs['name'];
