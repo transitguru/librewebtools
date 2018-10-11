@@ -148,7 +148,7 @@ class Test{
     
     //Test for empty string issues and numchars
     
-    //core_validate_inputs($input, $type, $format, $required=false, $chars=NULL, $notrim=false, $range=array(null, null, null), $range_flags=array(false, false, false))
+    //$this->validation($input, $type, $format, $required=false, $chars=NULL, $notrim=false, $range=array(null, null, null), $range_flags=array(false, false, false))
     
     // Testing Input Errors
     echo "<pre>\n\nTesting 10 series (input) errors\n\n";

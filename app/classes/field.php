@@ -70,7 +70,7 @@ class Field{
     $this->setFormat($format);
     $this->setRequired($required);
     $this->setChars($max_chars);
-    $this->seTrim($trim);
+    $this->setTrim($trim);
   }
   /**
    * Sets value of Field

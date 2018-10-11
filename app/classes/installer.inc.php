@@ -61,10 +61,8 @@ class Installer{
   <body>
     <?php echo $this->message; ?>
     <?php echo $this->console; ?>
-    <p>The site appears to not be installed, Please fill out the fields below to begin installing the LibreWebTools. Before you do so, make sure to adjust the site's <strong>/app/settings.inc.php</strong> file to your desired settings.</p>
+    <p>The site appears to not be installed, Please fill out the fields below to begin installing the LibreWebTools. Before you do so, make sure to adjust the site's <strong>/app/settings.php</strong> file to your desired settings.</p>
     <form action="" method="post" >
-      <label for="db[root_user]">DB Root User</label><input type="text" name="db[root_user]" />
-      <label for="db[root_pass]">DB Root Password</label><input type="password" name="db[root_pass]" />
       <label for="db[admin_user]">Website Admin User</label><input type="text" name="db[admin_user]" />
       <label for="db[admin_pass]">Website Admin Password</label><input type="password" name="db[admin_pass]" />
       <label for="db[confirm_pass]">Confirm Website Admin Password</label><input type="password" name="db[confirm_pass]" />
@@ -91,61 +89,60 @@ class Installer{
       $db_user = $settings->db['user'];
       $db_port = $settings->db['port'];
       
-      // If confirmed password, attempt to install
+      // If confirmed password, attempt to install by creating empty db connection
       if ($post['admin_pass'] == $post['confirm_pass']){
-        $conn = mysqli_connect($db_host, $post['root_user'], $post['root_pass'], null, $db_port);
-        if (!$conn){
+        $db = new Db(null, $db_pass, $db_host, $db_user, $db_port);
+        if (!$db){
           $this->message = 'error in database settings!';
           $this->error = 1;
         }
         else{
           $this->console = "<pre>\n";
+
           // Drop the database if it already exists (fresh install)
-          $sql = "DROP DATABASE IF EXISTS `{$db_name}`";
-          $conn->real_query($sql);
-          if ($conn->errno > 0){
+          if ($db->db['type'] == 'mysql' || $db->db['type'] == 'pgsql'){
+            $sql = 'DROP DATABASE IF EXISTS "' . $db_name . '"';
+            $db->write_raw($sql);
+            if ($db->error > 0){
+              $this->error = 1;
+              $this->console .= "Broken drop\n";
+            }
+          }
+          elseif($db->db['type'] == 'sqlite'){
+            if(is_file(DOC_ROOT . $db->db['name'])){
+              unlink(DOC_ROOT . $db->db['name']);
+            }
+          }
+          else{
             $this->error = 1;
             $this->console .= "Broken drop\n";
           }
           
           // Create the LWT database
-          $sql = "CREATE DATABASE `{$db_name}` DEFAULT CHARACTER SET utf8";
-          $conn->real_query($sql);
-          if ($conn->errno > 0){
+          if ($db->db['type'] == 'mysql' || $db->db['type'] == 'pgsql'){
+            $sql = "CREATE DATABASE `{$db_name}` DEFAULT CHARACTER SET utf8";
+            $db->write_raw($sql);
+            if ($db->error > 0){
+              $this->error = 1;
+              $this->console .= "Broken create db\n";
+            }
+          }
+          elseif($db->db['type'] == 'sqlite'){
+            if(!is_file(DOC_ROOT . $db->db['name'])){
+              $bytes = file_put_contents(DOC_ROOT . $db->db['name'], '');
+            }
+            if ($bytes === 'false'){
+              $this->error = 1;
+              $this->console .= "Broken create db\n";
+            }
+          }
+          else{
             $this->error = 1;
-            $this->console .= "Broken create db\n";
+            $this->console .= "Broken create\n";
           }
           
-          // The following lines must be uncommented if replacing a user
-          $sql = "DROP USER '{$db_user}'@'{$db_host}'";
-          $conn->real_query($sql);
-          
-          // Create the database user
-          $sql = "CREATE USER '{$db_user}'@'{$db_host}' IDENTIFIED BY '{$db_pass}'";
-          $conn->real_query($sql);
-          if ($conn->errno > 0){
-            $this->error = 1;
-            $this->console .= "Broken create user\n";
-          }
-          
-          // Grant user to database
-          $sql = "GRANT ALL PRIVILEGES ON `{$db_name}`.* TO '{$db_user}'@'{$db_host}'";
-          $conn->real_query($sql);
-          if ($conn->errno > 0){
-            $this->error = 1;
-            $this->console .= "Broken grant\n";
-          }
-          
-          // Grant user to database
-          $sql = "FLUSH PRIVILEGES";
-          $conn->real_query($sql);
-          if ($conn->errno > 0){
-            $this->error = 1;
-            $this->console .= "Broken flush\n";
-          }
-          
-          // Close the temporary connection
-          $conn->close();
+          // Unset the empty db connection
+          unset($db);
           
           if ($this->error){
             // Show that there is an error
@@ -175,6 +172,7 @@ class Installer{
 
   /**
    * Installs the Database for the LWT
+   * TODO: Use table object to create the tables
    *
    * @return int error
    *
