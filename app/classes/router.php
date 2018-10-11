@@ -30,7 +30,7 @@ class Router{
    *
    * @param string $uri Request URI for this request
    * @param string $method Lowercase HTTP method for the request
-   * @param phuSession $session Session object for user
+   * @param Session $session Session object for user
    * @param array $post POST data from user
    * @param array $files FILES data from user
    * @param array $get GET data from user

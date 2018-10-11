@@ -66,27 +66,6 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
     $session = new phuSession($_COOKIE['librewebtools']);
   }
 }
-// Collect information when invoking it via commandline
-elseif (isset($_SERVER['argv'][1])){
-  $string = $_SERVER['argv'][1];
-  if (strpos($string, '?') !== false){
-    $uri = strstr($string, '?', true);
-    $query = substr(strstr($string, '?', false),1);
-    parse_str($query, $get);
-  }
-  else{
-    $uri = $string;
-  }
-  if (isset($_SERVER['argv'][2])){
-    parse_str($_SERVER['argv'][2], $post);
-  }
-  if (isset($_SERVER['argv'][3])){
-    parse_str($_SERVER['argv'][3], $cookie);
-    if (isset($cookie) && isset($cookie['librewebtools'])){
-      $session = new phuSession($cookie['librewebtools']);
-    }
-  }
-}
 
 // The data gets through the router, which will route the request
 $router = new LWT\Router($uri, $method, $session, $post, $files, $get);

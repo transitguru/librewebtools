@@ -24,5 +24,4 @@ Here are a few simple steps for installing LibreWebTools
     to collect basic information to build your database based on the 
     instructions in the app/settings.php and your form data regarding the 
     administrative website user. At this moment, it will remove the database
-    user if it exists, then add it back with the password that you supplied
-    in `app/settings.php`.
+    if it exists then add it back in based on the inputs in `app/settings.php`.
