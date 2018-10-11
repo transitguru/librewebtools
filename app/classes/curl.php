@@ -32,7 +32,7 @@ class Curl {
    * @param string $method HTTP Method
    * @param array|string $data Data to pack and send out
    */
-  public function __construct($url, $method='GET', $data=''){
+  public function __construct($url, $method='GET', $data='', $ssl_verify = true){
     if(is_null($data)){
       $this->post_body = '';
     }
@@ -53,7 +53,7 @@ class Curl {
       CURLOPT_URL => $this->url,
       CURLOPT_POSTFIELDS => $this->post_body,
       CURLOPT_HTTPHEADER => array("Content-Type: application/json"),
-      CURLOPT_SSL_VERIFYPEER => false,
+      CURLOPT_SSL_VERIFYPEER => $ssl_verify,
       CURLOPT_CUSTOMREQUEST => $this->method,
     );
     $this->curl = curl_init();
