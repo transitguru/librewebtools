@@ -92,14 +92,14 @@ class Table{
   /**
    * Create the sql statement based on table definitions
    *
-   * @param array $table_defs Table definitions in the form of the array below
+   * @param array $table_defs Table definitions in the form of the object below
    *
    * @code
-   *   $table_defs = array(
+   *   $table_defs = (object) [
    *     'name' => 'table_name',
    *     'comment' => 'Comment to include with the table',
-   *     'columns' => array(
-   *       [0] => array(
+   *     'columns' => [
+   *       (object) [
    *         'name' => 'column_name',
    *         'type' => 'varchar', //type in $rosetta_stone
    *         'size' => 6,
@@ -107,10 +107,10 @@ class Table{
    *         'null' => false,
    *         'default' => 'default_value',
    *         'comment' => 'Comment to include with the column',
-   *       ),
-   *     ),
-   *     'constraints' => array(
-   *       [0] => array(
+   *       ],
+   *     ],
+   *     'constraints' => [
+   *       (object) [
    *         'name' => 'constraint_name',
    *         'type' => 'unique', // unique, primary, or foreign
    *         'columns' => ['column1', 'column2'],
@@ -118,14 +118,14 @@ class Table{
    *         'ref_columns' => ['fk_ref_col1', 'fk_ref_col2'],
    *         'delete' => 'cascade', // Use cascade, null, default, restrict, no
    *         'update' => 'cascade', // Use cascade, null, default, restrict, no
-   *       )
-   *     )
-   *   );
+   *       ]
+   *     ]
+   *   ];
    * @endcode
    */
   public function create_sql($table_defs = array()){
-    if (is_array($table_defs) && !is_null($table_defs['name']) && !fnmatch('*"*', $table_defs['name'])){
-      $this->name = $table_defs['name'];
+    if (is_object($table_defs) && isset($table_defs->name) && !fnmatch('*"*', $table_defs->name)){
+      $this->name = $table_defs->name;
     }
     else{
       $this->error = 1;
@@ -150,14 +150,14 @@ class Table{
     $p_frag = [];
     $c_frag = [];
 
-    if (!is_null($table_defs['comment'])){
-      $this->comment = $table_defs['comment'];
+    if (isset($table_defs->comment)){
+      $this->comment = $table_defs->comment;
     }
 
-    if (is_array($table_defs['columns']) && count($table_defs['columns']) > 0){
-      foreach($table_defs['columns'] as $column){
-        /** Column spec array to push into columns property */
-        $col_spec = array(
+    if (is_array($table_defs->columns) && count($table_defs->columns) > 0){
+      foreach($table_defs->columns as $column){
+        /** Column spec object to push into columns property */
+        $col_spec = (object) [
           'name' => null,
           'type' => null,
           'size' => null,
@@ -165,71 +165,71 @@ class Table{
           'null' => false,
           'default' => null,
           'comment' => null
-        );
+        ];
 
         //Create statements for this column
         $m_st = '';
         $p_st = '';
         $s_st = '';
 
-        if (is_array($column)){
-          if (isset($column['name']) && !is_null($column['name']) && !fnmatch('*"*', $column['name']) && $column['name'] != ''){
-            $col_spec['name'] = $column['name'];
-            $m_st = $column['name'] . ' ';
-            $p_st = $column['name'] . ' ';
-            $s_st = $column['name'] . ' ';
+        if (is_object($column)){
+          if (isset($column->name) && !fnmatch('*"*', $column->name) && $column->name != ''){
+            $col_spec->name = $column->name;
+            $m_st = $column->name . ' ';
+            $p_st = $column->name . ' ';
+            $s_st = $column->name . ' ';
           }
-          if (isset($column['type']) && array_key_exists($column['type'],$this->rosetta_stone)){
-            $col_spec['type'] = $column['type'];
-            $m_st .= $this->rosetta_stone["{$col_spec['type']}"][0];
-            $p_st .= $this->rosetta_stone["{$col_spec['type']}"][1];
-            $s_st .= $this->rosetta_stone["{$col_spec['type']}"][2];
+          if (isset($column->type) && array_key_exists($column->type,$this->rosetta_stone)){
+            $col_spec->type = $column->type;
+            $m_st .= $this->rosetta_stone["{$col_spec->type}"][0];
+            $p_st .= $this->rosetta_stone["{$col_spec->type}"][1];
+            $s_st .= $this->rosetta_stone["{$col_spec->type}"][2];
           }
-          if (isset($column['size']) && is_numeric($column['size'])){
-            $col_spec['size'] = $column['size'];
-            $m_st .= '(' . $col_spec['size'];
-            $p_st .= '(' . $col_spec['size'];
-            $s_st .= '(' . $col_spec['size'];
-            if (isset($column['scale']) && is_numeric($column['scale']) && $column['type'] == 'fixed'){
-              $col_spec['scale'] = $column['scale'];
-              $m_st .= ',' . $col_spec['scale'];
-              $p_st .= ',' . $col_spec['scale'];
-              $s_st .= ',' . $col_spec['scale'];
+          if (isset($column->size) && is_numeric($column->size)){
+            $col_spec->size = $column->size;
+            $m_st .= '(' . $col_spec->size;
+            $p_st .= '(' . $col_spec->size;
+            $s_st .= '(' . $col_spec->size;
+            if (isset($column->scale) && is_numeric($column->scale) && $column->type == 'fixed'){
+              $col_spec->scale = $column->scale;
+              $m_st .= ',' . $col_spec->scale;
+              $p_st .= ',' . $col_spec->scale;
+              $s_st .= ',' . $col_spec->scale;
             }
             $m_st .= ')';
             $p_st .= ')';
             $s_st .= ')';
           }
-          if (isset($column['null']) && $column['null'] == true){
-            $col_spec['null'] = true;
+          if (isset($column->null) && $column->null == true){
+            $col_spec->null = true;
           }
           else{
             $m_st .= ' NOT NULL';
             $p_st .= ' NOT NULL';
             $s_st .= ' NOT NULL';
           }
-          if (isset($column['default'])){
-            $col_spec['default'] = $column['default'];
-            if (in_array($column['type'], $this->numerics)){
-              $m_st .= " DEFAULT " . $col_spec['default'];
-              $p_st .= " DEFAULT " . $col_spec['default'];
-              $s_st .= " DEFAULT " . $col_spec['default'];
+          if (isset($column->default)){
+            $col_spec->default = $column->default;
+            if (in_array($column->type, $this->numerics)){
+              $m_st .= " DEFAULT " . $col_spec->default;
+              $p_st .= " DEFAULT " . $col_spec->default;
+              $s_st .= " DEFAULT " . $col_spec->default;
             }
             else{
-              $m_st .= " DEFAULT '" . $col_spec['default'] . "'";
-              $p_st .= " DEFAULT '" . $col_spec['default'] . "'";
-              $s_st .= " DEFAULT '" . $col_spec['default'] . "'";
+              $m_st .= " DEFAULT '" . $col_spec->default . "'";
+              $p_st .= " DEFAULT '" . $col_spec->default . "'";
+              $s_st .= " DEFAULT '" . $col_spec->default . "'";
 
             }
           }
-          if (isset($column['comment']) && $column['comment'] != ''){
-            $col_spec['comment'] = $column['comment'];
-            $m_st .= " COMMENT = '" . $col_spec['comment'] . "'";
-            $p_st .= " COMMENT = '" . $col_spec['comment'] . "'";
-            $s_st .= " --" . $col_spec['comment'];
+          if (isset($column->comment) && $column->comment != ''){
+            $col_spec->comment = $column->comment;
+            $m_st .= " COMMENT = '" . $col_spec->comment . "'";
+            $p_st .= " COMMENT = '" . $col_spec->comment . "'";
+            $s_st .= " --" . $col_spec->comment;
           }
 
-          if (!is_null($col_spec['name']) && !is_null($col_spec['type'])){
+          if (!is_null($col_spec->name) && !is_null($col_spec->type)){
             //Put col_spec into array
             $this->columns[] = $col_spec;
 
@@ -241,18 +241,16 @@ class Table{
         }
       }
     }
-    
-    if (count($this->columns) < 1){
+    else{
       $this->error = 2;
       $this->message = 'The table has no columns';
       return;
-
     }
 
-    if (is_array($table_defs['constraints']) && count($table_defs['constraints']) > 0){
-      foreach($table_defs['constraints'] as $constraint){
-        /** Constraint spec array to push into constraints property */
-        $con_spec = array(
+    if (is_array($table_defs->constraints) && count($table_defs->constraints) > 0){
+      foreach($table_defs->constraints as $constraint){
+        /** Constraint spec object to push into constraints property */
+        $con_spec = (object) [
           'name' => null,
           'type' => null,
           'columns' => array(),
@@ -260,53 +258,53 @@ class Table{
           'ref_columns' => array(),
           'delete' => null,
           'update' => null
-        ); 
+        ];
 
         //Create statements for this constraint
         $c_st = '';
 
-        if (is_array($constraint)){
-          if (isset($constraint['name']) && !is_null($constraint['name']) && !fnmatch('*"*', $constraint['name']) && $constraint['name'] != ''){
-            $con_spec['name'] = $constraint['name'];
-            $c_st = 'CONSTRAINT "' . $con_spec['name'] . '"';
+        if (is_object($constraint)){
+          if (isset($constraint->name) && !fnmatch('*"*', $constraint->name) && $constraint->name != ''){
+            $con_spec->name = $constraint->name;
+            $c_st = 'CONSTRAINT "' . $con_spec->name . '"';
           }
-          if (isset($constraint['type']) && array_key_exists($constraint['type'],$this->constraint_types)){
-            $con_spec['type'] = $constraint['type'];
-            $c_st .= ' "' . $this->constraint_types["{$con_spec['type']}"];
+          if (isset($constraint->type) && array_key_exists($constraint->type,$this->constraint_types)){
+            $con_spec->type = $constraint->type;
+            $c_st .= ' "' . $this->constraint_types["{$con_spec->type}"];
           }
-          if (is_array($constraint['columns']) && count($constraint['columns']) > 0){
+          if (is_array($constraint->columns) && count($constraint->columns) > 0){
             $fk_cols = array();
-            foreach($constraint['columns'] as $col){
+            foreach($constraint->columns as $col){
               if (!is_null($col) && !fnmatch('*"*', $col) && $col != ''){
                 $fk_cols[] = $col;
               }
             }
-            $con_spec['columns'] = $fk_cols;
-            $c_st .= ' ( "' .implode('" , "', $con_spec['columns']) . '" )';
+            $con_spec->columns = $fk_cols;
+            $c_st .= ' ( "' .implode('" , "', $con_spec->columns) . '" )';
           }
-          if (isset($constraint['ref_table']) && !is_null($constraint['ref_table']) && !fnmatch('*"*', $constraint['ref_table']) && $constraint['ref_table'] != ''){
-            $con_spec['ref_table'] = $constraint['ref_table'];
-            $c_st .= ' REFERENCES "' . $con_spec['ref_table'] . '"';
+          if (isset($constraint->ref_table) && !fnmatch('*"*', $constraint->ref_table) && $constraint->ref_table != ''){
+            $con_spec->ref_table = $constraint->ref_table;
+            $c_st .= ' REFERENCES "' . $con_spec->ref_table . '"';
           }
-          if (isset($constraint['ref_table']) && is_array($constraint['ref_columns']) && count($constraint['ref_columns']) > 0){
+          if (isset($constraint->ref_table) && is_array($constraint->ref_columns) && count($constraint->ref_columns) > 0){
             $ref_cols = array();
-            foreach($constraint['ref_columns'] as $rcol){
+            foreach($constraint->ref_columns as $rcol){
               if (!is_null($rcol) && !fnmatch('*"*', $rcol) && $rcol != ''){
                 $ref_cols[] = $col;
               }
             }
-            $con_spec['ref_columns'] = $ref_cols;
-            $c_st .= ' ( "' .implode('" , "', $con_spec['ref_columns']) . '" )';
+            $con_spec->ref_columns = $ref_cols;
+            $c_st .= ' ( "' .implode('" , "', $con_spec->ref_columns) . '" )';
           }
-          if (isset($constraint['delete']) && array_key_exists($constraint['delete'],$this->fk_actions)){
-            $con_spec['delete'] = $con_spec['delete'];
-            $c_st .= ' ON DELETE ' . $this->fk_actions["{$con_spec['delete']}"];
+          if (isset($constraint->delete) && array_key_exists($constraint->delete,$this->fk_actions)){
+            $con_spec->delete = $con_spec->delete;
+            $c_st .= ' ON DELETE ' . $this->fk_actions["{$con_spec->delete}"];
           }
-          if (isset($constraint['update']) && array_key_exists($constraint['update'],$this->fk_actions)){
-            $con_spec['update'] = $con_spec['update'];
-            $c_st .= ' ON UPDATE ' . $this->fk_actions["{$con_spec['update']}"];
+          if (isset($constraint->update) && array_key_exists($constraint->update,$this->fk_actions)){
+            $con_spec->update = $con_spec->update;
+            $c_st .= ' ON UPDATE ' . $this->fk_actions["{$con_spec->update}"];
           }
-          if (!is_null($col_spec['name']) && !is_null($col_spec['type']) && count($con_spec['columns']) > 0){
+          if (!is_null($con_spec->name) && !is_null($con_spec->type) && count($con_spec->columns) > 0){
             $this->constraints[] = $con_spec;
 
             //Build statement arrays
@@ -333,7 +331,6 @@ class Table{
     $this->sqlite = $sqlite_stmt . "\n;";
     $this->error = 0;
     $this->message = 'SQL successfully created';
-
   }
 
 }
