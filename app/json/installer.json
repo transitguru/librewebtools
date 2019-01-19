@@ -19,7 +19,6 @@
         {"name":"desc","type":"text","comment":"Optional additional information about the role"}
       ],
       "constraints":[
-        {"name":"pk_role_id","type":"primary","columns":["id"]},
         {"name":"uk_role_name","type":"unique","columns":["name"]}
       ]
     },
@@ -35,7 +34,6 @@
         {"name":"desc","type":"text","comment":"Optional additional information about the group"}
       ],
       "constraints":[
-        {"name":"pk_group_id","type":"primary","columns":["id"]},
         {"name":"fk_group_id","type":"foreign","columns":["parent_id"],"ref_table":"groups","ref_columns":["id"],"delete":"null","update":"cascade"},
         {"name":"uk_group_name","type":"unique","columns":["name"]}
       ]
@@ -53,7 +51,6 @@
         {"name":"desc","type":"text","comment":"Optional additional information about the user"}
       ],
       "constraints":[
-        {"name":"pk_user_id","type":"primary","columns":["id"]},
         {"name":"uk_user_login","type":"unique","columns":["login"]},
         {"name":"uk_user_email","type":"unique","columns":["email"]}
       ]
@@ -112,7 +109,6 @@
         {"name":"required","type":"bool","null":false,"default":1,"comment":"Boolean if required for application to work"}
       ],
       "constraints":[
-        {"name":"pk_module_id","type":"primary","columns":["id"]},
         {"name":"uk_module_code","type":"unique","columns":["core","code"]}
       ]
     },
@@ -135,7 +131,6 @@
         {"name":"deactivated","type":"datetime","comment":"Optional date for path to become deactivated"}
       ],
       "constraints":[
-        {"name":"pk_path_id","type":"primary","columns":["id"]},
         {"name":"uk_path_code","type":"unique","columns":["parent_id","url_code"]},
         {"name":"fk_path_parentid","type":"foreign","columns":["parent_id"],"ref_table":"paths","ref_columns":["id"],"delete":"null","update":"cascade"},
         {"name":"fk_path_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"null","update":"cascade"},
@@ -155,7 +150,6 @@
         {"name":"content","type":"longtext","comment":"User inputted content"}
       ],
       "constraints":[
-        {"name":"pk_content_id","type":"primary","columns":["id"]},
         {"name":"uk_content_history","type":"unique","columns":["path_id","created"]},
         {"name":"fk_content_pathid","type":"foreign","columns":["path_id"],"ref_table":"paths","ref_columns":["id"],"delete":"cascade","update":"cascade"},
         {"name":"fk_content_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"null","update":"cascade"}
@@ -174,7 +168,6 @@
         {"name":"created","type":"datetime","null":false,"comment":"Date menu item was initially created"}
       ],
       "constraints":[
-        {"name":"pk_menu_id","type":"primary","columns":["id"]},
         {"name":"uk_menu_name","type":"unique","columns":["parent_id","name"]},
         {"name":"fk_menu_parentid","type":"foreign","columns":["parent_id"],"ref_table":"menus","ref_columns":["id"],"delete":"null","update":"null"},
         {"name":"fk_menu_pathid","type":"foreign","columns":["path_id"],"ref_table":"paths","ref_columns":["id"],"delete":"null","update":"cascade"}
@@ -221,13 +214,12 @@
         {"name":"caption","type":"text","comment":"Optional caption text"}
       ],
       "constraints":[
-        {"name":"pk_file_id","type":"primary","columns":["id"]},
         {"name":"uk_file_path","type":"unique","columns":["path"]},
         {"name":"fk_file_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"null","update":"cascade"}
       ]
     },
     {
-      "name":"path_groups",
+      "name":"file_groups",
       "comment":"Simple file permissions for groups",
       "columns":[
         {"name":"file_id","type":"int","null":false,"comment":"Reference to files.id"},

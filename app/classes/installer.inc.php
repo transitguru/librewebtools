@@ -178,9 +178,27 @@ class Installer{
    *
    */
   private function install_db($post){
-    $file = DOC_ROOT . '/app/sql/schema.sql';
-    $sql = file_get_contents($file);
-    
+    $file = DOC_ROOT . '/app/json/installer.json';
+    $json = file_get_contents($file);
+
+    $sql = (object) ['mysql' => '', 'pgsql' => '', 'sqlite' =>''];
+
+    $table_builder = new LWT\Table();
+    $object = json_decode($json);
+    if (isset($object->tables) && is_array($object->tables)){
+      foreach($object->tables as $table){
+        $table_builder->create_sql($table);
+        $sql->mysql .= "\n\n" . $table_builder->mysql;
+        $sql->pgsql .= "\n\n" . $table_builder->pgsql;
+        $sql->sqlite .= "\n\n" . $table_builder->sqlite;
+      }
+    }
+    else{
+      $this->console = "Error making tables";
+      return 999;
+    }
+
+    echo "<pre>" . $sql->mysql . $sql->pgsql . $sql->sqlite . "</pre>";
     //TODO Put real tables in here
 
 /*

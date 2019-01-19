@@ -162,7 +162,7 @@ class Table{
           'type' => null,
           'size' => null,
           'scale' => null,
-          'null' => false,
+          'null' => true,
           'default' => null,
           'comment' => null
         ];
@@ -175,9 +175,9 @@ class Table{
         if (is_object($column)){
           if (isset($column->name) && !fnmatch('*"*', $column->name) && $column->name != ''){
             $col_spec->name = $column->name;
-            $m_st = $column->name . ' ';
-            $p_st = $column->name . ' ';
-            $s_st = $column->name . ' ';
+            $m_st = '"' . $column->name . '" ';
+            $p_st = '"' . $column->name . '" ';
+            $s_st = '"' . $column->name . '" ';
           }
           if (isset($column->type) && array_key_exists($column->type,$this->rosetta_stone)){
             $col_spec->type = $column->type;
@@ -200,13 +200,14 @@ class Table{
             $p_st .= ')';
             $s_st .= ')';
           }
-          if (isset($column->null) && $column->null == true){
-            $col_spec->null = true;
-          }
-          else{
+          if (isset($column->null) && $column->null == false){
+            $col_spec->null = false;
             $m_st .= ' NOT NULL';
             $p_st .= ' NOT NULL';
             $s_st .= ' NOT NULL';
+          }
+          else{
+            $col_spec->null = true;
           }
           if (isset($column->default)){
             $col_spec->default = $column->default;
@@ -224,8 +225,8 @@ class Table{
           }
           if (isset($column->comment) && $column->comment != ''){
             $col_spec->comment = $column->comment;
-            $m_st .= " COMMENT = '" . $col_spec->comment . "'";
-            $p_st .= " COMMENT = '" . $col_spec->comment . "'";
+            $m_st .= " COMMENT '" . $col_spec->comment . "'";
+            $p_st .= " COMMENT '" . $col_spec->comment . "'";
             $s_st .= " --" . $col_spec->comment;
           }
 
@@ -270,7 +271,7 @@ class Table{
           }
           if (isset($constraint->type) && array_key_exists($constraint->type,$this->constraint_types)){
             $con_spec->type = $constraint->type;
-            $c_st .= ' "' . $this->constraint_types["{$con_spec->type}"];
+            $c_st .= ' ' . $this->constraint_types["{$con_spec->type}"];
           }
           if (is_array($constraint->columns) && count($constraint->columns) > 0){
             $fk_cols = array();
@@ -290,18 +291,18 @@ class Table{
             $ref_cols = array();
             foreach($constraint->ref_columns as $rcol){
               if (!is_null($rcol) && !fnmatch('*"*', $rcol) && $rcol != ''){
-                $ref_cols[] = $col;
+                $ref_cols[] = $rcol;
               }
             }
             $con_spec->ref_columns = $ref_cols;
             $c_st .= ' ( "' .implode('" , "', $con_spec->ref_columns) . '" )';
           }
           if (isset($constraint->delete) && array_key_exists($constraint->delete,$this->fk_actions)){
-            $con_spec->delete = $con_spec->delete;
+            $con_spec->delete = $constraint->delete;
             $c_st .= ' ON DELETE ' . $this->fk_actions["{$con_spec->delete}"];
           }
           if (isset($constraint->update) && array_key_exists($constraint->update,$this->fk_actions)){
-            $con_spec->update = $con_spec->update;
+            $con_spec->update = $constraint->update;
             $c_st .= ' ON UPDATE ' . $this->fk_actions["{$con_spec->update}"];
           }
           if (!is_null($con_spec->name) && !is_null($con_spec->type) && count($con_spec->columns) > 0){
@@ -321,8 +322,8 @@ class Table{
     $sqlite_stmt .= "\n  " . implode("\n  ,",$s_frag) . "\n)";
 
     if (!is_null($this->comment)){
-      $mysql_stmt .= " COMMENT = '" . $this->comment . "'";
-      $pgsql_stmt .= " COMMENT = '" . $this->comment . "'";
+      $mysql_stmt .= " COMMENT '" . $this->comment . "'";
+      $pgsql_stmt .= " COMMENT '" . $this->comment . "'";
       $sqlite_stmt .= " --" . $this->comment . "";
     }
 
