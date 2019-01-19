@@ -181,8 +181,15 @@ class Installer{
     $file = DOC_ROOT . '/app/sql/schema.sql';
     $sql = file_get_contents($file);
     
+    //TODO Put real tables in here
+
+/*
+ Load JSON file with schema and data definitions for creating database
+*/
+
+
     $db = new Db();
-    $db->multiquery($sql);
+    $db->write_raw($sql);
     if ($db->error != 0){
       $db->error;
     }

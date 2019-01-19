@@ -1,0 +1,256 @@
+{
+  "librewebtools_file_info":{
+    "category"  : "configuration",
+    "package"   : "LibreWebTools",
+    "author"    : "Michael Sypolt <msypolt@transitguru.limited>",
+    "copyright" : "Copyright (c) 2019",
+    "license"   : "http://www.gnu.org/licenses/gpl-3.0.txt",
+    "version"   : "Release: @package_version@"
+  },
+  "tables":[
+    {
+      "name": "roles",
+      "comment": "Basic user roles",
+      "columns": [
+        {"name":"id","type":"serial","null":false,"comment":"Primary Identifier"},
+        {"name":"sortorder","type":"int","null":false,"default":0,"comment":"Allows site admin to sort roles"},
+        {"name":"name","type":"varchar","size":255,"null":false,"comment":"Human-readable name for the role"},
+        {"name":"created","type":"datetime","null":false,"comment":"Date role created"},
+        {"name":"desc","type":"text","comment":"Optional additional information about the role"}
+      ],
+      "constraints":[
+        {"name":"pk_role_id","type":"primary","columns":["id"]},
+        {"name":"uk_role_name","type":"unique","columns":["name"]}
+      ]
+    },
+    {
+      "name":"groups",
+      "comment":"User groups (in a heirarchical tree)",
+      "columns":[
+        {"name":"id","type":"serial","null":false,"comment":"Primary Identifier"},
+        {"name":"parent_id","type":"int","null":true,"default":null,"comment":"Parent for a group, 0 is root, NULL means ready to delete (unless id=0)"},
+        {"name":"sortorder","type":"int","null":false,"default":0,"comment":"Allows site admin to sort groups"},
+        {"name":"name","type":"varchar","size":255,"null":false,"comment":"Human-readable name for the group"},
+        {"name":"created","type":"datetime","null":false,"comment":"Date group created"},
+        {"name":"desc","type":"text","comment":"Optional additional information about the group"}
+      ],
+      "constraints":[
+        {"name":"pk_group_id","type":"primary","columns":["id"]},
+        {"name":"fk_group_id","type":"foreign","columns":["parent_id"],"ref_table":"groups","ref_columns":["id"],"delete":"null","update":"cascade"},
+        {"name":"uk_group_name","type":"unique","columns":["name"]}
+      ]
+    },
+    {
+      "name":"users",
+      "comment":"Basic authenticated user information",
+      "columns":[
+        {"name":"id","type":"serial","null":false,"comment":"Primary Identifier"},
+        {"name":"login","type":"varchar","size":40,"null":false,"comment":"Username for logging in"},
+        {"name":"firstname","type":"varchar","size":100,"null":false,"comment":"Given Name"},
+        {"name":"lastname","type":"varchar","size":100,"null":false,"comment":"Surname"},
+        {"name":"email","type":"varchar","size":255,"null":false,"comment":"Email address for user"},
+        {"name":"created","type":"datetime","null":false,"comment":"Date user created"},
+        {"name":"desc","type":"text","comment":"Optional additional information about the user"}
+      ],
+      "constraints":[
+        {"name":"pk_user_id","type":"primary","columns":["id"]},
+        {"name":"uk_user_login","type":"unique","columns":["login"]},
+        {"name":"uk_user_email","type":"unique","columns":["email"]}
+      ]
+    },
+    {
+      "name":"user_groups",
+      "comment":"Matches users to groups to denote membership in the group hierarchy",
+      "columns":[
+        {"name":"user_id","type":"int","null":false,"comment":"Reference to users.id"},
+        {"name":"group_id","type":"int","null":false,"comment":"Reference to groups.id"}
+      ],
+      "constraints":[
+        {"name":"pk_usergroup_id","type":"primary","columns":["user_id","group_id"]},
+        {"name":"fk_usergroup_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"cascade","update":"cascade"},
+        {"name":"fk_usergroup_groupid","type":"foreign","columns":["group_id"],"ref_table":"groups","ref_columns":["id"],"delete":"cascade","update":"cascade"}
+      ]
+    },
+    {
+      "name":"user_roles",
+      "comment":"Matches users to roles to denote membership in each role",
+      "columns":[
+        {"name":"user_id","type":"int","null":false,"comment":"Reference to users.id"},
+        {"name":"role_id","type":"int","null":false,"comment":"Reference to roles.id"}
+      ],
+      "constraints":[
+        {"name":"pk_userrole_id","type":"primary","columns":["user_id","role_id"]},
+        {"name":"fk_userrole_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"cascade","update":"cascade"},
+        {"name":"fk_userrole_roleid","type":"foreign","columns":["role_id"],"ref_table":"roles","ref_columns":["id"],"delete":"cascade","update":"cascade"}
+      ]
+    },
+    {
+      "name":"passwords",
+      "comment":"User hashed passwords",
+      "columns":[
+        {"name":"user_id","type":"int","null":false,"comment":"Reference to users.id"},
+        {"name":"valid_date","type":"datetime","null":false,"comment":"Validity (start date) of password"},
+        {"name":"expire_date","type":"datetime","comment":"If set, expiration date of password"},
+        {"name":"reset_date","type":"datetime","comment":"If set, expiration date of the reset code"},
+        {"name":"reset_code","type":"varchar","size":255,"comment":"If set and unexpired, reset code to create a new password"},
+        {"name":"hashed","type":"varchar","size":255,"comment":"Hashed password"}
+      ],
+      "constraints":[
+        {"name":"pk_password_id","type":"primary","columns":["user_id","valid_date"]},
+        {"name":"fk_password_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"cascade","update":"cascade"}
+      ]
+    },
+    {
+      "name":"modules",
+      "comment":"Registry of application modules",
+      "columns":[
+        {"name":"id","type":"serial","null":false,"comment":"Unique identifier"},
+        {"name":"core","type":"bool","null":false,"default":1,"comment":"Determines if it is core module. Custom is 0"},
+        {"name":"code","type":"varchar","size":100,"null":false,"comment":"Name of module (directory name)"},
+        {"name":"name","type":"varchar","size":255,"null":false,"comment":"Human-friendly name of module"},
+        {"name":"enabled","type":"bool","null":false,"default":1,"comment":"Boolean determining if enabled"},
+        {"name":"required","type":"bool","null":false,"default":1,"comment":"Boolean if required for application to work"}
+      ],
+      "constraints":[
+        {"name":"pk_module_id","type":"primary","columns":["id"]},
+        {"name":"uk_module_code","type":"unique","columns":["core","code"]}
+      ]
+    },
+    {
+      "name":"paths",
+      "comment":"Paths that would translate into a URL Tree",
+      "columns":[
+        {"name":"id","type":"serial","null":false,"comment":"Unique identifier"},
+        {"name":"parent_id","type":"int","comment":"Parent for a path, 0 is root, NULL means ready to delete (unless id=0)"},
+        {"name":"user_id","type":"int","comment":"User who originally created the path (references users.id)"},
+        {"name":"module_id","type":"int","comment":"Module to which this path is a member (references modules.id)"},
+        {"name":"url_code","type":"varchar","size":100,"null":false,"comment":"URL alias at the particular level (no slashes allowed)"},
+        {"name":"title","type":"varchar","size":255,"null":false,"comment":"Current human-readable title of the path"},
+        {"name":"app_root","type":"bool","null":false,"default":0,"comment":"Determines if root of sub-app, therefore no sub-paths registered in this database"},
+        {"name":"core","type":"bool","null":false,"default":0,"comment":"Determines if this path needs protected from deletion"},
+        {"name":"ajax","type":"varchar","size":255,"comment":"Function to call BEFORE loading the path"},
+        {"name":"render","type":"varchar","size":255,"comment":"Function to call WHILE loading the path"},
+        {"name":"created","type":"datetime","null":false,"comment":"Date path was initially created"},
+        {"name":"activated","type":"datetime","comment":"Optional date for path to become activated"},
+        {"name":"deactivated","type":"datetime","comment":"Optional date for path to become deactivated"}
+      ],
+      "constraints":[
+        {"name":"pk_path_id","type":"primary","columns":["id"]},
+        {"name":"uk_path_code","type":"unique","columns":["parent_id","url_code"]},
+        {"name":"fk_path_parentid","type":"foreign","columns":["parent_id"],"ref_table":"paths","ref_columns":["id"],"delete":"null","update":"cascade"},
+        {"name":"fk_path_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"null","update":"cascade"},
+        {"name":"fk_path_moduleid","type":"foreign","columns":["module_id"],"ref_table":"modules","ref_columns":["id"],"delete":"null","update":"cascade"}
+      ]
+    },
+    {
+      "name":"path_content",
+      "comment":"Content for paths for simple web page capabilities",
+      "columns":[
+        {"name":"id","type":"serial","null":false,"comment":"Unique identifier"},
+        {"name":"path_id","type":"int","comment":"Reference to paths.id"},
+        {"name":"user_id","type":"int","comment":"User who edited the content (references users.id)"},
+        {"name":"created","type":"datetime","null":false,"comment":"Date content was edited"},
+        {"name":"title","type":"varchar","size":255,"null":false,"comment":"Human-readable title of the content"},
+        {"name":"summary","type":"text","comment":"User inputted summary for content"},
+        {"name":"content","type":"longtext","comment":"User inputted content"}
+      ],
+      "constraints":[
+        {"name":"pk_content_id","type":"primary","columns":["id"]},
+        {"name":"uk_content_history","type":"unique","columns":["path_id","created"]},
+        {"name":"fk_content_pathid","type":"foreign","columns":["path_id"],"ref_table":"paths","ref_columns":["id"],"delete":"cascade","update":"cascade"},
+        {"name":"fk_content_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"null","update":"cascade"}
+      ]
+    },
+    {
+      "name":"menus",
+      "comment":"Menu links tree",
+      "columns":[
+        {"name":"id","type":"serial","null":false,"comment":"Unique identifier"},
+        {"name":"parent_id","type":"int","comment":"Parent for a menu, 0 is root, NULL means ready to delete (unless id=0)"},
+        {"name":"sortorder","type":"int","null":false,"default":0,"comment":"Allows site admin to sort items"},
+        {"name":"name","type":"varchar","size":255,"null":false,"comment":"Current human-readable title of the item"},
+        {"name":"path_id","type":"int","comment":"Location for menu item to hot-link (Reference to paths.id)"},
+        {"name":"external_link","type":"varchar","size":255,"comment":"Location to link in lieu of path id"},
+        {"name":"created","type":"datetime","null":false,"comment":"Date menu item was initially created"}
+      ],
+      "constraints":[
+        {"name":"pk_menu_id","type":"primary","columns":["id"]},
+        {"name":"uk_menu_name","type":"unique","columns":["parent_id","name"]},
+        {"name":"fk_menu_parentid","type":"foreign","columns":["parent_id"],"ref_table":"menus","ref_columns":["id"],"delete":"null","update":"null"},
+        {"name":"fk_menu_pathid","type":"foreign","columns":["path_id"],"ref_table":"paths","ref_columns":["id"],"delete":"null","update":"cascade"}
+      ]
+    },
+    {
+      "name":"path_groups",
+      "comment":"Matches paths to groups to denote membership in the group hierarchy",
+      "columns":[
+        {"name":"path_id","type":"int","null":false,"comment":"Reference to paths.id"},
+        {"name":"group_id","type":"int","null":false,"comment":"Reference to groups.id"}
+      ],
+      "constraints":[
+        {"name":"pk_pathgroup_id","type":"primary","columns":["path_id","group_id"]},
+        {"name":"fk_pathgroup_pathid","type":"foreign","columns":["path_id"],"ref_table":"paths","ref_columns":["id"],"delete":"cascade","update":"cascade"},
+        {"name":"fk_pathgroup_groupid","type":"foreign","columns":["group_id"],"ref_table":"groups","ref_columns":["id"],"delete":"cascade","update":"cascade"}
+      ]
+    },
+    {
+      "name":"path_roles",
+      "comment":"Matches paths to roles to denote membership in each role",
+      "columns":[
+        {"name":"path_id","type":"int","null":false,"comment":"Reference to paths.id"},
+        {"name":"role_id","type":"int","null":false,"comment":"Reference to roles.id"}
+      ],
+      "constraints":[
+        {"name":"pk_pathrole_id","type":"primary","columns":["path_id","role_id"]},
+        {"name":"fk_pathrole_pathid","type":"foreign","columns":["path_id"],"ref_table":"paths","ref_columns":["id"],"delete":"cascade","update":"cascade"},
+        {"name":"fk_pathrole_roleid","type":"foreign","columns":["role_id"],"ref_table":"roles","ref_columns":["id"],"delete":"cascade","update":"cascade"}
+      ]
+    },
+    {
+      "name":"files",
+      "comment":"Registry of uploaded files",
+      "columns":[
+        {"name":"id","type":"serial","null":false,"comment":"Unique identifier"},
+        {"name":"user_id","type":"int","comment":"User who originally uploaded the file (references users.id)"},
+        {"name":"basename","type":"varchar","size":255,"null":false,"comment":"File basename as uploaded"},
+        {"name":"path","type":"varchar","size":255,"null":false,"comment":"File name adjusted to prevent repeats"},
+        {"name":"size","type":"bigint","null":false,"default":0,"comment":"File size in bytes"},
+        {"name":"mimetype","type":"varchar","size":255,"comment":"File type"},
+        {"name":"uploaded","type":"datetime","null":false,"comment":"Date was initially uploaded"},
+        {"name":"title","type":"varchar","size":255,"comment":"Optional title"},
+        {"name":"caption","type":"text","comment":"Optional caption text"}
+      ],
+      "constraints":[
+        {"name":"pk_file_id","type":"primary","columns":["id"]},
+        {"name":"uk_file_path","type":"unique","columns":["path"]},
+        {"name":"fk_file_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"null","update":"cascade"}
+      ]
+    },
+    {
+      "name":"path_groups",
+      "comment":"Simple file permissions for groups",
+      "columns":[
+        {"name":"file_id","type":"int","null":false,"comment":"Reference to files.id"},
+        {"name":"group_id","type":"int","null":false,"comment":"Reference to groups.id"}
+      ],
+      "constraints":[
+        {"name":"pk_filegroup_id","type":"primary","columns":["file_id","group_id"]},
+        {"name":"fk_filegroup_fileid","type":"foreign","columns":["file_id"],"ref_table":"files","ref_columns":["id"],"delete":"cascade","update":"cascade"},
+        {"name":"fk_filegroup_groupid","type":"foreign","columns":["group_id"],"ref_table":"groups","ref_columns":["id"],"delete":"cascade","update":"cascade"}
+      ]
+    },
+    {
+      "name":"file_roles",
+      "comment":"Simple file permissions for roles",
+      "columns":[
+        {"name":"file_id","type":"int","null":false,"comment":"Reference to files.id"},
+        {"name":"role_id","type":"int","null":false,"comment":"Reference to roles.id"}
+      ],
+      "constraints":[
+        {"name":"pk_filerole_id","type":"primary","columns":["file_id","role_id"]},
+        {"name":"fk_filerole_fileid","type":"foreign","columns":["file_id"],"ref_table":"files","ref_columns":["id"],"delete":"cascade","update":"cascade"},
+        {"name":"fk_filerole_roleid","type":"foreign","columns":["role_id"],"ref_table":"roles","ref_columns":["id"],"delete":"cascade","update":"cascade"}
+      ]
+    }
+  ]
+}
