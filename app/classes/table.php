@@ -23,8 +23,8 @@ class Table{
     'smallint' => [ 'SMALLINT', 'SMALLINT', 'INTEGER'],
     'int' => [ 'INT', 'INT', 'INTEGER'],
     'bigint' => [ 'INT', 'INT', 'INTEGER'],
-    'serial' => [ 'INT PRIMARY KEY AUTO_INCREMENT', 'SERIAL', 'INTEGER PRIMARY KEY AUTOINCREMENT'],
-    'bigserial' => [ 'SERIAL', 'BIGSERIAL', 'INTEGER PRIMARY KEY AUTOINCREMENT'],
+    'serial' => [ 'INT AUTO_INCREMENT', 'SERIAL', 'INTEGER'],
+    'bigserial' => [ 'SERIAL', 'BIGSERIAL', 'INTEGER'],
     'fixed' => [ 'NUMERIC', 'NUMERIC', 'NUMERIC'],
     'float' => [ 'FLOAT', 'REAL', 'REAL'],
     'double' => [ 'DOUBLE', 'DOUBLE PRECISION', 'REAL'],
@@ -150,6 +150,9 @@ class Table{
     $p_frag = [];
     $c_frag = [];
 
+    // Postgres needs individual statements for comments
+    $p_comm = '';
+
     if (isset($table_defs->comment)){
       $this->comment = $table_defs->comment;
     }
@@ -226,7 +229,7 @@ class Table{
           if (isset($column->comment) && $column->comment != ''){
             $col_spec->comment = $column->comment;
             $m_st .= " COMMENT '" . $col_spec->comment . "'";
-            $p_st .= " COMMENT '" . $col_spec->comment . "'";
+            $p_comm .= ' COMMENT ON COLUMN "' . $this->name . '"."' . $col_spec->name . '" IS \'' . $col_spec->comment . "'; \n";
             $s_st .= " --" . $col_spec->comment;
           }
 
@@ -323,12 +326,12 @@ class Table{
 
     if (!is_null($this->comment)){
       $mysql_stmt .= " COMMENT '" . $this->comment . "'";
-      $pgsql_stmt .= " COMMENT '" . $this->comment . "'";
+      $p_comm .= "\n" . ' COMMENT ON TABLE "' . $this->name . '" IS \'' . $this->comment . "';\n";
       $sqlite_stmt .= " --" . $this->comment . "";
     }
 
     $this->mysql = $mysql_stmt . "\n;";
-    $this->pgsql = $pgsql_stmt . "\n;";
+    $this->pgsql = $pgsql_stmt . "\n;\n" . $p_comm;
     $this->sqlite = $sqlite_stmt . "\n;";
     $this->error = 0;
     $this->message = 'SQL successfully created';
