@@ -78,16 +78,18 @@ class Module{
       $dir = 'custom';
     }
     $PATH = DOC_ROOT . '/app/' . $dir . '/' . $this->code;
-    $files = scandir($scan);
-    foreach ($files as $file){
-      if(is_file($PATH . '/' . $file) && fnmatch('*.js', $file)){
-        $this->javascripts[] = $dir . '/' . $this->code . '/' . $file;
-      }
-      elseif(is_file($PATH . '/' . $file) && fnmatch('*.css', $file)){
-        $this->stylesheets[] = $dir . '/' . $this->code . '/' . file;
+    if (is_dir($PATH)){
+      $files = scandir($scan);
+      foreach ($files as $file){
+        if(is_file($PATH . '/' . $file) && fnmatch('*.js', $file)){
+          $this->javascripts[] = $dir . '/' . $this->code . '/' . $file;
+        }
+        elseif(is_file($PATH . '/' . $file) && fnmatch('*.css', $file)){
+          $this->stylesheets[] = $dir . '/' . $this->code . '/' . file;
+        }
       }
     }
-    $file = DOC_ROOT . '/' . $dir . '/' . $this->code . '/template.php';
+    $file = $PATH . '/template.php';
     if (is_file($file)){
       require_once ($file);
     }
@@ -111,13 +113,14 @@ class Module{
       foreach ($db->output as $module){
         $code = $module['code'];
         $PATH = DOC_ROOT . '/app/' . $dir . '/' . $code;
+        $file = $PATH . '/bootstrap.php';
+        if (is_file($file)){
+          require_once ($file);
+        }
         if (is_dir($PATH)){
           $files = scandir($PATH);
           foreach ($files as $file){
-            if (is_file($PATH . '/' . $file) && fnmatch('*.php', $file)){
-              require_once($PATH . '/' . $file);
-            }
-            elseif(is_file($PATH . '/' . $file) && fnmatch('*.js', $file)){
+            if(is_file($PATH . '/' . $file) && fnmatch('*.js', $file)){
               $this->javascripts[] = "{$dir}/{$code}/{$file}";
             }
             elseif(is_file($PATH . '/' . $file) && fnmatch('*.css', $file)){
