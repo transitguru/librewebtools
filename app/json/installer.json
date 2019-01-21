@@ -1,5 +1,5 @@
 {
-  "librewebtools_file_info":{
+  "__comments__":{
     "category"  : "configuration",
     "package"   : "LibreWebTools",
     "author"    : "Michael Sypolt <msypolt@transitguru.limited>",
@@ -147,8 +147,8 @@
       "comment":"Content for paths for simple web page capabilities",
       "columns":[
         {"name":"id","type":"serial","null":false,"comment":"Unique identifier"},
-        {"name":"path_id","type":"int","comment":"Reference to paths.id"},
-        {"name":"user_id","type":"int","comment":"User who edited the content (references users.id)"},
+        {"name":"path_id","type":"int","null":false,"comment":"Reference to paths.id"},
+        {"name":"user_id","type":"int","null":false,"comment":"User who edited the content (references users.id)"},
         {"name":"created","type":"datetime","null":false,"comment":"Date content was edited"},
         {"name":"title","type":"varchar","size":255,"null":false,"comment":"Human-readable title of the content"},
         {"name":"summary","type":"text","comment":"User inputted summary for content"},
@@ -251,6 +251,221 @@
         {"name":"fk_filerole_fileid","type":"foreign","columns":["file_id"],"ref_table":"files","ref_columns":["id"],"delete":"cascade","update":"cascade"},
         {"name":"fk_filerole_roleid","type":"foreign","columns":["role_id"],"ref_table":"roles","ref_columns":["id"],"delete":"cascade","update":"cascade"}
       ]
+    }
+  ],
+  "data":[
+    {
+      "table":"groups",
+      "inputs":{
+        "id":0,
+        "created":"2013-11-01 15:00:00",
+        "name":"Everyone",
+        "parent_id":null,
+        "desc":"Root level group, i.e. Everyone!"
+      }
+    },
+    {
+      "table":"groups",
+      "inputs":{
+        "id":1,
+        "created":"2013-11-01 15:00:00",
+        "name":"Unauthenticated",
+        "parent_id":0,
+        "desc":"Users who are not logged in, no user gets assigned this group"
+      }
+    },
+    {
+      "table":"groups",
+      "inputs":{
+        "id":2,
+        "created":"2013-11-01 15:00:00",
+        "name":"Authenticated",
+        "parent_id":0,
+        "desc":"Basic authenticated users"
+      }
+    },
+    {
+      "table":"groups",
+      "inputs":{
+        "created":"2013-11-01 15:00:00",
+        "name":"Internal",
+        "parent_id":2,
+        "desc":"Users within the organization"
+      }
+    },
+    {
+      "table":"groups",
+      "inputs":{
+        "created":"2013-11-01 15:00:00",
+        "name":"External",
+        "parent_id":2,
+        "desc":"Users outside the organization"
+      }
+    },
+    {
+      "table":"roles",
+      "inputs":{
+        "id":0,
+        "created":"2013-11-01 15:00:00",
+        "name":"Unauthenticated User",
+        "desc":"Users who are not logged in"
+      }
+    },
+    {
+      "table":"roles",
+      "inputs":{
+        "id":1,
+        "created":"2013-11-01 15:00:00",
+        "name":"Administrator",
+        "desc":"Administrator website"
+      }
+    },
+    {
+      "table":"roles",
+      "inputs":{
+        "created":"2013-11-01 15:00:00",
+        "name":"Authenticated User",
+        "desc":"Basic user"
+      }
+    },
+    {
+      "table":"users",
+      "inputs":{
+        "login":"admin_user",
+        "firstname":"Site",
+        "lastname":"Administrator",
+        "email":"admin_email"
+      }
+    },
+    {
+      "table":"modules",
+      "inputs":{
+        "core":1,
+        "code":"core",
+        "enabled":1,
+        "required":1,
+        "name":"Default Core"
+      }
+    },
+    {
+      "table":"paths",
+      "inputs":{
+        "id":0,
+        "parent_id":null,
+        "module_id":1,
+        "user_id":1,
+        "url_code":"/",
+        "title":"Home",
+        "app_root":0,
+        "core_page":1,
+        "ajax_call":"",
+        "render_call":"",
+        "created":"2013-11-01 15:00:00"
+      }
+    },
+    {
+      "table":"paths",
+      "inputs":{
+        "parent_id":0,
+        "module_id":1,
+        "user_id":1,
+        "url_code":"admin",
+        "title":"Administration",
+        "app_root":1,
+        "core_page":1,
+        "ajax_call":"core_ajaxadmin",
+        "render_call":"core_admin",
+        "created":"2013-11-01 15:00:00"
+      }
+    },
+    {
+      "table":"paths",
+      "inputs":{
+        "parent_id":0,
+        "module_id":1,
+        "user_id":1,
+        "url_code":"auth",
+        "title":"Authentication",
+        "app_root":1,
+        "core_page":1,
+        "ajax_call":"core_authentication",
+        "render_call":"core_auth_render",
+        "created":"2013-11-01 15:00:00"
+      }
+    },
+    {
+      "table":"paths",
+      "inputs":{
+        "parent_id":0,
+        "module_id":1,
+        "user_id":1,
+        "url_code":"download",
+        "title":"Not Found",
+        "app_root":1,
+        "core_page":1,
+        "ajax_call":"core_download",
+        "render_call":"core_404",
+        "created":"2013-11-01 15:00:00"
+      }
+    },
+    {
+      "table":"paths",
+      "inputs":{
+        "parent_id":0,
+        "module_id":1,
+        "user_id":1,
+        "url_code":"scripts",
+        "title":"Not Found",
+        "app_root":1,
+        "core_page":1,
+        "ajax_call":"core_scripts",
+        "render_call":"core_404",
+        "created":"2013-11-01 15:00:00"
+      }
+    },
+    {
+      "table":"path_roles",
+      "inputs":{
+        "path_id":1,
+        "group_id":1
+      }
+    },
+    {
+      "table":"path_groups",
+      "inputs":{
+        "path_id":0,
+        "group_id":0
+      }
+    },
+    {
+      "table":"path_groups",
+      "inputs":{
+        "path_id":2,
+        "group_id":0
+      }
+    },
+    {
+      "table":"path_groups",
+      "inputs":{
+        "path_id":3,
+        "group_id":0
+      }
+    },
+    {
+      "table":"path_groups",
+      "inputs":{
+        "path_id":4,
+        "group_id":0
+      }
+    },
+    {
+      "table":"path_content",
+      "inputs":{
+        "path_id":0,
+        "user_id":1,
+        "created":"2013-11-01 15:00:00",
+        "content":"<p>Welcome to LibreWebTools</p>"
+      }
     }
   ]
 }
