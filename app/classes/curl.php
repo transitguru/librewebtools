@@ -9,7 +9,7 @@ namespace LWT;
  * @category Request Handling
  * @package LibreWebToold
  * @author Michael Sypolt <michael.sypolt@transitguru.limited>
- * @copyright Copyright (c) 2015-2018
+ * @copyright Copyright (c) 2015-2019
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  *

@@ -10,7 +10,7 @@
  * @category   Bootstrap
  * @package    LibreWebTools
  * @author     Michael Sypolt <msypolt@transitguru.limited>
- * @copyright  Copyright (c) 2015-2018
+ * @copyright  Copyright (c) 2015-2019
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt
  * @version    @package_version@
  */
@@ -63,7 +63,7 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
     $get = $_GET;
   }
   if (isset($_COOKIE) && isset($_COOKIE['librewebtools'])){
-    $session = new phuSession($_COOKIE['librewebtools']);
+    $session = new LWT\Session($_COOKIE['librewebtools']);
   }
 }
 

@@ -1,12 +1,13 @@
 # SQLite Requirements
 
 To use SQLite with your LWT installation, the following requirements must 
-be met: Server has PHP 7.0 or later with PDO, and the PDO SQLite driver must be
-enabled. SQLite version 3.0 or later should be used.
+be met: Server has PHP 7.1 or later with PDO, and the PDO SQLite driver must be
+enabled. SQLite version 3.14 or later should be used.
 
 The 'name' key for the database `$db` array in the `app/settings.php` should
-contain the full path to the database for this installation to work. All other
-fields are not required or recommended to be filled out and can be `null`.
+contain the full path to the database for this installation to work. For your
+convenience, the constant `DOC_ROOT` would help provide relative paths.  All
+other fields are not required and if present must be `null`.
 
 The LWT installer will create the SQLite database for you. The only
 requirement is that the installer must have write permissions to the directory

@@ -1,7 +1,7 @@
 # MySQL/MariaDB REQUIREMENTS
 
 To use MySQL or MariaDB with your LWT installation, the following
-requirements must be met: Server has PHP 7.0 or later with PDO, and the PDO
+requirements must be met: Server has PHP 7.1 or later with PDO, and the PDO
 mysql driver must be enabled. MariaDB 5.5 or greater must be installed or
 MySQL 5.5 or greater must be installed. The commands below are identical for
 either MySQL or MariaDB.
@@ -37,3 +37,4 @@ Query OK, 0 rows affected
 If the InnoDB storage engine is available, it will be used for all database
 tables. InnoDB provides features over MyISAM such as transaction support,
 row-level locks, and consistent non-locking reads.
+

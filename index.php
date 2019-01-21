@@ -7,7 +7,7 @@
  * This calls the bootstrap file, which would load appropriate themes, classes,
  * and modules.
  *
- * LICENSE: All LibreWebTools code is Copyright 2012 - 2018 by Michael Sypolt of 
+ * LICENSE: All LibreWebTools code is Copyright 2012 - 2019 by Michael Sypolt of 
  * TransitGuru Limited <msypolt@transitguru.limited>.
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -28,9 +28,9 @@
  * @category   Bootstrap
  * @package    LibreWebTools
  * @author     Michael Sypolt <msypolt@transitguru.info>
- * @copyright  Copyright (c) 2014-2018
+ * @copyright  Copyright (c) 2014-2019
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt
- * @version    0.6.0
+ * @version    0.6
  */
 
 // Load the core bootstrap file, nothing more, nothing less!

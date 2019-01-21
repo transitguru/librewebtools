@@ -1,8 +1,8 @@
 # Changelog
 
-## LibreWebTools v0.6.0, ongoing
+## LibreWebTools v0.6, 2019-??-??
 - Change direction to make this a toolbox, not a content management system
-- Target PHP 7.0 as minimum requirements for use of this toolbox
+- Target PHP 7.1 as minimum requirements for use of this toolbox
 - Each module should be able to stand alone except for a few core modules
 
 ## LibreWebTools v0.5.0, 2014-12-15
@@ -27,5 +27,4 @@
 
 ## LibreWebTools v0.0, 2014-03-06
 - Combined old project files to make this project, not very usable
-
 

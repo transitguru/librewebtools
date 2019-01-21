@@ -1,7 +1,7 @@
 # PostgreSQL Requirements
 
 To use PostgreSQL with your LWT installation, the following requirements
-must be met: Server has PHP 7.0 or later with PDO, and the PDO pgsql driver 
+must be met: Server has PHP 7.1 or later with PDO, and the PDO pgsql driver
 must be enabled. It is recommended to use PostgreSQL v9.0 or later.
 
 You will need to log into psql as postgres to create your database user if it
@@ -28,3 +28,4 @@ found, that means that PostgreSQL was not installed properly.
 
 At this point, this application does not currently support custom schemas within
 the database.
+
