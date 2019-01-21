@@ -14,10 +14,9 @@ namespace LWT;
  */
 class Module{
   public $id = null; /**< Module's ID in the database */
-  public $type = 'theme'; /**< Module type ('theme' or 'module') */
   public $core = 1;  /**< Set to 1 if it is a core module, 0 if Custom */
-  public $code = 'core'; /**< Name of module's directory */
-  public $name = 'Default Core'; /**< Human Readable name of module */
+  public $code = 'init'; /**< Name of module's directory */
+  public $name = 'Init'; /**< Human Readable name of module */
   public $enabled = 1;  /**< Determines if the module is enabled */
   public $required = 1; /**< Determines if a module is required to be enabled */
   public $javascripts = array(); /**< Array of javascripts loaded from modules and themes */
@@ -36,7 +35,6 @@ class Module{
         $this->code = $db->output[0]['code'];
         $this->enabled = $db->output[0]['enabled'];
         $this->name = $db->output[0]['name'];
-        $this->type = $db->output[0]['type'];
         $this->required = $db->output[0]['required'];
       }
       else{
@@ -61,36 +59,35 @@ class Module{
     $this->name = '';
     $this->enabled = 1;
     $this->required = 1;
-    $this->type = 'theme';
     $this->id = null;
   }
   
   /**
-   * Load the theme's template for rendering
-   * @param Page $page Page information to be rendered in the template
+   * Load the module's template and related code for rendering
+   * @param Path $path Path information to be rendered in the template
    */
-  public function loadTheme($page){
-    if (is_null($page->page_id) || $page->page_id < 0 || is_null($this->id)){
+  public function loadTemplate($path){
+    if (is_null($path->path_id) || $path->path_id < 0 || is_null($this->id)){
       $this->core = 1;
-      $this->code = 'core';
-      $this->type = 'theme';
+      $this->code = 'init';
     }
-    if ($this->core == 1 && $this->type == 'theme'){
-      $dir = 'core';
+    if ($this->core == 1){
+      $dir = 'modules';
     }
-    elseif($this->type == 'theme'){
+    else{
       $dir = 'custom';
     }
-    $files = scandir(DOC_ROOT . '/' . $dir . '/themes/' . $this->code);
+    $PATH = DOC_ROOT . '/app/' . $dir . '/' . $this->code;
+    $files = scandir($scan);
     foreach ($files as $file){
-      if(is_file(DOC_ROOT . '/' . $dir . '/themes/' . $this->code . '/' . $file) && fnmatch('*.js', $file)){
-        $this->javascripts[] = "{$dir}/themes/{$this->code}/{$file}";
+      if(is_file($PATH . '/' . $file) && fnmatch('*.js', $file)){
+        $this->javascripts[] = $dir . '/' . $this->code . '/' . $file;
       }
-      elseif(is_file(DOC_ROOT . '/' . $dir . '/themes/' . $this->code . '/' . $file) && fnmatch('*.css', $file)){
-        $this->stylesheets[] = "{$dir}/themes/{$this->code}/{$file}";
+      elseif(is_file($PATH . '/' . $file) && fnmatch('*.css', $file)){
+        $this->stylesheets[] = $dir . '/' . $this->code . '/' . file;
       }
     }
-    $file = DOC_ROOT . '/' . $dir . '/themes/' . $this->code . '/template.php';
+    $file = DOC_ROOT . '/' . $dir . '/' . $this->code . '/template.php';
     if (is_file($file)){
       require_once ($file);
     }
@@ -102,18 +99,18 @@ class Module{
    */
   public function loadMods($core = 1){
     if ($core == 1){
-      $dir = 'core';
+      $dir = 'modules';
     }
     else{
       $core = 0;
       $dir = 'custom';
     }
     $db = new Db();
-    $db->fetch('modules', null, array('type' =>'module', 'core' => $core), null, array('code'));
+    $db->fetch('modules', null, array('core' => $core), null, array('code'));
     if ($db->affected_rows > 0 ){
       foreach ($db->output as $module){
         $code = $module['code'];
-        $PATH = DOC_ROOT . '/' . $dir . '/modules/' . $code;
+        $PATH = DOC_ROOT . '/app/' . $dir . '/' . $code;
         if (is_dir($PATH)){
           $files = scandir($PATH);
           foreach ($files as $file){
@@ -121,10 +118,10 @@ class Module{
               require_once($PATH . '/' . $file);
             }
             elseif(is_file($PATH . '/' . $file) && fnmatch('*.js', $file)){
-              $this->javascripts[] = "{$dir}/modules/{$code}/{$file}";
+              $this->javascripts[] = "{$dir}/{$code}/{$file}";
             }
             elseif(is_file($PATH . '/' . $file) && fnmatch('*.css', $file)){
-              $this->stylesheets[] = "{$dir}/modules/{$code}/{$file}";
+              $this->stylesheets[] = "{$dir}/{$code}/{$file}";
             }
           }
         }
@@ -137,10 +134,10 @@ class Module{
    */
   public function loadScripts(){
     $db = new Db();
-    $db->fetch('pages', array('url_code', 'parent_id'), array('ajax_call' => 'core_send_scripts'));
+    $db->fetch('paths', array('url_code', 'parent_id'), array('ajax_call' => 'core_send_scripts'));
     $path = $db->output[0]['url_code']; 
     while ($db->output[0]['parent_id'] != 0){
-      $db->fetch('pages', array('url_code', 'parent_id'), array('id' => $db->output[0]['parent_id']));
+      $db->fetch('paths', array('url_code', 'parent_id'), array('id' => $db->output[0]['parent_id']));
       $path = $db->output[0]['url_code'] . '/' . $path; 
     }
     if (count($this->javascripts)>0){
@@ -188,7 +185,7 @@ class Module{
   public function delete(){
     if ($this->id >= 0){
       $db = new Db();
-      $db->write_raw("DELETE FROM `modules` WHERE `id`={$this->id}");
+      $db->write_raw('DELETE FROM "modules" WHERE "id"=' . $this->id);
       if (!$db->error){
         $this->clear();
       }
@@ -196,6 +193,5 @@ class Module{
       $this->message = $db->message;
     }
   }
-
 }
 

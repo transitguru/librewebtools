@@ -341,10 +341,10 @@
       "table":"modules",
       "inputs":{
         "core":1,
-        "code":"core",
+        "code":"init",
         "enabled":1,
         "required":1,
-        "name":"Default Core"
+        "name":"Init"
       }
     },
     {

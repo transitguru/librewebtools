@@ -1,39 +1,39 @@
 <?php
 namespace LWT;
 /**
- * Page Class
+ * Path Class
  * 
- * This object handles page requests from the user
+ * This object handles path requests from the user
  *
- * @category Page Handling
+ * @category Path Handling
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
  * @copyright Copyright (c) 2014-2019
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class Page extends Tree{
-  public $table = 'pages'; /**< Table name in Database */
+class Path extends Tree{
+  public $table = 'paths'; /**< Table name in Database */
   public $uri = '/';  /**< Request from the User, as a string */
-  public $title = '';  /**< Title of the page, as loaded from the database */
+  public $title = '';  /**< Title of the path, as loaded from the database */
   public $header = '200 OK';  /**< HTTP status of the request */
   public $access = false; /**< Whether this request can be fulfilled */
-  public $page_id = null; /**< Page ID that would be fetched from database */
+  public $path_id = null; /**< Path ID that would be fetched from database */
   public $app_root = 0; /**< Determines if this request is the root of a "subapp" */
-  public $ajax_call = null; /**< Function to call prior to page load */
-  public $render_call = null; /**< Function to call while loading page (in content area) */
+  public $ajax_call = null; /**< Function to call prior to path load */
+  public $render_call = null; /**< Function to call while loading path (in content area) */
   public $created = ''; /**< Date created in ISO format */
-  public $activated = null; /**< Date when it is desired for page to be valid */
-  public $deactivated = null; /**< Date when it is desired to deactivate the page */
-  public $theme_id = null; /**< Default template to use when rendering the page */
+  public $activated = null; /**< Date when it is desired for path to be valid */
+  public $deactivated = null; /**< Date when it is desired to deactivate the path */
+  public $module_id = null; /**< Default template to use when rendering the path */
   public $root = ''; /**< Application root where database stopped */
-  public $content = ''; /**< Page content to be shown if valid content */
+  public $content = ''; /**< Path content to be shown if valid content */
   
   /**
    * Creates request
    *
    * @param string $uri Request URI from user
-   * @param User $user User object requesting the page
+   * @param User $user User object requesting the path
    */
   public function __construct($uri, $user){
     $this->uri = $uri;
@@ -41,14 +41,14 @@ class Page extends Tree{
     $path = explode("/",$uri);
     $i = 0;
     $this->app_root = 0;
-    $this->page_id = null;
+    $this->path_id = null;
     $this->root = '';
     $this->content = '';
     foreach ($path as $i => $url_code){
       if($this->app_root == 0 && ($i == 0 || ($i > 0 && $url_code !== ''))){
-        $db->fetch('pages',NULL, array('parent_id' => $this->page_id, 'url_code' => $url_code));
+        $db->fetch('paths',NULL, array('parent_id' => $this->path_id, 'url_code' => $url_code));
         if ($db->affected_rows > 0){
-          $this->page_id = $db->output[0]['id'];
+          $this->path_id = $db->output[0]['id'];
           $this->app_root = $db->output[0]['app_root'];
           $this->ajax_call = $db->output[0]['ajax_call'];
           $this->render_call = $db->output[0]['render_call'];
@@ -56,15 +56,15 @@ class Page extends Tree{
           $this->activated = $db->output[0]['activated'];
           $this->deactivated = $db->output[0]['deactivated'];
           $this->title = $db->output[0]['title'];
-          $this->theme_id = $db->output[0]['theme_id'];
+          $this->module_id = $db->output[0]['module_id'];
           $this->root .= $url_code . '/';
         }
         else{
-          $this->page_id = null;
+          $this->path_id = null;
           $this->header = "404 Not Found";
           $this->access = FALSE;
           $this->title = 'Not Found';
-          $this->theme_id = null;
+          $this->module_id = null;
           return;
         }
       }
@@ -92,19 +92,19 @@ class Page extends Tree{
       }
     }
     if ($this->access){
-      // Retrieve any page content, if it exists
-      $db->fetch_raw("SELECT * FROM `page_content` WHERE `page_id` = {$this->page_id} ORDER BY `created` DESC LIMIT 1");
+      // Retrieve any path content, if it exists
+      $db->fetch_raw('SELECT * FROM "path_content" WHERE "path_id" = ' . $this->path_id . ' ORDER BY "created" DESC LIMIT 1');
       if ($db->affected_rows > 0){
         $this->content = $db->output[0]['content'];
       }
     }
     else{
-      $this->page_id = null;
+      $this->path_id = null;
       $this->header = "404 Not Found";
       $this->title = 'Not Found';
       $this->ajax_call = null;
       $this->render_call = null;
-      $this->theme_id = null;
+      $this->module_id = null;
     }
     return;    
   }
@@ -138,9 +138,9 @@ class Page extends Tree{
       $all_groups = $group->traverse($all_groups);
     } 
 
-    // Get the allowable groups for the page
+    // Get the allowable groups for the path
     $db = new Db();
-    $db->fetch('page_groups', NULL, array('page_id' => $this->page_id));
+    $db->fetch('path_groups', NULL, array('path_id' => $this->path_id));
     if ($db->affected_rows > 0){
       foreach ($db->output as $record){
         if (in_array($record['group_id'],$all_groups)){
@@ -150,7 +150,7 @@ class Page extends Tree{
     }
     
     // Check for Role overrides (if unset, means everyone can access!)
-    $db->fetch('page_roles', NULL, array('page_id' => $this->page_id));
+    $db->fetch('path_roles', NULL, array('path_id' => $this->path_id));
     if ($db->affected_rows > 0){
       //Reset access to false
       $access = false;
