@@ -11,7 +11,7 @@ for LWT to use when enabled. Each subdirectory would contain the following:
       namespace for official LWT code.
     - `template.php`: LWT looks for this file for templating
 - JS files: All JavaScript files are included at this directory level. All JS
-  files should be wrapped up into classes within the `LWT` namespace object.
+  code should be wrapped up into classes within the `LWT` namespace object.
 - CSS files: All CSS stylesheets are included at this directory level.
 - info.json: Information about the module to properly register it to LWT
 
