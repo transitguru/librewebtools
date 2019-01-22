@@ -19,7 +19,6 @@ class Router{
   
   public $uri;      /**< Request URI to route the request */
   public $method;   /**< HTTP Method used for the request */
-  public $path;     /**< URI Exploded to components */
   public $session;  /**< User session from bootstrap */
   public $post;     /**< POST Request processed from bootstrap */
   public $files;    /**< FILES array processed from bootstrap */
@@ -54,7 +53,6 @@ class Router{
     }
     $this->uri = $uri;
     $this->method = $method;
-    $this->path = explode('/', $uri);
     $this->session = $session;
     $this->post = $post;
     $this->files = $files;
@@ -65,21 +63,20 @@ class Router{
    * Routes the request based on URI path data
    */
   public function process(){
-    if($this->path[0] == '' && isset($this->path[1])){
-      
-      if($this->path[1] == '' && !isset($this->path[2])){
-        echo 'This is index';
-      }
-      elseif($this->path[1] == 'home' && !isset($this->path[2])){
-        echo 'This is home';
-      }
-      else{
-        http_response_code(404);
-        echo '404';
-      }
+    if($this->uri == '/'){
+      echo 'This is index';
+    }
+    elseif($this->uri == '/home/'){
+      echo 'This is home';
     }
     else{
-      echo 'This was a script attempt';
+      $path = new LWT\Path($this->uri,$user);
+      define('APP_ROOT', $path->root);
+      // Load enabled modules and chosen theme
+      $theme = new LWT\Module($path->module_id);
+      $theme->loadMods(1);
+      $theme->loadMods(0);
+      $theme->loadTheme($path);
     }
   }
 }
