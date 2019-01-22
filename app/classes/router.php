@@ -70,13 +70,20 @@ class Router{
       echo 'This is home';
     }
     else{
+      // Get user information
+      if (isset($this->session['user_id'])){
+        $user = new LWT\User($this->session['user_id']);
+      }
+      else{
+        $user = new LWT\User(0);
+      }
       $path = new LWT\Path($this->uri,$user);
       define('APP_ROOT', $path->root);
       // Load enabled modules and chosen theme
-      $theme = new LWT\Module($path->module_id);
-      $theme->loadMods(1);
-      $theme->loadMods(0);
-      $theme->loadTheme($path);
+      $module = new LWT\Module($path->module_id);
+      $module->loadMods(1);
+      $module->loadMods(0);
+      $module->loadTheme($path);
     }
   }
 }

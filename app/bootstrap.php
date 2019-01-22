@@ -27,6 +27,19 @@ foreach ($includes as $include){
   }
 }
 
+// Check to see if the application is installed
+$installer = new LWT\Installer();
+if ($installer->install == true && $uri !== '/install/'){
+  header("Location: /install/");
+  exit;
+}
+elseif ($installer->install == true && $uri === '/install/'){
+  if (isset($_POST['db'])){
+    $installer->build($_POST['db']);
+  }
+  $installer->view();
+}
+
 // These variables are used to remove reliance on superglobals
 $uri = '/';         /**< Request URI */
 $session = array(); /**< User Session */
