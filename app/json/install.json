@@ -59,6 +59,20 @@
       ]
     },
     {
+      "name":"user_sessions",
+      "comment":"User session data",
+      "columns":[
+        {"name":"user_id","type":"int","null":false,"default":0,"comment":"References users.id"},
+        {"name":"session_name","type":"varchar","size":255,"comment":"Unique session ID"},
+        {"name":"valid","type":"datetime","null":false,"comment":"Date session expires"},
+        {"name":"data","type":"longtext","comment":"Session data (JSON Encoded)"}
+      ],
+      "constraints":[
+        {"name":"pk_session_name","type":"primary","columns":["session_name"]},
+        {"name":"fk_session_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"default","update":"cascade"}
+      ]
+    },
+    {
       "name":"user_groups",
       "comment":"Matches users to groups to denote membership in the group hierarchy",
       "columns":[
