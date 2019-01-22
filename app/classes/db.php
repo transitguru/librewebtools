@@ -132,7 +132,7 @@ class Db{
 
   /**
    * Simple database Write (uses raw write to do actual db write)
-   * 
+   *
    * @param string $table Table name
    * @param array $inputs Associative array of Inputs
    * @param array $where Associative array of WHERE clause
@@ -199,6 +199,45 @@ class Db{
         $wheres[] = "\"{$field}\"={$value}";
       }
       $sql = "UPDATE \"{$table}\" SET " . implode(" , ",$queries) . " WHERE " . implode(" AND ", $wheres);
+    }
+    $this->write_raw($sql);
+  }
+
+  /**
+   * Database Delete (uses raw write to do actual db write)
+   *
+   * @param string $table Table name
+   * @param array $where Associative array of WHERE clause
+   */
+  public function delete($table, $where = NULL){
+    if (is_null($where)){
+      $sql = "DELETE FROM \"{$table}\"";
+    }
+    else{
+      $wheres = array();
+      foreach ($where as $field => $value){
+        if (fnmatch('*"*', $field)){
+          $status['error'] = 9999;
+          $status['message'] = 'Bad input settings';
+          return $status;
+        }
+        $type = gettype($value);
+        if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
+        }
+        elseif ($type == 'string' && $value !== ''){
+          $value = "'" . str_replace("'", "\\'",str_replace("\\", "\\\\", $value)) . "'";
+        }
+        elseif ($type == 'null' || $value == NULL || $value === ''){
+          $value = 'NULL';
+        }
+        else{
+          $status['error'] = 9999;
+          $status['message'] = 'Bad input settings';
+          return $status;
+        }
+        $wheres[] = "\"{$field}\"={$value}";
+      }
+      $sql = "DELETE FROM \"{$table}\" WHERE " . implode(" AND ", $wheres);
     }
     $this->write_raw($sql);
   }

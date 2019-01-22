@@ -77,18 +77,6 @@ class Module{
     else{
       $dir = 'custom';
     }
-    $PATH = DOC_ROOT . '/app/' . $dir . '/' . $this->code;
-    if (is_dir($PATH)){
-      $files = scandir($scan);
-      foreach ($files as $file){
-        if(is_file($PATH . '/' . $file) && fnmatch('*.js', $file)){
-          $this->javascripts[] = $dir . '/' . $this->code . '/' . $file;
-        }
-        elseif(is_file($PATH . '/' . $file) && fnmatch('*.css', $file)){
-          $this->stylesheets[] = $dir . '/' . $this->code . '/' . file;
-        }
-      }
-    }
     $file = $PATH . '/template.php';
     if (is_file($file)){
       require_once ($file);
@@ -188,7 +176,7 @@ class Module{
   public function delete(){
     if ($this->id >= 0){
       $db = new Db();
-      $db->write_raw('DELETE FROM "modules" WHERE "id"=' . $this->id);
+      $db->delete('modules', ['id' => $this->id]);
       if (!$db->error){
         $this->clear();
       }
