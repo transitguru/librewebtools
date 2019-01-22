@@ -12,10 +12,12 @@ use when enabled. Each subdirectory would contain the following:
       recommended to use object oriented programming and use a namespace that is
       not using the reserved `LWT` namespace.
     - `template.php`: LWT looks for this file for templating
-- JS files: All JavaScript files are included at this directory level. All JS
+- JS files: All JavaScript files are included at this directory level. They are
+  loaded in alphabetical order using the php `scandir()` function. All JS
   code should be wrapped up into classes within a namespace object of your
   choosing. The `LWT` global object is reserved and should not be used.
-- CSS files: All CSS stylesheets are included at this directory level.
+- CSS files: All CSS stylesheets are included at this directory level. They are
+  loaded in alphabetical order using the php `scandir()` function.
 - info.json: Information about the module to properly register it to LWT
 
 Additional files can be added and may be referenced using the `include()` or

@@ -10,9 +10,11 @@ for LWT to use when enabled. Each subdirectory would contain the following:
       recommended to use object oriented programming and use the reserved `LWT`
       namespace for official LWT code.
     - `template.php`: LWT looks for this file for templating
-- JS files: All JavaScript files are included at this directory level. All JS
+- JS files: All JavaScript files are included at this directory level. They are
+  loaded in alphabetical order using the php `scandir()` function. All JS
   code should be wrapped up into classes within the `LWT` namespace object.
-- CSS files: All CSS stylesheets are included at this directory level.
+- CSS files: All CSS stylesheets are included at this directory level. They are
+  loaded in alphabetical order using the php `scandir()` function.
 - info.json: Information about the module to properly register it to LWT
 
 Additional files can be added and may be referenced using the `include()` or
