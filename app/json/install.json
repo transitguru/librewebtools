@@ -59,12 +59,12 @@
       ]
     },
     {
-      "name":"user_sessions",
+      "name":"sessions",
       "comment":"User session data",
       "columns":[
         {"name":"user_id","type":"int","null":false,"default":0,"comment":"References users.id"},
         {"name":"name","type":"varchar","size":255,"comment":"Unique session ID"},
-        {"name":"valid","type":"datetime","null":false,"comment":"Date session expires"},
+        {"name":"valid","type":"datetime","null":false,"comment":"Date session created"},
         {"name":"data","type":"longtext","comment":"Session data (JSON Encoded)"}
       ],
       "constraints":[
