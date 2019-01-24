@@ -22,13 +22,15 @@ class Module{
   public $required = 1; /**< Determines if a module is required to be enabled */
   public $javascripts = array(); /**< Array of javascripts loaded from modules and themes */
   public $stylesheets = array(); /**< Array of stylesheets loaded from modules and themes */
+  public $user_input = (object)[]; /**< Object of user input (POST, FILES, GET) */
   /**
    * Construct the theme
    * @param int $id ID for the theme
    */
-  public function __construct($id = null){
+  public function __construct($id = null, $user_input = array()){
     if (!is_null($id) && $id > 0){
       $db = new Db();
+      $this->user_input = $user_input;
       $db->fetch('modules', null, array('id' => $id));
       if ($db->affected_rows > 0){
         $this->id = $id;
@@ -61,6 +63,7 @@ class Module{
     $this->enabled = 1;
     $this->required = 1;
     $this->id = null;
+    $this->user_input = (object)[];
   }
   
   /**

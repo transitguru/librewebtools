@@ -124,7 +124,7 @@ class Db{
         }
         $this->pdo->exec("SET NAMES utf8");
       }
-      catch (Exception $e){
+      catch (\Exception $e){
         $this->error = 9999;
         $this->message = 'Bad database settings';
       }

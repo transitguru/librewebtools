@@ -91,7 +91,7 @@ class Installer{
       $db_port = $settings->db['port'];
       
       // If confirmed password, attempt to install by creating empty db connection
-      if ($post['admin_pass'] == $post['confirm_pass']){
+      if ($post->admin_pass == $post->confirm_pass){
         $db = new Db(null, $db_pass, $db_host, $db_user, $db_port);
         if (!$db){
           $this->message = 'error in database settings!';
@@ -221,10 +221,10 @@ class Installer{
         if ($table == 'users'){
           // Add the Admin User using the User object
           $user = new LWT\User(-1);
-          $user->login = $post['admin_user'];
+          $user->login = $post->admin_user;
           $user->firstname = $inputs->firstname;
           $user->lastname = $inputs->lastname;
-          $user->email = $post['admin_email'];
+          $user->email = $post->admin_email;
           $user->roles = array(1 => [1]);
           $user->groups = array(0 => [0]);
           $user->write();
@@ -232,7 +232,7 @@ class Installer{
           if ($user->error){
             return $user->error;
           }
-          $user->setpassword($post['admin_pass']);
+          $user->setpassword($post->admin_pass);
         }
         else{
           if (isset($inputs->created)){

@@ -35,7 +35,11 @@ $method = 'get';        /**< Lowercase method such as POST, PUT, or GET */
 
 // Collect globals when using webserver
 if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
-  $uri = $_SERVER['REQUEST_URI'];
+  $site_root = $_SERVER['DOCUMENT_ROOT'];
+  $sr_len = mb_strlen($site_root . '/');
+  define('BASE_URI', mb_substr(DOC_ROOT, $sr_len));
+  $b_len = mb_strlen(BASE_URI . '/');
+  $uri = mb_substr($_SERVER['REQUEST_URI'], $b_len);
   $method = strtolower($_SERVER['REQUEST_METHOD']);
   if (isset($_SERVER['CONTENT_TYPE'])){
     $content_type = $_SERVER['CONTENT_TYPE'];
@@ -57,7 +61,7 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
     else{
       $parsed = array();
       $raw = file_get_contents('php://input');
-      parse_str($raw, $parsed);
+      mb_parse_str($raw, $parsed);
       $input->post = json_decode(json_encode($parsed));
     }
   }
@@ -67,19 +71,6 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
   if (isset($_COOKIE) && isset($_COOKIE['librewebtools'])){
     $session = new LWT\Session($_COOKIE['librewebtools']);
   }
-}
-
-// Check to see if the application is installed
-$installer = new LWT\Installer();
-if ($installer->install == true && $uri !== '/install/'){
-  header("Location: /install/");
-  exit;
-}
-elseif ($installer->install == true && $uri === '/install/'){
-  if (isset($input->post->db)){
-    $installer->build($input->post->db);
-  }
-  $installer->view();
 }
 
 // The data gets through the router, which will route the request
