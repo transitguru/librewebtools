@@ -1,6 +1,7 @@
 <?php
 namespace LWT;
 /**
+ * @file
  * Db Class
  *
  * reads and writes to the database

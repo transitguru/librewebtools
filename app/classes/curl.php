@@ -78,7 +78,7 @@ class Curl {
   }
 
   /**
-   *
+   * Unpacks stringified data to a JSON object
    */
   public function unpack(){
     if (fnmatch('application/json*', $this->headers['content_type']) && $this->status > 0){

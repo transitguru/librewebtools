@@ -1,6 +1,7 @@
 <?php
 namespace LWT;
 /**
+ * @file
  * Role Class
  *
  * allows for loading and editing of role information

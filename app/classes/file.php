@@ -1,6 +1,7 @@
 <?php
 namespace LWT;
 /**
+ * @file
  * File Class
  * 
  * This object processes files

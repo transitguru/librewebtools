@@ -1,6 +1,7 @@
 <?php
 namespace LWT;
 /**
+ * @file
  * Installer Class
  * 
  * Checks for installation, then installs the site
@@ -36,7 +37,7 @@ class Installer{
       if ($db->affected_rows == 0){
         $this->install = true;
       }
-      $db->fetch('pages', NULL, array('id' => 0));
+      $db->fetch('paths', NULL, array('id' => 0));
       if ($db->affected_rows == 0){
         $this->install = true;
       }    
@@ -61,7 +62,7 @@ class Installer{
   <body>
     <?php echo $this->message; ?>
     <?php echo $this->console; ?>
-    <p>The site appears to not be installed, Please fill out the fields below to begin installing the LibreWebTools. Before you do so, make sure to adjust the site's <strong>/app/settings.php</strong> file to your desired settings.</p>
+    <p>The site appears to not be installed, Please fill out the fields below to begin installing the LibreWebTools. Before you do so, make sure to adjust the <strong>/app/settings.php</strong> file to your desired settings.</p>
     <form action="" method="post" >
       <label for="db[admin_user]">Website Admin User</label><input type="text" name="db[admin_user]" />
       <label for="db[admin_pass]">Website Admin Password</label><input type="password" name="db[admin_pass]" />

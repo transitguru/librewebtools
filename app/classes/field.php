@@ -1,6 +1,7 @@
 <?php
 namespace LWT;
 /**
+ * @file
  * Field Class
  * 
  * creates, collectes, and validates user inputs for data fields

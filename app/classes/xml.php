@@ -1,6 +1,7 @@
 <?php
 namespace LWT;
 /**
+ * @file
  * Xml class
  *
  * creates or scrubs XML fragments

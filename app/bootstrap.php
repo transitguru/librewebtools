@@ -27,19 +27,6 @@ foreach ($includes as $include){
   }
 }
 
-// Check to see if the application is installed
-$installer = new LWT\Installer();
-if ($installer->install == true && $uri !== '/install/'){
-  header("Location: /install/");
-  exit;
-}
-elseif ($installer->install == true && $uri === '/install/'){
-  if (isset($_POST['db'])){
-    $installer->build($_POST['db']);
-  }
-  $installer->view();
-}
-
 // These variables are used to remove reliance on superglobals
 $uri = '/';         /**< Request URI */
 $session = array(); /**< User Session */
@@ -78,6 +65,19 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
   if (isset($_COOKIE) && isset($_COOKIE['librewebtools'])){
     $session = new LWT\Session($_COOKIE['librewebtools']);
   }
+}
+
+// Check to see if the application is installed
+$installer = new LWT\Installer();
+if ($installer->install == true && $uri !== '/install/'){
+  header("Location: /install/");
+  exit;
+}
+elseif ($installer->install == true && $uri === '/install/'){
+  if (isset($_POST['db'])){
+    $installer->build($_POST['db']);
+  }
+  $installer->view();
 }
 
 // The data gets through the router, which will route the request

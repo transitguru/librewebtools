@@ -1,6 +1,7 @@
 <?php
 namespace LWT;
 /**
+ * @file
  * Module Class
  * 
  * This object keeps track of the modules

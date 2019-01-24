@@ -1,6 +1,7 @@
 <?php
 namespace LWT;
 /**
+ * @file
  * User Class
  * 
  * allows for loading and editing of user information and authentication

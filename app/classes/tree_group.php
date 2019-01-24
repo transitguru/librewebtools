@@ -1,6 +1,7 @@
 <?php
 namespace LWT;
 /**
+ * @file
  * Group Class
  * 
  * displays and modifies group information

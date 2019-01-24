@@ -1,6 +1,7 @@
 <?php
 namespace LWT;
 /**
+ * @file
  * Path Class
  * 
  * This object handles path requests from the user

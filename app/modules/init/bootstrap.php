@@ -2,18 +2,27 @@
 
 /**
  * @file
- * Bootstrap file for LibreWebTools core tools
+ * Bootstrap file for LibreWebTools Init module
  *
- * This provides a means for the database to invoke the relevant ajax_call or 
- * render_call as shown in the fields in the pages table
+ * Loads all includeded classes for the Init module. Also provides a means for
+ * the database to invoke the relevant ajax_call or render_call as shown in
+ * the fields in the paths table.
  *
  * @category   Bootstrap
  * @package    LibreWebTools
  * @author     Michael Sypolt <msypolt@transitguru.limited>
- * @copyright  Copyright (c) 2014
+ * @copyright  Copyright (c) 2014 - 2019
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt
  * @version    @package_version@
  */
+// Load the classes
+$PATH = __DIR__ . '/classes';
+$includes = scandir($PATH);
+foreach ($includes as $include){
+  if (is_file($PATH . '/' . $include) && $include != '.' && $include != '..' && fnmatch("*.php", $include)){
+    require_once ($PATH . '/' . $include);
+  }
+}
 
 /**
  * Processes any AJAX request for the Admin application

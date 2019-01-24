@@ -1,6 +1,7 @@
 <?php
 namespace LWT;
 /**
+ * @file
  * Tree Class
  * 
  * provides a way to get tree information (there are inherited classes)
