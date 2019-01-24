@@ -33,7 +33,7 @@ class Router{
    * @param object $user_inputs Input data from user (POST, FILES, GET)
    *
    */
-  public function __construct($uri = '/', $method = 'get', $session = (object)[], $user_inputs = (object)[]){
+  public function __construct($uri = '/', $method = 'get', $session = [], $user_inputs = []){
     if (fnmatch('*//*', $uri)){
       $newuri = preg_replace('/\/+/', '/', $uri);
       header("Location: {$newuri}");
@@ -61,27 +61,20 @@ class Router{
    * Routes the request based on URI path data
    */
   public function process(){
-    if($this->uri == '/'){
-      echo 'This is index';
-    }
-    elseif($this->uri == '/home/'){
-      echo 'This is home';
+    // Get user information
+    if (isset($this->session['user_id'])){
+      $user = new User($this->session['user_id']);
     }
     else{
-      // Get user information
-      if (isset($this->session['user_id'])){
-        $user = new User($this->session['user_id']);
-      }
-      else{
-        $user = new User(0);
-      }
-      $path = new Path($this->uri,$user);
-      define('APP_ROOT', $path->root);
-      // Load enabled modules and chosen theme
-      $module = new Module($path->module_id);
-      $module->loadMods(1);
-      $module->loadMods(0);
-      $module->loadTheme($path);
+      $user = new User(0);
     }
+    $path = new Path($this->uri,$user);
+    define('APP_ROOT', $path->root);
+    // Load enabled modules and chosen theme
+    $module = new Module($path->module_id);
+    $module->loadMods(1);
+    $module->loadMods(0);
+    $module->loadTheme($path);
   }
 }
+

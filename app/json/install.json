@@ -140,10 +140,8 @@
         {"name":"module_id","type":"int","comment":"Module to which this path is a member (references modules.id)"},
         {"name":"url_code","type":"varchar","size":100,"null":false,"comment":"URL alias at the particular level (no slashes allowed)"},
         {"name":"title","type":"varchar","size":255,"null":false,"comment":"Current human-readable title of the path"},
-        {"name":"app_root","type":"bool","null":false,"default":0,"comment":"Determines if root of sub-app, therefore no sub-paths registered in this database"},
+        {"name":"app","type":"varchar","size":255,"default":null,"default":0,"comment":"Determines if a sub-app by function name, therefore no sub-paths registered in this database"},
         {"name":"core","type":"bool","null":false,"default":0,"comment":"Determines if this path needs protected from deletion"},
-        {"name":"ajax","type":"varchar","size":255,"comment":"Function to call BEFORE loading the path"},
-        {"name":"render","type":"varchar","size":255,"comment":"Function to call WHILE loading the path"},
         {"name":"created","type":"datetime","null":false,"comment":"Date path was initially created"},
         {"name":"activated","type":"datetime","comment":"Optional date for path to become activated"},
         {"name":"deactivated","type":"datetime","comment":"Optional date for path to become deactivated"}
@@ -368,12 +366,10 @@
         "parent_id":null,
         "module_id":1,
         "user_id":1,
-        "url_code":"/",
+        "url_code":"",
         "title":"Home",
-        "app_root":0,
+        "app":null,
         "core_page":1,
-        "ajax_call":"",
-        "render_call":"",
         "created":"2013-11-01 15:00:00"
       }
     },
@@ -385,10 +381,8 @@
         "user_id":1,
         "url_code":"admin",
         "title":"Administration",
-        "app_root":1,
+        "app":"core_admin",
         "core_page":1,
-        "ajax_call":"core_ajaxadmin",
-        "render_call":"core_admin",
         "created":"2013-11-01 15:00:00"
       }
     },
@@ -400,10 +394,8 @@
         "user_id":1,
         "url_code":"auth",
         "title":"Authentication",
-        "app_root":1,
+        "app":"core_authentication",
         "core_page":1,
-        "ajax_call":"core_authentication",
-        "render_call":"core_auth_render",
         "created":"2013-11-01 15:00:00"
       }
     },
@@ -415,10 +407,8 @@
         "user_id":1,
         "url_code":"download",
         "title":"Not Found",
-        "app_root":1,
+        "app":"core_download",
         "core_page":1,
-        "ajax_call":"core_download",
-        "render_call":"core_404",
         "created":"2013-11-01 15:00:00"
       }
     },
@@ -430,10 +420,8 @@
         "user_id":1,
         "url_code":"scripts",
         "title":"Not Found",
-        "app_root":1,
+        "app":"core_scripts",
         "core_page":1,
-        "ajax_call":"core_scripts",
-        "render_call":"core_404",
         "created":"2013-11-01 15:00:00"
       }
     },

@@ -13,29 +13,29 @@
  * @version    @package_version@
  */
 
-header("HTTP/1.1 " . $page->header);
-if (!is_null($page->ajax_call) && $page->ajax_call !== '' &&  function_exists($page->ajax_call)){
-  $fn = $page->ajax_call;
-  $fn();
+header("HTTP/1.1 " . $path->header);
+if (!is_null($path->app) && $path->app !== '' &&  function_exists($path->app)){
+  $fn = $page->app;
+  $fn(true);
 }
 ?>              
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8" />
-    <title><?php echo $page->title; ?></title>
+    <title><?php echo $path->title; ?></title>
     <?php $this->loadScripts();?>
   </head>
   <body>
     <div class="container">
       <div class="content">
-        <h1><?php echo $page->title; ?></h1>
+        <h1><?php echo $path->title; ?></h1>
 <?php 
-if (!is_null($page->page_id) && $page->page_id >= 0){
-  echo $page->content;
-  if (!is_null($page->render_call) && $page->render_call !== '' &&  function_exists($page->render_call)){
-    $fn = $page->render_call;
-    $fn();
+if (!is_null($path->path_id) && $path->path_id >= 0){
+  echo $path->content;
+  if (!is_null($path->app) && $path->app != null &&  function_exists($path->app)){
+    $fn = $page->app;
+    $fn(false);
   }
 }
 else{

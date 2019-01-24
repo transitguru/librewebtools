@@ -20,9 +20,7 @@ class Path extends Tree{
   public $header = '200 OK';  /**< HTTP status of the request */
   public $access = false; /**< Whether this request can be fulfilled */
   public $path_id = null; /**< Path ID that would be fetched from database */
-  public $app_root = 0; /**< Determines if this request is the root of a "subapp" */
-  public $ajax_call = null; /**< Function to call prior to path load */
-  public $render_call = null; /**< Function to call while loading path (in content area) */
+  public $app = null; /**< Determines if this request is a function */
   public $created = ''; /**< Date created in ISO format */
   public $activated = null; /**< Date when it is desired for path to be valid */
   public $deactivated = null; /**< Date when it is desired to deactivate the path */
@@ -41,18 +39,16 @@ class Path extends Tree{
     $db = new Db();
     $path = explode("/",$uri);
     $i = 0;
-    $this->app_root = 0;
+    $this->app = null;
     $this->path_id = null;
     $this->root = '';
     $this->content = '';
     foreach ($path as $i => $url_code){
-      if($this->app_root == 0 && ($i == 0 || ($i > 0 && $url_code !== ''))){
+      if($this->app == null && ($i == 0 || ($i > 0 && $url_code !== ''))){
         $db->fetch('paths',NULL, array('parent_id' => $this->path_id, 'url_code' => $url_code));
         if ($db->affected_rows > 0){
           $this->path_id = $db->output[0]['id'];
-          $this->app_root = $db->output[0]['app_root'];
-          $this->ajax_call = $db->output[0]['ajax_call'];
-          $this->render_call = $db->output[0]['render_call'];
+          $this->app = $db->output[0]['app'];
           $this->created = $db->output[0]['created'];
           $this->activated = $db->output[0]['activated'];
           $this->deactivated = $db->output[0]['deactivated'];

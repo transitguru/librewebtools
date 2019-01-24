@@ -49,9 +49,9 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
       $input->post = json_decode($raw);
     }
     elseif ($method == 'post'){
-      $input->post = json_decode(json_encode($_POST);
+      $input->post = json_decode(json_encode($_POST));
       if (isset($_FILES)){
-        $input->files = json_decode(json_encode($_FILES);
+        $input->files = json_decode(json_encode($_FILES));
       }
     }
     else{
