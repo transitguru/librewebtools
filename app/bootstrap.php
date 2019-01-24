@@ -28,12 +28,10 @@ foreach ($includes as $include){
 }
 
 // These variables are used to remove reliance on superglobals
-$uri = '/';         /**< Request URI */
-$session = array(); /**< User Session */
-$post = array();    /**< Information from POST  */
-$files = array();   /**< Information from FILES (only when used in webserver) */
-$get = array();     /**< Information GET */
-$method = 'get';    /**< Lowercase method such as POST, PUT, or GET */
+$uri = '/';             /**< Request URI */
+$session = (object)[];  /**< User Session */
+$input = (object)[];    /**< Information from user (POST, GET, FILES)  */
+$method = 'get';        /**< Lowercase method such as POST, PUT, or GET */
 
 // Collect globals when using webserver
 if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
@@ -48,19 +46,23 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
   if (isset($_POST)){
     if (fnmatch('application/json*', $content_type) || fnmatch('text/json*', $content_type)){
       $raw = file_get_contents('php://input');
-      $post = json_decode($raw, true);
+      $input->post = json_decode($raw);
     }
     elseif ($method == 'post'){
-      $post = $_POST;
-      $files = $_FILES;
+      $input->post = json_decode(json_encode($_POST);
+      if (isset($_FILES)){
+        $input->files = json_decode(json_encode($_FILES);
+      }
     }
     else{
+      $parsed = array();
       $raw = file_get_contents('php://input');
-      parse_str($raw, $post);
+      parse_str($raw, $parsed);
+      $input->post = json_decode(json_encode($parsed));
     }
   }
   if (isset($_GET)){
-    $get = $_GET;
+    $input->get = json_decode(json_encode($_GET));
   }
   if (isset($_COOKIE) && isset($_COOKIE['librewebtools'])){
     $session = new LWT\Session($_COOKIE['librewebtools']);
@@ -74,12 +76,12 @@ if ($installer->install == true && $uri !== '/install/'){
   exit;
 }
 elseif ($installer->install == true && $uri === '/install/'){
-  if (isset($_POST['db'])){
-    $installer->build($_POST['db']);
+  if (isset($input->post->db)){
+    $installer->build($input->post->db);
   }
   $installer->view();
 }
 
 // The data gets through the router, which will route the request
-$router = new LWT\Router($uri, $method, $session, $post, $files, $get);
+$router = new LWT\Router($uri, $method, $session, $input);
 $router->process();

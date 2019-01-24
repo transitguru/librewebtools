@@ -30,12 +30,10 @@ class Router{
    * @param string $uri Request URI for this request
    * @param string $method Lowercase HTTP method for the request
    * @param Session $session Session object for user
-   * @param array $post POST data from user
-   * @param array $files FILES data from user
-   * @param array $get GET data from user
+   * @param object $user_inputs Input data from user (POST, FILES, GET)
    *
    */
-  public function __construct($uri = '/', $method = 'get', $session = array(), $post = array(), $files = array(), $get = array()){
+  public function __construct($uri = '/', $method = 'get', $session = (object)[], $user_inputs = (object)[]){
     if (fnmatch('*//*', $uri)){
       $newuri = preg_replace('/\/+/', '/', $uri);
       header("Location: {$newuri}");
@@ -54,9 +52,9 @@ class Router{
     $this->uri = $uri;
     $this->method = $method;
     $this->session = $session;
-    $this->post = $post;
-    $this->files = $files;
-    $this->get = $get;
+    $this->post = $user_inputs->post;
+    $this->files = $user_inputs->files;
+    $this->get = $user_inputs->get;
   }
  
   /**
