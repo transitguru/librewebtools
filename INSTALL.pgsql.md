@@ -11,7 +11,7 @@ Once you see the psql prompt, enter the following command.
 
 
 ```
-CREATE USER 'username' CREATEDB NOCREATEROLE ENCRYPTED PASSWORD 'password';
+CREATE USER username CREATEDB NOCREATEROLE ENCRYPTED PASSWORD 'password';
 ```
 
 where:
