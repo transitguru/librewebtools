@@ -36,11 +36,12 @@ $method = 'get';        /**< Lowercase method such as POST, PUT, or GET */
 // Collect globals when using webserver
 if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
   $site_root = $_SERVER['DOCUMENT_ROOT'];
-  $sr_len = mb_strlen($site_root . '/');
+  $sr_len = mb_strlen($site_root);
   define('BASE_URI', mb_substr(DOC_ROOT, $sr_len));
-  $b_len = mb_strlen(BASE_URI . '/');
+  $b_len = mb_strlen(BASE_URI);
   $uri = mb_substr($_SERVER['REQUEST_URI'], $b_len);
   $method = strtolower($_SERVER['REQUEST_METHOD']);
+
   if (isset($_SERVER['CONTENT_TYPE'])){
     $content_type = $_SERVER['CONTENT_TYPE'];
   }

@@ -34,17 +34,17 @@ class Router{
   public function __construct($uri = '/', $method = 'get', $session = [], $user_input = []){
     if (fnmatch('*//*', $uri)){
       $newuri = preg_replace('/\/+/', '/', $uri);
-      header("Location: {$newuri}");
+      header('Location: ' . BASE_URI . $newuri);
       exit;
     }
     if (fnmatch('*../*', $uri)){
       $newuri = preg_replace('/\.\.\/+/', '/', $uri);
-      header('Location: ' . BASE_URI . '/' . $newuri);
+      header('Location: ' . BASE_URI . $newuri);
       exit;
     }
     if (strlen($uri) > 1 && substr($uri, -1) == '/'){
       $newuri = substr($uri, 0, -1);
-      header('Location: ' . BASE_URI . '/' . $newuri);
+      header('Location: ' . BASE_URI . $newuri);
       exit;
     }
     $this->uri = $uri;
