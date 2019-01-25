@@ -59,11 +59,11 @@ class Router{
   public function process(){
     // Check to see if the application is installed
     $installer = new Installer();
-    if ($installer->install == true && $uri !== '/install/'){
-      header('Location: ' . BASE_URI . '/install/');
+    if ($installer->install == true && $this->uri !== '/install'){
+      header('Location: ' . BASE_URI . '/install');
       exit;
     }
-    elseif ($installer->install == true && $uri === '/install/'){
+    elseif ($installer->install == true && $this->uri === '/install'){
       if (isset($this->user_input->post->db)){
         $installer->build($this->user_input->post);
       }
