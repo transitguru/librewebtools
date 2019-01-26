@@ -62,14 +62,14 @@
       "name":"sessions",
       "comment":"User session data",
       "columns":[
-        {"name":"user_id","type":"int","default":0,"comment":"References users.id"},
+        {"name":"user_id","type":"int","default":null,"comment":"References users.id"},
         {"name":"name","type":"varchar","size":255,"comment":"Unique session ID"},
         {"name":"valid","type":"datetime","null":false,"comment":"Date session created"},
         {"name":"data","type":"longtext","comment":"Session data (JSON Encoded)"}
       ],
       "constraints":[
         {"name":"uk_session_name","type":"unique","columns":["name"]},
-        {"name":"fk_session_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"default","update":"cascade"}
+        {"name":"fk_session_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"null","update":"cascade"}
       ]
     },
     {
@@ -160,7 +160,7 @@
       "columns":[
         {"name":"id","type":"serial","null":false,"comment":"Unique identifier"},
         {"name":"path_id","type":"int","null":false,"comment":"Reference to paths.id"},
-        {"name":"user_id","type":"int","default":0,"comment":"User who edited the content (references users.id)"},
+        {"name":"user_id","type":"int","default":null,"comment":"User who edited the content (references users.id)"},
         {"name":"created","type":"datetime","null":false,"comment":"Date content was edited"},
         {"name":"title","type":"varchar","size":255,"null":false,"comment":"Human-readable title of the content"},
         {"name":"summary","type":"text","comment":"User inputted summary for content"},
@@ -170,7 +170,7 @@
         {"name":"pk_content_id","type":"primary","columns":["id"]},
         {"name":"uk_content_history","type":"unique","columns":["path_id","created"]},
         {"name":"fk_content_pathid","type":"foreign","columns":["path_id"],"ref_table":"paths","ref_columns":["id"],"delete":"cascade","update":"cascade"},
-        {"name":"fk_content_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"default","update":"cascade"}
+        {"name":"fk_content_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"null","update":"cascade"}
       ]
     },
     {
