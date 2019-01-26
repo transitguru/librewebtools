@@ -103,7 +103,7 @@ class Installer{
       
       // If confirmed password, attempt to install by creating empty db connection
       if (isset ($post->db->admin_pass) && $post->db->admin_pass == $post->db->confirm_pass){
-        $src = (object)['pass'=>$db_pass,'host'=>$db_host,'user'=>$db_user,'port'=>$db_port];
+        $src = ['type'=>$db_type,'pass'=>$db_pass,'host'=>$db_host,'user'=>$db_user,'port'=>$db_port];
         $db = new Db($src);
         if (!$db){
           $this->message = 'error in database settings!';
@@ -192,14 +192,14 @@ class Installer{
    */
   private function install_db($post,$db_type){
     //Load installer file
-    $file = DOC_ROOT . '/app/json/installer.json';
+    $file = DOC_ROOT . '/app/json/install.json';
     $json = file_get_contents($file);
 
     //Keep track of raw SQL for building the tables
     $sql = (object) ['mysql' => '', 'pgsql' => '', 'sqlite' =>''];
 
     //Build the tables from the installer file
-    $table_builder = new LWT\Table();
+    $table_builder = new Table();
     $object = json_decode($json);
     if (isset($object->tables) && is_array($object->tables)){
       foreach($object->tables as $table){
@@ -232,7 +232,7 @@ class Installer{
         $inputs = $data->inputs;
         if ($table == 'users'){
           // Add the Admin User using the User object
-          $user = new LWT\User(-1);
+          $user = new User(-1);
           $user->login = $post->db->admin_user;
           $user->firstname = $inputs->firstname;
           $user->lastname = $inputs->lastname;
