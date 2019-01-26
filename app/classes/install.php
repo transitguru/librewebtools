@@ -95,13 +95,14 @@ class Installer{
       // Define DB variables
       $settings = new Settings();
       $db_name = $settings->db['name'];
+      $db_type = $settings->db['type'];
       $db_pass = $settings->db['pass'];
       $db_host = $settings->db['host'];
       $db_user = $settings->db['user'];
       $db_port = $settings->db['port'];
       
       // If confirmed password, attempt to install by creating empty db connection
-      if ($post->admin_pass == $post->confirm_pass){
+      if (isset ($post->db->admin_pass) && $post->db->admin_pass == $post->db->confirm_pass){
         $db = new Db(null, $db_pass, $db_host, $db_user, $db_port);
         if (!$db){
           $this->message = 'error in database settings!';
@@ -111,7 +112,7 @@ class Installer{
           $this->console = "<pre>\n";
 
           // Drop the database if it already exists (fresh install)
-          if ($db->db['type'] == 'mysql' || $db->db['type'] == 'pgsql'){
+          if ($db_type == 'mysql' || $db_type == 'pgsql'){
             $sql = 'DROP DATABASE IF EXISTS "' . $db_name . '"';
             $db->write_raw($sql);
             if ($db->error > 0){
@@ -119,9 +120,9 @@ class Installer{
               $this->console .= "Broken drop\n";
             }
           }
-          elseif($db->db['type'] == 'sqlite'){
-            if(is_file(DOC_ROOT . $db->db['name'])){
-              unlink(DOC_ROOT . $db->db['name']);
+          elseif($db_type == 'sqlite'){
+            if(is_file(DOC_ROOT . $db_name)){
+              unlink(DOC_ROOT . $db_name);
             }
           }
           else{
@@ -130,7 +131,7 @@ class Installer{
           }
           
           // Create the LWT database
-          if ($db->db['type'] == 'mysql' || $db->db['type'] == 'pgsql'){
+          if ($db_type == 'mysql' || $db_type == 'pgsql'){
             $sql = 'CREATE DATABASE "' . $db_name . '" DEFAULT CHARACTER SET utf8';
             $db->write_raw($sql);
             if ($db->error > 0){
@@ -138,9 +139,9 @@ class Installer{
               $this->console .= "Broken create db\n";
             }
           }
-          elseif($db->db['type'] == 'sqlite'){
-            if(!is_file(DOC_ROOT . $db->db['name'])){
-              $bytes = file_put_contents(DOC_ROOT . $db->db['name'], '');
+          elseif($db_type == 'sqlite'){
+            if(!is_file(DOC_ROOT . $db_name)){
+              $bytes = file_put_contents(DOC_ROOT . $db_name, '');
             }
             if ($bytes === 'false'){
               $this->error = 1;
@@ -161,7 +162,7 @@ class Installer{
           }
           else{
             // Install the databases using the install_db method
-            $status = $this->install_db($post);
+            $status = $this->install_db($post, $db_type);
             $this->console .= "\n</pre>";
             if ($status == 0){
               header("Location: /");
@@ -188,7 +189,7 @@ class Installer{
    * @return int error
    *
    */
-  private function install_db($post){
+  private function install_db($post,$db_type){
     //Load installer file
     $file = DOC_ROOT . '/app/json/installer.json';
     $json = file_get_contents($file);
@@ -214,7 +215,7 @@ class Installer{
 
     //Write the tables into the new Db (make sure to use the correct SQL type)
     $db = new Db();
-    $db->write_raw($sql->{$db->type});
+    $db->write_raw($sql->{$db_type});
     if ($db->error != 0){
       $db->error;
     }
@@ -231,10 +232,10 @@ class Installer{
         if ($table == 'users'){
           // Add the Admin User using the User object
           $user = new LWT\User(-1);
-          $user->login = $post->admin_user;
+          $user->login = $post->db->admin_user;
           $user->firstname = $inputs->firstname;
           $user->lastname = $inputs->lastname;
-          $user->email = $post->admin_email;
+          $user->email = $post->db->admin_email;
           $user->roles = array(1 => [1]);
           $user->groups = array(0 => [0]);
           $user->write();
@@ -242,7 +243,7 @@ class Installer{
           if ($user->error){
             return $user->error;
           }
-          $user->setpassword($post->admin_pass);
+          $user->setpassword($post->db->admin_pass);
         }
         else{
           if (isset($inputs->created)){
