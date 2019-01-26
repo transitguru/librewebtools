@@ -103,7 +103,8 @@ class Installer{
       
       // If confirmed password, attempt to install by creating empty db connection
       if (isset ($post->db->admin_pass) && $post->db->admin_pass == $post->db->confirm_pass){
-        $db = new Db(null, $db_pass, $db_host, $db_user, $db_port);
+        $src = (object)['pass'=>$db_pass,'host'=>$db_host,'user'=>$db_user,'port'=>$db_port];
+        $db = new Db($src);
         if (!$db){
           $this->message = 'error in database settings!';
           $this->error = 1;
