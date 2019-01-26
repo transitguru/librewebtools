@@ -68,7 +68,7 @@
         {"name":"data","type":"longtext","comment":"Session data (JSON Encoded)"}
       ],
       "constraints":[
-        {"name":"pk_session_name","type":"primary","columns":["name"]},
+        {"name":"uk_session_name","type":"unique","columns":["name"]},
         {"name":"fk_session_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"default","update":"cascade"}
       ]
     },

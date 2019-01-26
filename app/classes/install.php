@@ -166,7 +166,7 @@ class Installer{
             $status = $this->install_db($post, $db_type);
             $this->console .= "\n</pre>";
             if ($status == 0){
-              header("Location: /");
+              header('Location: ' . BASE_URI . '/');
               exit;
             }
             else{
@@ -210,7 +210,7 @@ class Installer{
       }
     }
     else{
-      $this->console .= "Error making tables\n";
+      $this->console .= "Error creating SQL for tables\n";
       return 999;
     }
 
@@ -218,7 +218,8 @@ class Installer{
     $db = new Db();
     $db->write_raw($sql->{$db_type});
     if ($db->error != 0){
-      $db->error;
+      $this->console .= "Error making tables\n";
+      return $db->error;
     }
     // Set Date for 'created' fields
     $date = date('Y-m-d H:i:s');
