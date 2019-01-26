@@ -199,6 +199,7 @@ class Installer{
     $sql = (object) ['mysql' => '', 'pgsql' => '', 'sqlite' =>''];
 
     //Build the tables from the installer file
+    $db = new Db();
     $table_builder = new Table();
     $object = json_decode($json);
     if (isset($object->tables) && is_array($object->tables)){
@@ -211,6 +212,7 @@ class Installer{
         if ($db->error != 0){
           echo "Error making table {$table->name}\n";
           echo $db->error;
+          echo $db->message;
           exit;
         }
       }
