@@ -75,7 +75,7 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
 }
 
 // Check to see if the application is installed
-$installer = new LWT\Installer($uri,input->post);
+$installer = new LWT\Installer($uri,$input->post);
 
 // Get user information
 if (isset($session->user_id)){
