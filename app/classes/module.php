@@ -81,7 +81,7 @@ class Module{
     else{
       $dir = 'custom';
     }
-    $file = $PATH . '/template.php';
+    $file = DOC_ROOT . '/app/' . $dir . '/' . $this->code . '/template.php';
     if (is_file($file)){
       require_once ($file);
     }

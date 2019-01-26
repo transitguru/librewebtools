@@ -79,16 +79,16 @@ $installer = new LWT\Installer($uri,$input->post);
 
 // Get user information
 if (isset($session->user_id)){
-  $user = new User($session->user_id);
+  $user = new LWT\User($session->user_id);
 }
 else{
-  $user = new User(0);
+  $user = new LWT\User(0);
 }
 
 $path = new LWT\Path($uri,$method,$user);
 define('APP_ROOT', $path->root);
 // Load enabled modules and chosen theme
-$module = new LWT\Module($path->module_id,$user_input);
+$module = new LWT\Module($path->module_id,$input);
 $module->loadMods(1);
 $module->loadMods(0);
-$module->loadTheme($path);
+$module->loadTemplate($path);
