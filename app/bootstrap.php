@@ -74,6 +74,21 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
   }
 }
 
-// The data gets through the router, which will route the request
-$router = new LWT\Router($uri, $method, $session, $input);
-$router->process();
+// Check to see if the application is installed
+$installer = new LWT\Installer($input->post);
+
+// Get user information
+if (isset($session->user_id)){
+  $user = new User($session->user_id);
+}
+else{
+  $user = new User(0);
+}
+
+$path = new LWT\Path($uri,$user);
+define('APP_ROOT', $path->root);
+// Load enabled modules and chosen theme
+$module = new LWT\Module($path->module_id,$user_input);
+$module->loadMods(1);
+$module->loadMods(0);
+$module->loadTheme($path);

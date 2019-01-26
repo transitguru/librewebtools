@@ -35,6 +35,22 @@ class Path extends Tree{
    * @param User $user User object requesting the path
    */
   public function __construct($uri, $user){
+    $newuri = $uri;
+    while (fnmatch('*//*', $newuri)){
+      $newuri = preg_replace('/\/+/', '/', $newuri);
+    }
+    while (fnmatch('*../*', $newuri)){
+      $newuri = preg_replace('/\.\.\/+/', '/', $newuri);
+    }
+    while (strlen($uri) > 1 && substr($newuri, -1) == '/'){
+      $newuri = substr($newuri, 0, -1);
+    }
+
+    if ($newuri != $uri){
+      header('Location: ' . BASE_URI . $newuri);
+      exit;
+    }
+
     $this->uri = $uri;
     $db = new Db();
     $path = explode("/",$uri);
@@ -99,8 +115,7 @@ class Path extends Tree{
       $this->path_id = null;
       $this->header = "404 Not Found";
       $this->title = 'Not Found';
-      $this->ajax_call = null;
-      $this->render_call = null;
+      $this->app = null;
       $this->module_id = null;
     }
     return;    

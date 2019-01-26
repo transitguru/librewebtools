@@ -22,7 +22,7 @@ class Installer{
   /**
    * Constructs the installer object, checking to see if it is installed
    */  
-  public function __construct(){
+  public function __construct($uri, $post){
     $this->install = false;
     
     // Check to see if the DB can even connect
@@ -42,13 +42,23 @@ class Installer{
         $this->install = true;
       }    
     }
+    if ($this->install == true && $uri !== '/install'){
+      header('Location: ' . BASE_URI . '/install');
+      exit;
+    }
+    elseif ($this->install == true && $uri === '/install'){
+      if (isset($post->db)){
+        $this->build($post);
+      }
+      $this->view();
+    }
   }
   
   /**
    * Render installation page
    *
    */
-  public function view(){
+  private function view(){
 ?>
 <!DOCTYPE html>
 <html>
@@ -80,7 +90,7 @@ class Installer{
    * Installs the site
    *
    */
-  public function build($post){
+  private function build($post){
     if (isset($post)){
       // Define DB variables
       $settings = new Settings();
