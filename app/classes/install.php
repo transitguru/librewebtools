@@ -204,23 +204,22 @@ class Installer{
     if (isset($object->tables) && is_array($object->tables)){
       foreach($object->tables as $table){
         $table_builder->create_sql($table);
-        $sql->mysql .= "\n\n" . $table_builder->mysql;
-        $sql->pgsql .= "\n\n" . $table_builder->pgsql;
-        $sql->sqlite .= "\n\n" . $table_builder->sqlite;
+        $sql->mysql = $table_builder->mysql;
+        $sql->pgsql = $table_builder->pgsql;
+        $sql->sqlite = $table_builder->sqlite;
+        $db->write_raw($sql->{$db_type});
+        if ($db->error != 0){
+          echo "Error making table {$table->name}\n";
+          echo $db->error;
+          exit;
+        }
       }
     }
     else{
-      $this->console .= "Error creating SQL for tables\n";
+      $this->console .= "Error making tables\n";
       return 999;
     }
 
-    //Write the tables into the new Db (make sure to use the correct SQL type)
-    $db = new Db();
-    $db->write_raw($sql->{$db_type});
-    if ($db->error != 0){
-      $this->console .= "Error making tables\n";
-      return $db->error;
-    }
     // Set Date for 'created' fields
     $date = date('Y-m-d H:i:s');
 
