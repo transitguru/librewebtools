@@ -210,10 +210,8 @@ class Installer{
         $sql->sqlite = $table_builder->sqlite;
         $db->write_raw($sql->{$db_type});
         if ($db->error != 0){
-          echo "Error making table {$table->name}\n";
-          echo $db->error;
-          echo $db->message;
-          exit;
+          $this->console .= Error making table {$table->name}\n";
+          return $db->error;
         }
       }
     }
@@ -253,6 +251,10 @@ class Installer{
             $inputs->created = $date;
           }
           $db->write($table, $inputs);
+          if ($db->error != 0){
+            $this->console .= Error populating table {$table->name}\n";
+            return $db->error;
+          }
         }
       }
     }
