@@ -64,7 +64,12 @@ class Path extends Tree{
     $this->content = '';
     foreach ($path as $i => $url_code){
       if($this->app == null && ($i == 0 || ($i > 0 && $url_code !== ''))){
-        $db->fetch('paths',NULL, array('parent_id' => $this->path_id, 'url_code' => $url_code));
+        if ($i == 0){
+          $db->fetch('paths',NULL, array('parent_id' => $this->path_id, 'url_code' => '/'));
+        }
+        else{
+          $db->fetch('paths',NULL, array('parent_id' => $this->path_id, 'url_code' => $url_code));
+        }
         if ($db->affected_rows > 0){
           $this->path_id = $db->output[0]['id'];
           $this->app = $db->output[0]['app'];
