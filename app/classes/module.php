@@ -130,19 +130,21 @@ class Module{
   public function loadScripts(){
     $db = new Db();
     $db->fetch('paths', array('url_code', 'parent_id'), array('ajax_call' => 'core_send_scripts'));
-    $path = $db->output[0]['url_code']; 
-    while ($db->output[0]['parent_id'] != 0){
-      $db->fetch('paths', array('url_code', 'parent_id'), array('id' => $db->output[0]['parent_id']));
-      $path = $db->output[0]['url_code'] . '/' . $path; 
-    }
-    if (count($this->javascripts)>0){
-      foreach ($this->javascripts as $script){
-        echo "    <script type=\"application/javascript\" src=\"/{$path}/{$script}\"></script>\n";
+    if ($db->affected_rows > 0){
+      $path = $db->output[0]['url_code'];
+      while ($db->output[0]['parent_id'] != 0){
+        $db->fetch('paths', array('url_code', 'parent_id'), array('id' => $db->output[0]['parent_id']));
+        $path = $db->output[0]['url_code'] . '/' . $path; 
       }
-    }
-    if (count($this->stylesheets)>0){
-      foreach ($this->stylesheets as $sheet){
-        echo "    <link rel=\"stylesheet\" type=\"text/css\" href=\"/{$path}/{$sheet}\" />\n";
+      if (count($this->javascripts)>0){
+        foreach ($this->javascripts as $script){
+          echo "    <script type=\"application/javascript\" src=\"/{$path}/{$script}\"></script>\n";
+        }
+      }
+      if (count($this->stylesheets)>0){
+        foreach ($this->stylesheets as $sheet){
+          echo "    <link rel=\"stylesheet\" type=\"text/css\" href=\"/{$path}/{$sheet}\" />\n";
+        }
       }
     }
   }
