@@ -136,7 +136,7 @@ class Module{
    */
   public function loadScripts(){
     $db = new Db();
-    $db->fetch('paths', array('url_code', 'parent_id'), array('ajax_call' => 'core_send_scripts'));
+    $db->fetch('paths', array('url_code', 'parent_id'), array('app' => '\\LWT\\Modules\\Init\\Script'));
     if ($db->affected_rows > 0){
       $path = $db->output[0]['url_code'];
       while ($db->output[0]['parent_id'] != 0){
@@ -145,12 +145,12 @@ class Module{
       }
       if (count($this->javascripts)>0){
         foreach ($this->javascripts as $script){
-          echo "    <script type=\"application/javascript\" src=\"/{$path}/{$script}\"></script>\n";
+          echo '    <script type="application/javascript" src="' . BASE_URI . '/' . $path . '/' . $script . '"></script>' . "\n";
         }
       }
       if (count($this->stylesheets)>0){
         foreach ($this->stylesheets as $sheet){
-          echo "    <link rel=\"stylesheet\" type=\"text/css\" href=\"/{$path}/{$sheet}\" />\n";
+          echo '    <link rel="stylesheet" type="text/css" href="' . BASE_URI . '/' . $path . '/' . $sheet . '" />' . "\n";
         }
       }
     }

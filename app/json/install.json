@@ -420,7 +420,7 @@
         "user_id":1,
         "url_code":"scripts",
         "title":"Not Found",
-        "app":"\\LWT\\Modules\\Init\\Scripts",
+        "app":"\\LWT\\Modules\\Init\\Script",
         "core":1,
         "created":"2013-11-01 15:00:00"
       }
