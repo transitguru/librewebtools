@@ -23,14 +23,16 @@ class Module{
   public $javascripts = array(); /**< Array of javascripts loaded from modules and themes */
   public $stylesheets = array(); /**< Array of stylesheets loaded from modules and themes */
   public $user_input = array(); /**< Object of user input (POST, FILES, GET) */
+  public $session = array(); /**< Object of user session */
   /**
    * Construct the theme
    * @param int $id ID for the theme
    */
-  public function __construct($id = null, $user_input = array()){
+  public function __construct($id = null, $user_input = array(), $session = array()){
     if (!is_null($id) && $id > 0){
       $db = new Db();
       $this->user_input = $user_input;
+      $this->session = $session;
       $db->fetch('modules', null, array('id' => $id));
       if ($db->affected_rows > 0){
         $this->id = $id;

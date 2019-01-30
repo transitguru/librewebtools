@@ -143,9 +143,9 @@ class Db{
     $values = array();
     foreach ($inputs as $field => $value){
       if (fnmatch('*"*', $field)){
-        $status['error'] = 9999;
-        $status['message'] = 'Bad input settings';
-        return $status;
+        $this->error = 9999;
+        $this->message = 'Bad input settings';
+        return;
       }
       $type = gettype($value);
       if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
@@ -161,9 +161,9 @@ class Db{
         $fields[] = $field;
       }
       else{
-        $status['error'] = 9999;
-        $status['message'] = 'Bad input settings';
-        return $status;
+        $this->error = 9999;
+        $this->message = 'Bad input settings';
+        return;
       }
     }
     if (is_null($where)){
@@ -179,9 +179,9 @@ class Db{
       $wheres = array();
       foreach ($where as $field => $value){
         if (fnmatch('*"*', $field)){
-          $status['error'] = 9999;
-          $status['message'] = 'Bad input settings';
-          return $status;
+          $this->error = 9999;
+          $this->message = 'Bad input settings';
+          return;
         }
         $type = gettype($value);
         if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
@@ -193,9 +193,9 @@ class Db{
           $value = 'NULL';
         }
         else{
-          $status['error'] = 9999;
-          $status['message'] = 'Bad input settings';
-          return $status;
+          $this->error = 9999;
+          $this->message = 'Bad input settings';
+          return;
         }
         $wheres[] = "\"{$field}\"={$value}";
       }
@@ -218,9 +218,9 @@ class Db{
       $wheres = array();
       foreach ($where as $field => $value){
         if (fnmatch('*"*', $field)){
-          $status['error'] = 9999;
-          $status['message'] = 'Bad input settings';
-          return $status;
+          $this->error = 9999;
+          $this->message = 'Bad input settings';
+          return;
         }
         $type = gettype($value);
         if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
@@ -232,9 +232,9 @@ class Db{
           $value = 'NULL';
         }
         else{
-          $status['error'] = 9999;
-          $status['message'] = 'Bad input settings';
-          return $status;
+          $this->error = 9999;
+          $this->message = 'Bad input settings';
+          return;
         }
         $wheres[] = "\"{$field}\"={$value}";
       }
@@ -277,9 +277,9 @@ class Db{
           $value = NULL;
         }
         else{
-          $status['error'] = 9999;
-          $status['message'] = 'Bad input settings';
-          return $status;
+          $this->error = 9999;
+          $this->message = 'Bad input settings';
+          return;
         }
         if (is_null($value)){
           $where_elements[] = "\"{$key}\" IS NULL";

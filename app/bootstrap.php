@@ -31,7 +31,7 @@ foreach ($includes as $include){
 $uri = '/';             /**< Request URI */
 $session = (object)[];  /**< User Session */
 $input = (object)[];    /**< Information from user (POST, GET, FILES)  */
-$method = 'get';        /**< Lowercase method such as POST, PUT, or GET */
+$method = 'get';        /**< Lowercase method such as post, put, or get */
 
 // Collect globals when using webserver
 if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
@@ -88,7 +88,7 @@ else{
 $path = new LWT\Path($uri,$method,$user);
 define('APP_ROOT', $path->root);
 // Load enabled modules and chosen theme
-$module = new LWT\Module($path->module_id,$input);
+$module = new LWT\Module($path->module_id,$input,$session);
 $module->loadMods(1);
 $module->loadMods(0);
 $module->loadTemplate($path);

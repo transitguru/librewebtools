@@ -105,10 +105,7 @@ class Path extends Tree{
       if (!is_null($this->activated) && $time < $this->activated){
         $this->access = false;
       }
-      if (!is_null($this->activated) && $time < $this->activated){
-        $this->access = false;
-      }
-      if(!is_null($this->deactivated) && $time > $this->eactivated){
+      if(!is_null($this->deactivated) && $time > $this->deactivated){
         $this->access = false;
       }
     }
@@ -126,7 +123,6 @@ class Path extends Tree{
       $this->app = null;
       $this->module_id = null;
     }
-    return;    
   }
   
   /**
