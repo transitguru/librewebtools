@@ -16,15 +16,32 @@ namespace LWT\Modules;
  */
 Class Init{
   public function __construct(){
+    $this->uri = $uri;
+    $this->method = $method;
+    $this->inputs = $user_input;
+    $this->session = $session;
   }
-  public static function auth($ajax = false, $uri='/', $method='get', $user_input = array(), $session=array()){
-    echo "<p>You have successfully constructed the path, see dump below</p><pre>";
+  public function ajax(){
+    $this->auth(true);
+  }
+
+  public function render(){
+    $this->auth(false);
+  }
+
+  private function auth($ajax = false){
+    if($ajax == true){
+      echo "This is ajax!";
+    }
+    else{
+      echo "<h1>Inside the wrapper</h1>";
+    }
+    echo "<p>You have successfully constructed the path, see dump below</p><pre>\n";
     $everything = (object)[];
-    $everything->ajax = $ajax;
-    $everything->uri = $uri;
-    $everything->method = $method;
-    $everything->user_input = $user_input;
-    $everything->session = $session;
+    $everything->uri = $this->uri;
+    $everything->method = $this->method;
+    $everything->user_input = $this->input;
+    $everything->session = $this->session;
     var_dump($everything);
     echo "</pre>";
   }
