@@ -1,26 +1,19 @@
 <?php
-namespace LWT\Modules;
+namespace LWT\Modules\Init;
 /**
  * @file
- * LibreWebTools Init module Class
+ * LibreWebTools Auth Class
  *
- * Interfaces with user input to handle the several purposes that the Init
- * Module must serve for the LibreWebTools application.
+ * Authentication and profile management
  *
- * @category   Modules
+ * @category   Authentication
  * @package    LibreWebTools
  * @author     Michael Sypolt <msypolt@transitguru.limited>
  * @copyright  Copyright (c) 2014 - 2019
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt
  * @version    @package_version@
  */
-Class Init{
-  public function __construct($uri = '/', $method = 'get', $user_input = [], $session = []){
-    $this->uri = $uri;
-    $this->method = $method;
-    $this->inputs = $user_input;
-    $this->session = $session;
-  }
+Class Auth Extends \LWT\Subapp{
   public function ajax(){
     $this->auth(true);
   }

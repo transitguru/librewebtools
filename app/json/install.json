@@ -381,7 +381,7 @@
         "user_id":1,
         "url_code":"admin",
         "title":"Administration",
-        "app":"core_admin",
+        "app":"\\LWT\\Modules\\Init\\Admin",
         "core":1,
         "created":"2013-11-01 15:00:00"
       }
@@ -394,7 +394,7 @@
         "user_id":1,
         "url_code":"auth",
         "title":"Authentication",
-        "app":"core_authentication",
+        "app":"\\LWT\\Modules\\Init\\Auth",
         "core":1,
         "created":"2013-11-01 15:00:00"
       }
@@ -407,7 +407,7 @@
         "user_id":1,
         "url_code":"download",
         "title":"Not Found",
-        "app":"core_download",
+        "app":"\\LWT\\Modules\\Init\\Download",
         "core":1,
         "created":"2013-11-01 15:00:00"
       }
@@ -420,7 +420,7 @@
         "user_id":1,
         "url_code":"scripts",
         "title":"Not Found",
-        "app":"core_scripts",
+        "app":"\\LWT\\Modules\\Init\\Scripts",
         "core":1,
         "created":"2013-11-01 15:00:00"
       }
