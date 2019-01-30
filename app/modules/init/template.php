@@ -16,7 +16,7 @@
 header("HTTP/1.1 " . $path->header);
 if (!is_null($path->app) && $path->app !== '' &&  function_exists($path->app)){
   $fn = $path->app;
-  $fn(true, $path->uri, $path->method, $this->user_input);
+  $fn(true, $path->uri, $path->method, $this->user_input, $this->session);
 }
 ?>              
 <!DOCTYPE html>
@@ -35,7 +35,7 @@ if (!is_null($path->path_id) && $path->path_id >= 0){
   echo $path->content;
   if (!is_null($path->app) && $path->app != null && function_exists($path->app)){
     $fn = $path->app;
-    $fn(false, $path->uri, $path->method, $this->user_input);
+    $fn(false, $path->uri, $path->method, $this->user_input, $this->session);
   }
 }
 else{
