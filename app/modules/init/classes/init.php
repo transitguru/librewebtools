@@ -15,7 +15,9 @@ namespace LWT\Modules;
  * @version    @package_version@
  */
 Class Init{
-  public function __construct($ajax = false, $uri='/', $method='get', $user_input = array(), $session=array()){
+  public function __construct(){
+  }
+  public static function auth($ajax = false, $uri='/', $method='get', $user_input = array(), $session=array()){
     echo "<p>You have successfully constructed the path, see dump below</p><pre>";
     $everything = (object)[];
     $everything->ajax = $ajax;

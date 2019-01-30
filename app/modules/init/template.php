@@ -14,7 +14,8 @@
  */
 
 header("HTTP/1.1 " . $path->header);
-if (!is_null($path->app) && $path->app !== '' &&  function_exists($path->app)){
+$call = explode('::',$path->app);
+if (!is_null($path->app) && $path->app !== '' && method_exists($call[0], $call[1])){
   $fn = $path->app;
   $fn(true, $path->uri, $path->method, $this->user_input, $this->session);
 }
@@ -33,7 +34,7 @@ if (!is_null($path->app) && $path->app !== '' &&  function_exists($path->app)){
 <?php 
 if (!is_null($path->path_id) && $path->path_id >= 0){
   echo $path->content;
-  if (!is_null($path->app) && $path->app != null && function_exists($path->app)){
+  if (!is_null($path->app) && $path->app != null && method_exists($call[0], $call[1])){
     $fn = $path->app;
     $fn(false, $path->uri, $path->method, $this->user_input, $this->session);
   }
