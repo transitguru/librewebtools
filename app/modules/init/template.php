@@ -23,7 +23,7 @@ if (!is_null($sub_app) && method_exists($path->app, 'ajax')){
   <head>
     <meta charset="utf-8" />
     <title><?php echo $path->title; ?></title>
-    <?php $this->loadScripts();?>
+<?php $this->loadScripts();?>
   </head>
   <body>
     <div class="container">

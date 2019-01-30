@@ -112,10 +112,7 @@ class Module{
       foreach ($db->output as $module){
         $code = $module['code'];
         $PATH = DOC_ROOT . '/app/' . $dir . '/' . $code;
-        $file = $PATH . '/bootstrap.php';
-        if (is_file($file)){
-          require_once ($file);
-        }
+        $include = $PATH . '/bootstrap.php';
         if (is_dir($PATH)){
           $files = scandir($PATH);
           foreach ($files as $file){
@@ -126,6 +123,9 @@ class Module{
               $this->stylesheets[] = "{$dir}/{$code}/{$file}";
             }
           }
+        }
+        if (is_file($include)){
+          require_once ($include);
         }
       }
     }

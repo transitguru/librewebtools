@@ -16,11 +16,11 @@
  * @version    @package_version@
  */
 // Load the classes
-$PATH = __DIR__ . '/classes';
-$includes = scandir($PATH);
+$DIR = __DIR__ . '/classes';
+$includes = scandir($DIR);
 foreach ($includes as $include){
-  if (is_file($PATH . '/' . $include) && $include != '.' && $include != '..' && fnmatch("*.php", $include)){
-    require_once ($PATH . '/' . $include);
+  if (is_file($DIR . '/' . $include) && $include != '.' && $include != '..' && fnmatch("*.php", $include)){
+    require_once ($DIR . '/' . $include);
   }
 }
 
@@ -286,7 +286,7 @@ function core_render_copyright(){
 function core_render_404(){
   $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
 ?>
-  <p>Page not found. Please go <a href="/">Home</a>.</p>
+  <p>Page not found. Please go <a href="<?php echo BASE_URI ?>/">Home</a>.</p>
 <?php
 }
 
