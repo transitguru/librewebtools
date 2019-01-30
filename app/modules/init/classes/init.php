@@ -15,7 +15,7 @@ namespace LWT\Modules;
  * @version    @package_version@
  */
 Class Init{
-  public function __construct(){
+  public function __construct($uri = '/', $method = 'get', $user_input = [], $session = []){
     $this->uri = $uri;
     $this->method = $method;
     $this->inputs = $user_input;
@@ -40,7 +40,7 @@ Class Init{
     $everything = (object)[];
     $everything->uri = $this->uri;
     $everything->method = $this->method;
-    $everything->user_input = $this->input;
+    $everything->user_input = $this->inputs;
     $everything->session = $this->session;
     var_dump($everything);
     echo "</pre>";

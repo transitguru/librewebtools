@@ -14,7 +14,7 @@
  */
 
 header("HTTP/1.1 " . $path->header);
-if (!is_null($sub_app) && method_exists($this->app, 'ajax')){
+if (!is_null($sub_app) && method_exists($path->app, 'ajax')){
   $sub_app->ajax();
 }
 ?>              

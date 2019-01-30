@@ -86,7 +86,7 @@ class Module{
     $file = DOC_ROOT . '/app/' . $dir . '/' . $this->code . '/template.php';
     $sub_app = null;
     if (!is_null($path->app) && $path->app !== '' && class_exists($path->app)){
-      $sub_app = new {$path->app}($path->uri, $path->method, $this->user_input, $this->session);
+      $sub_app = new $path->app($path->uri, $path->method, $this->user_input, $this->session);
     }
 
     if (is_file($file)){
