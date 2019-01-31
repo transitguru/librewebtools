@@ -28,4 +28,39 @@ class Subapp{
     $this->inputs = $user_input;
     $this->session = $session;
   }
+
+  /**
+   * Renders the 404 Not Found page
+   *
+   */
+  public function render_404(){
+    $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
+?>
+  <p>Page not found. Please go <a href="<?php echo BASE_URI ?>/">Home</a>.</p>
+<?php
+  }
+
+  /**
+   * Renders the copyright disclaimer
+   *
+   */
+  function render_copyright(){
+    $start_year = 2012;
+    $current_year = date('Y');
+    $owner = "TransitGuru Limited";
+
+    // If the start year is not the current year: display start-current in copyright
+    if ($start_year != $current_year){
+?>
+        <p class="copy">&copy;<?php echo "{$start_year} &ndash; {$current_year} {$owner}"; ?></p>
+<?php
+    }
+    // Only display current year.
+    else{
+?>
+        <p class="copy">&copy;<?php echo "{$current_year} {$owner}"; ?></p>
+<?php
+    }
+  }
 }
+

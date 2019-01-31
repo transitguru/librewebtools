@@ -142,3 +142,4 @@ class Session{
     $this->__construct('');
   }
 }
+

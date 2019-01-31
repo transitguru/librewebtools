@@ -37,11 +37,11 @@ if (!is_null($path->path_id) && $path->path_id >= 0){
   }
 }
 else{
-  core_render_404();
+  $sub_app->render_404();
 }
 ?>     
       </div>
-<?php core_render_copyright(); ?>
+<?php $sub_app->render_copyright(); ?>
     </div>
   </body>
 </html>
