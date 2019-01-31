@@ -92,3 +92,4 @@ $module = new LWT\Module($path->module_id,$input,$session);
 $module->loadMods(1);
 $module->loadMods(0);
 $module->loadTemplate($path);
+

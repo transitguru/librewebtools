@@ -18,7 +18,7 @@ class Path extends Tree{
   public $uri = '/';  /**< Request from the User, as a string */
   public $method = 'get';  /**< Request method from the User, lowercase */
   public $title = '';  /**< Title of the path, as loaded from the database */
-  public $header = '200 OK';  /**< HTTP status of the request */
+  public $http_status = 200;  /**< HTTP status of the request */
   public $access = false; /**< Whether this request can be fulfilled */
   public $path_id = null; /**< Path ID that would be fetched from database */
   public $app = null; /**< Determines if this request is a function */
@@ -82,7 +82,7 @@ class Path extends Tree{
         }
         else{
           $this->path_id = null;
-          $this->header = "404 Not Found";
+          $this->http_status = 404;
           $this->access = FALSE;
           $this->title = 'Not Found';
           $this->module_id = null;
@@ -118,7 +118,7 @@ class Path extends Tree{
     }
     else{
       $this->path_id = null;
-      $this->header = "404 Not Found";
+      $this->http_status = 404;
       $this->title = 'Not Found';
       $this->app = null;
       $this->module_id = null;
@@ -179,3 +179,4 @@ class Path extends Tree{
     return $access;
   }
 }
+

@@ -13,7 +13,7 @@
  * @version    @package_version@
  */
 
-header("HTTP/1.1 " . $path->header);
+http_response_code($path->http_status);
 if (!is_null($sub_app) && method_exists($path->app, 'ajax')){
   $sub_app->ajax();
 }
@@ -45,3 +45,4 @@ else{
     </div>
   </body>
 </html>
+

@@ -48,6 +48,9 @@ Class Script Extends \LWT\Subapp{
       readfile($included);  
       exit;  
     }
+    http_response_code(404);
+    echo '{"error":{"status":404,"message":"Not Found"}}';
+    exit;
   }
 }
 
