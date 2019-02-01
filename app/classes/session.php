@@ -39,7 +39,7 @@ class Session{
           $db->delete('sessions', ['name' => $this->id]);
         }
         else{
-          $this->data = json_decode($db->output[0]['data'], true);
+          $this->data = json_decode($db->output[0]['data']);
           $this->user_id = $db->output[0]['user_id'];
           $db->fetch('users', null, array('id' => $userid));
           if($db->error == 0 && count($db->output)>0){
@@ -125,8 +125,8 @@ class Session{
         $date = date('Y-m-d H:i:s');
         $db->write('sessions', array('user_id' => $user_id, 'valid' => $date, 'data' => '{}', 'name' => $token));
         $this->__construct($token);
-        header('Location: /');
-        setcookie('librewebtools', $token, 0, '/');
+        header('Location: ' . BASE_URI . '/');
+        setcookie('librewebtools', $token, 0, BASE_URI . '/');
         exit;
       }
     }
