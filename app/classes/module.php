@@ -84,9 +84,9 @@ class Module{
       $dir = 'custom';
     }
     $file = DOC_ROOT . '/app/' . $dir . '/' . $this->code . '/template.php';
-    $sub_app = new \LWT\Subapp($this->user_input, $this->session);
+    $sub_app = new \LWT\Subapp($path, $this->user_input, $this->session);
     if (!is_null($path->app) && $path->app !== '' && class_exists($path->app)){
-      $sub_app = new $path->app($this->user_input, $this->session);
+      $sub_app = new $path->app($path, $this->user_input, $this->session);
     }
 
     if (is_file($file)){

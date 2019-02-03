@@ -92,7 +92,7 @@ else{
 }
 
 $path = new LWT\Path($input->uri,$user);
-define('APP_ROOT', $path->root);
+
 // Load enabled modules and chosen theme
 $module = new LWT\Module($path->module_id,$input,$session);
 $module->loadMods(1);

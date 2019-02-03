@@ -19,7 +19,7 @@ Class Download Extends \LWT\Subapp{
    */
   public function ajax(){
     // Find out the application's URL path
-    $begin = strlen(APP_ROOT);
+    $begin = strlen($this->path->root);
     if (strlen($this->inputs->uri) > $begin){
       $pathstring = substr($this->inputs->uri, $begin);
     }

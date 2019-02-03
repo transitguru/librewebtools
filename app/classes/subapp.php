@@ -17,10 +17,12 @@ class Subapp{
   /**
    * Generic constructor for a Module that would inherit this class
    *
+   * @param Path $path Path object
    * @param Object $user_input Inputs from user (URI, POST, GET, FILES)
    * @param \LWT\Session $session User Session object
    */
-  public function __construct($user_input = [], $session = []){
+  public function __construct($path = [], $user_input = [], $session = []){
+    $this->path = $path;
     $this->inputs = $user_input;
     $this->session = $session;
   }
