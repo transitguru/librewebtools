@@ -15,7 +15,20 @@ namespace LWT\Modules\Init;
  */
 Class Auth Extends \LWT\Subapp{
   public function ajax(){
-    $this->auth(true);
+    if (fnmatch('application/json*', $this->inputs->content_type) || fnmatch('text/json*', $this->inputs->content_type)){
+      header('Pragma: ');
+      header('Cache-Control: ');
+      $payload = (object)[
+        'status' => 'success',
+        'code' => 200,
+        'var_dump' => (object)[
+          'user_input' => $this->inputs,
+          'session' => $this->session,
+        ],
+      ];
+      echo json_encode($payload, JSON_UNESCAPED_SLASHES);
+      exit;
+    }
   }
 
   public function render(){
@@ -23,12 +36,6 @@ Class Auth Extends \LWT\Subapp{
   }
 
   private function auth($ajax = false){
-    if($ajax == true){
-      echo "This is ajax!";
-    }
-    else{
-      echo "<h1>Inside the wrapper</h1>";
-    }
     echo "<p>You have successfully constructed the path, see dump below</p><pre>\n";
     $everything = (object)[];
     $everything->user_input = $this->inputs;
