@@ -337,5 +337,5 @@ class Table{
     $this->error = 0;
     $this->message = 'SQL successfully created';
   }
-
 }
+
