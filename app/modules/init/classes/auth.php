@@ -31,8 +31,6 @@ Class Auth Extends \LWT\Subapp{
     }
     echo "<p>You have successfully constructed the path, see dump below</p><pre>\n";
     $everything = (object)[];
-    $everything->uri = $this->uri;
-    $everything->method = $this->method;
     $everything->user_input = $this->inputs;
     $everything->session = $this->session;
     var_dump($everything);

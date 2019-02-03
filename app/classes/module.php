@@ -22,7 +22,7 @@ class Module{
   public $required = 1; /**< Determines if a module is required to be enabled */
   public $javascripts = array(); /**< Array of javascripts loaded from modules and themes */
   public $stylesheets = array(); /**< Array of stylesheets loaded from modules and themes */
-  public $user_input = array(); /**< Object of user input (POST, FILES, GET) */
+  public $user_input = array(); /**< Object of user input (URI, POST, FILES, GET) */
   public $session = array(); /**< Object of user session */
   /**
    * Construct the theme
@@ -84,9 +84,9 @@ class Module{
       $dir = 'custom';
     }
     $file = DOC_ROOT . '/app/' . $dir . '/' . $this->code . '/template.php';
-    $sub_app = new \LWT\Subapp($path->uri, $path->method, $this->user_input, $this->session);
+    $sub_app = new \LWT\Subapp($this->user_input, $this->session);
     if (!is_null($path->app) && $path->app !== '' && class_exists($path->app)){
-      $sub_app = new $path->app($path->uri, $path->method, $this->user_input, $this->session);
+      $sub_app = new $path->app($this->user_input, $this->session);
     }
 
     if (is_file($file)){

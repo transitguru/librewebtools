@@ -27,11 +27,17 @@ foreach ($includes as $include){
   }
 }
 
-// These variables are used to remove reliance on superglobals
-$uri = '/';             /**< Request URI */
-$session = (object)[];  /**< User Session */
-$input = (object)[];    /**< Information from user (POST, GET, FILES)  */
-$method = 'get';        /**< Lowercase method such as post, put, or get */
+/**
+ * Information from user (URI, POST, GET, FILES)
+ */
+$input = (object)[
+  'uri' => '/',
+  'method' => 'get',
+  'content_type' => 'text/plain',
+  'get' => (object)[],
+  'post' => (object)[],
+  'files' => (object)[],
+];
 
 // Collect globals when using webserver
 if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
@@ -39,21 +45,21 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
   $sr_len = mb_strlen($site_root);
   define('BASE_URI', mb_substr(DOC_ROOT, $sr_len));
   $b_len = mb_strlen(BASE_URI);
-  $uri = mb_substr($_SERVER['REQUEST_URI'], $b_len);
-  $method = strtolower($_SERVER['REQUEST_METHOD']);
+  $input->uri = mb_substr($_SERVER['REQUEST_URI'], $b_len);
+  $input->method = strtolower($_SERVER['REQUEST_METHOD']);
 
   if (isset($_SERVER['CONTENT_TYPE'])){
-    $content_type = $_SERVER['CONTENT_TYPE'];
+    $input->content_type = $_SERVER['CONTENT_TYPE'];
   }
   else{
-    $content_type = 'text/plain';
+    $input->content_type = 'text/plain';
   }
   if (isset($_POST)){
-    if (fnmatch('application/json*', $content_type) || fnmatch('text/json*', $content_type)){
+    if (fnmatch('application/json*', $input->content_type) || fnmatch('text/json*', $input->content_type)){
       $raw = file_get_contents('php://input');
       $input->post = json_decode($raw);
     }
-    elseif ($method == 'post'){
+    elseif ($input->method == 'post'){
       $input->post = json_decode(json_encode($_POST));
       if (isset($_FILES)){
         $input->files = json_decode(json_encode($_FILES));
@@ -75,7 +81,7 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
 }
 
 // Check to see if the application is installed
-$installer = new LWT\Installer($uri,$input->post);
+$installer = new LWT\Installer($input->uri,$input->post);
 
 // Get user information
 if (isset($session->user_id)){
@@ -85,7 +91,7 @@ else{
   $user = new LWT\User(0);
 }
 
-$path = new LWT\Path($uri,$method,$user);
+$path = new LWT\Path($input->uri,$user);
 define('APP_ROOT', $path->root);
 // Load enabled modules and chosen theme
 $module = new LWT\Module($path->module_id,$input,$session);
