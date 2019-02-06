@@ -1,9 +1,9 @@
 <?php
-namespace LWT;
+namespace LWT\Modules\Test;
 /**
- * Test Class
+ * Test Field Class
  * 
- * Generally for testing things
+ * Testing for the Field and Xml classes
  *
  * @category Unit Testing
  * @package LibreWebTools
@@ -12,43 +12,12 @@ namespace LWT;
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class Test{
+class Field{
   
   public $time = '1988-06-06 15:00:00'; /**< Date test object made, not really needed */
   
   public function __construct(){
     $this->time = date('Y-m-d H:i:s');
-  }
-
-  /**
-   * Prints and array into expandable links using the JS toggle_hide()
-   * 
-   * @param array $array Array to be printed
-   * @param string $prefix ID prefix to prevent multiple test prints from breaking
-   * @param int $n Number to make each UL have unique identifier
-   * @return int Running total of $n so that all IDs are unique
-   */
-  public function array_print($array, $prefix = 'foo', $n=0){
-    if ($n >= 1){
-      $hide = 'class="hide"';
-    }
-    else{
-      $hide = '';
-    }
-    echo '<ul id="'.$prefix.'_'.$n.'" '.$hide.'>'."\n";
-    foreach ($array as $key => $value){
-      $n++;
-      echo '<li><a href="javascript:;" onclick="toggle_hide(\''.$prefix.'_'.$n.'\');">'.$key.'</a> ';
-      if (is_array($value)){
-        $n = core_test_array_print($value, $prefix, $n);
-      }
-      else{
-        echo $value;
-      }
-      echo "</li>\n";
-    }
-    echo "</ul>\n";
-    return $n;
   }
 
   /**

@@ -1,24 +1,24 @@
 <?php
-namespace LWT\Modules\Init;
+namespace LWT\Modules\Test;
 /**
  * @file
- * LibreWebTools Auth Class
+ * LibreWebTools Test Class
  *
- * Authentication and profile management
+ * Test class used in calling test suites via the JSON object received via post
  *
- * @category   Authentication
+ * @category   Unit Testing
  * @package    LibreWebTools
  * @author     Michael Sypolt <msypolt@transitguru.limited>
  * @copyright  Copyright (c) 2014 - 2019
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt
  * @version    @package_version@
  */
-Class Auth Extends \LWT\Subapp{
+Class Test Extends \LWT\Subapp{
   public function ajax(){
+    //This function will use properly formed JSON to call the appropriate test
     if (fnmatch('application/json*', $this->inputs->content_type) || fnmatch('text/json*', $this->inputs->content_type)){
       header('Pragma: ');
       header('Cache-Control: ');
-      header('Content-Type: application/json');
       $payload = (object)[
         'status' => 'success',
         'code' => 200,
@@ -33,16 +33,6 @@ Class Auth Extends \LWT\Subapp{
   }
 
   public function render(){
-    $this->auth(false);
-  }
-
-  private function auth($ajax = false){
-    echo "<p>You have successfully constructed the path, see dump below</p><pre>\n";
-    $everything = (object)[];
-    $everything->user_input = $this->inputs;
-    $everything->session = $this->session;
-    var_dump($everything);
-    echo "</pre>";
+    echo "<p>You did not send the proper payload for testing</p>";
   }
 }
-

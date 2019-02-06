@@ -4,9 +4,7 @@
  * @file
  * Bootstrap file for LibreWebTools Init module
  *
- * Loads all includeded classes for the Init module. Also provides a means for
- * the database to invoke the relevant ajax_call or render_call as shown in
- * the fields in the paths table.
+ * Loads all included classes for the Init module.
  *
  * @category   Bootstrap
  * @package    LibreWebTools

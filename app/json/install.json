@@ -360,6 +360,16 @@
       }
     },
     {
+      "table":"modules",
+      "inputs":{
+        "core":1,
+        "code":"test",
+        "enabled":1,
+        "required":0,
+        "name":"Test"
+      }
+    },
+    {
       "table":"paths",
       "inputs":{
         "id":0,
@@ -422,6 +432,19 @@
         "title":"Not Found",
         "app":"\\LWT\\Modules\\Init\\Script",
         "core":1,
+        "created":"2013-11-01 15:00:00"
+      }
+    },
+    {
+      "table":"paths",
+      "inputs":{
+        "parent_id":0,
+        "module_id":1,
+        "user_id":1,
+        "url_code":"test",
+        "title":"Not Found",
+        "app":"\\LWT\\Modules\\Test\\Test",
+        "core":0,
         "created":"2013-11-01 15:00:00"
       }
     },

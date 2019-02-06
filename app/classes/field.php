@@ -22,25 +22,44 @@ class Field{
   public $message = '';      /**< message to be emitted based on validation */
   public $error = 0;         /**< int error number based on validation */
   
+  private $element_types = ['button','select','text','textarea'];
+  private $format_types = [
+    'preg',
+    'memo',
+    'svghtml',
+    'html',
+    'basicsvg',
+    'basichtml',
+    'simple',
+    'nohtml',
+    'text',
+    'email',
+    'password',
+    'oneline',
+    'nowacky',
+    'int',
+    'dec',
+    'date',
+  ];
+
   /**
    * Qualitative name of format type
    *
-   * 'preg' test against a regular expression
-   * 'memo' longer, multi-line text
-   * 'text' oneline text
-   * 'num'  numeric values
-   * 'date' test against any date format
-   *
-   */
-  private $type;
-  /**
-   * Qualitative format type or regular expression
-   *
-   * Any regular expression where $type=='preg'
-   * 'all', 'svghtml', 'html', 'basicsvg', 'basichtml', 'simple', 'nohtml' where $type=='memo'
-   * 'email', 'password', 'oneline', 'nowacky' where $type=='text'
-   * 'int', 'dec' where $type=='num'
-   * Any string date format where $type=='date'
+   * 'preg:' test against the regular expression shown after the colon
+   * 'date:' test against the date format shown after the colon
+   * 'memo' longer, multi-line text with no filtering
+   * 'svghtml' Allows nearly all SVG + HTML tags
+   * 'html' Allows nearly all HTML tags, but excludes SVG
+   * 'basichtml' Allows a few HTML tags and attributes
+   * 'simple' Allows no HTML attributes and barely any tags
+   * 'nohtml' Does not allow HTML
+   * 'text' oneline text with no filtering
+   * 'email' format for an email address
+   * 'password' No tabs, or any type of return character
+   * 'oneline' Same as password
+   * 'nowacky' No special characters allowed
+   * 'int' Integer numbers only
+   * 'dec' Allows both integers and decimal numbers
    *
    */
   private $format;
@@ -57,112 +76,98 @@ class Field{
   
   /**
    * Initializes new Field
-   * 
-   * @param string $input Untested user input from user
-   * @param string $type Qualitative name of format type
-   * @param string $format Qualitative format type OR Regular expression test (only when $type=='preg')
-   * @param boolean $required Optional: set to true if the value is required
-   * @param int $max_chars Optional: Limit number of characters
-   * @param boolean $trim Optional: set to true if you want to enable auto trimming
+   *
+   * @param Object $defs Definitions for the Field in the form of the object below
+   *
+   * @code
+   *   $defs = (object) [
+   *     'label' => 'Human-friendly label for field',
+   *     'name' => 'form_name_for_html',
+   *     'element' => 'text',
+   *     'list' => [
+   *       (object) ['name' => 'Pennsylvania', 'value', 'PA'],
+   *       (object) ['name' => 'Ohio', 'value', 'OH'],
+   *       (object) ['name' => 'West Virginia', 'value', 'WV'],
+   *     ],
+   *     'value' => 'some_value_to_test',
+   *     'format' => 'nowacky',
+   *     'required' => false,
+   *     'min_chars' => 0,
+   *     'max_chars' => 0,
+   *     'trim' => true,
+   *     'min' => 0,
+   *     'max' => 2990,
+   *     'step' => 0.5,
+   *     'inc_min' => true,
+   *     'inc_max' => true,
+   *     'auto_step' => true
+   *   ];
+   * @endcode
    */
-  public function __construct($value, $type, $format, $required=false, $max_chars=0, $trim=true){
-    $this->setValue($value);
-    $this->setType($type);
-    $this->setFormat($format);
-    $this->setRequired($required);
-    $this->setChars($max_chars);
-    $this->setTrim($trim);
-  }
-  /**
-   * Sets value of Field
-   * @param string $input Untested user input from user
-   */ 
-  public function setValue($value){
-    $this->value = $value;
-  }
-  
-  /**
-   * Sets type of input
-   * @param string $type Qualitative name of format type
-   */ 
-  public function setType($type){
-    $this->type = $type;
-  }
-  
-  /**
-   * Sets format of input
-   * @param string $format Qualitative format type OR Regular expression test (only when $type=='preg')
-   */ 
-  public function setFormat($format){
-    $this->format = $format;
+
+  public function __construct($defs){
+    $this->update_defs($defs);
   }
 
   /**
-   * Sets whether the field is required
-   * @param boolean $required Optional: set to true if the value is required
+   * Updates definitions for the Field
+   *
+   * @param Object $defs Definitions for the Field in the form of the object in constructor above
+   *
    */
-  public function setRequired($required=false){
-    if(is_bool($required)){
-      $this->required = $required;
+  public function update_defs($defs){
+    if (isset($defs->label)){
+      $this->label = $defs->label;
     }
-  }
-  
-  /**
-   * Sets maximum, and optionally minimum number of characters
-   * @param int $max_chars Optional: Limit number of characters
-   * @param int $min_chars Optional: Lower limit for number of characters
-   */
-  public function setChars($max_chars=0, $min_chars=0){
-    if (is_numeric($max_chars) && $max_chars >= 0){
-      $this->max_chars = (int)$max_chars;
+    if (isset($defs->name)){
+      $this->name = $defs->name;
     }
-    if (is_numeric($min_chars) && $min_chars >= 0){
-      $this->min_chars = (int)$min_chars;
+    if (isset($defs->element) && in_array($defs->element, $this->element_types)){
+      $this->element = $defs->element;
     }
-  }
-  /**
-   * Sets whether the field will autotrim
-   * @param boolean $required Optional: set to true if the value is required
-   */ 
-  public function setTrim($trim){
-    if(is_bool($trim = true)){
-      $this->trim = $trim;
+    if (isset($defs->list) && is_array($defs->list)){
+      $this->list = [];
+      foreach($defs->list as $items){
+        if (is_object($items) && isset($items->name) && isset($items->value)){
+          $this->list[] = $items;
+        }
+      }
     }
-  }
-  
- /**
-   * Sets the range and step values for numeric inputs
-   * @param mixed $min Optional: minumum value accepted for input (float or int)
-   * @param mixed $max Optional: maximum value accepted for input (float or int)
-   * @param mixed $step Optional: step interval value accepted for input (float or int)   
-   */  
-  public function setRange($min=null, $max=null, $step=null){
-    if(is_numeric($min)){
-      $this->min = $min;
+    if (isset($defs->value)){
+      $this->value = $defs->value;
     }
-    if(is_numeric($max)){
-      $this->max = $max;
+    if (isset($defs->format) && is_string($defs->format)){
+      $length = mb_strpos($defs->format, ':');
+      if ($length >0){
+        $test = mb_substr($defs->format,0,$length);
+      }
+      else{
+        $test = $defs->format;
+      }
+      if (in_array($test, $this->format_types)){
+        $this->format = $defs->format;
+      }
     }
-    if(is_numeric($step)){
-      $this->step = $step;
+    if (is_bool($defs->required)){
+      $this->required = $defs->required;
     }
-  }
-
- /**
-   * Sets the range and step values for numeric inputs
-   * @param boolean $min Optional: set to false to not include the value
-   * @param boolean $max Optional: set to false to not include the value
-   * @param boolean $step Optional: set to true to auto "round" to step
-   */    
-  public function setBounds($min=true, $max=true, $step=true){
-    if(is_bool($min)){
-      $this->inc_min = $min;
+    if (is_int($defs->min_chars)){
+      $this->min_chars = $defs->min_chars;
     }
-    if(is_bool($max)){
-      $this->inc_max = $max;
+    if (is_int($defs->max_chars)){
+      $this->max_chars = $defs->max_chars;
     }
-    if(is_bool($step)){
-      $this->auto_step = $step;
+    if (is_numeric($defs->step)){
+      $this->step = $defs->step;
+    }
+    if (is_bool($defs->inc_min)){
+      $this->inc_min = $defs->inc_min;
+    }
+    if (is_bool($defs->inc_max)){
+      $this->inc_max = $defs->inc_max;
+    }
+    if (is_bool($defs->auto_step)){
+      $this->auto_step = $defs->auto_step;
     }
   }
 
@@ -220,110 +225,120 @@ class Field{
       return;
     }
     
-    //Check for all type cases
-    if ($this->type=='preg'){
-      // Do regular expression
-      $matches = array();
-      preg_match($this->format, $this->value, $matches);
-      if (count($matches)==0 || $matches[0] != $this->value){
-        $this->error = 21;
-        $this->message = 'Invalid: Value does not match the pattern expected.';
-        return;
+    //Formats that have a colon separator
+    $length = mb_strpos($this->format, ':');
+    if ($length >0){
+      $type = mb_substr($this->format, 0, $length);
+      $format = mb_substr($this->format, $length+1);
+
+      //Regular expression
+      if ($type == 'preg'){
+        $matches = array();
+        preg_match($format, $this->value, $matches);
+        if (count($matches)==0 || $matches[0] != $this->value){
+          $this->error = 21;
+          $this->message = 'Invalid: Value does not match the pattern expected.';
+          return;
+        }
       }
-    }
-    elseif ($this->type == 'memo'){
-      if ($this->format === 'all'){
-        // Allow everything (this is dangerous, unless this is HTML encoded somewhere else)
-        
-      }
-      elseif($this->format !== 'nohtml'){
-        if($this->format==='svghtml'){
-          // Allow most HTML and SVG, but no scripts
-          $qualifier = 'html+svg';
-        }
-        elseif($this->format=='html'){
-          // Allow most HTML, but no SVG and no scripts
-          $qualifier = 'html';
-        }
-        elseif($this->format=='basicsvg'){
-          // Allow basic HTML/SVG, but no raster images
-          $qualifier = 'basic+svg';
-        }
-        elseif($this->format=='basichtml'){
-          // Allow basic HTML, no images, no SVG
-          $qualifier = 'basic';
+
+      //Check time against $format (which uses PHP date() format string)
+      elseif ($type == 'date'){
+        if(date_create_from_format($format, $this->value)){
+          $date = date_create_from_format($format, $this->value);
+          $formatted = date_format($date, $format);
+          if ($formatted != $this->value){
+            $this->error = 52;
+            $this->message = 'Invalid: Value is not a valid date.';
+            return;
+          }
         }
         else{
-          // Allow the nearly no tags, and definitely no links or styling
-          $qualifier = 'simple';
+          $this->error = 51;
+          $this->message = 'Invalid: Date format is wrong.';
+          return;
         }
-        $xml = new Xml($input, $qualifier);
-        $xml->scrub();
-        $this->value = $xml->markup;
+      }
 
-      }
+      //Format was wrong
       else{
-        //Just HTMLencode everything!
-        $this->value = htmlspecialchars($this->value);
+        $format = $type;
       }
+    }
+    else{
+      $format = $this->format;
+    }
+    $qualifier = '';
+
+    //Check for Memo Types
+    if ($format == 'memo'){
+      // Allow everything (this is dangerous, unless this is HTML encoded somewhere else)
       
     }
-    elseif ($this->type=='text'){
-      if ($this->format=='password'){
-        //Allow nearly everything for a oneline password
-        if(fnmatch("*\t*",$this->value) || fnmatch("*\r*",$this->value) || fnmatch("*\n*",$this->value)){
-          $this->error = 41;
-          $this->message = 'Invalid: Please remove line breaks (hard returns) or tabs.';
-          return;
-        }
-      }
-      elseif($this->format=='oneline'){
-        //$input = core_validate_descript($input);
-        //Allow only one line text, do not allow CR or LF
-        if(fnmatch("*\r*",$this->value) || fnmatch("*\n*",$this->value)){
-          $this->error = 42;
-          $this->message = 'Invalid: Please remove line breaks (hard returns).';
-          return;
-        }
-      }
-      elseif($this->format=='email'){
-        //Email formatting only
-        preg_match('/([\w\-\.%+-]+\@[\w\-]+\.[\w\-]+)/',$this->value, $matches);
-        if (count($matches)==0 || $matches[0] != $this->value){
-          $this->error = 43;
-          $this->message = 'Invalid: Not a valid email address.';
-          return;
-        }
-      }
-      elseif($this->format=='nowacky'){
-        //No special characters
-        preg_match('/[\w-]*/', $this->value, $matches);
-        if (count($matches)==0 || $matches[0] != $this->value){
-          $this->error = 44;
-          $this->message = 'Invalid: Special characters exist, please only use numbers, letters, hyphens, and underscores.';
-          return;
-        }      
-      }
+    elseif($format =='svghtml'){
+      // Allow most HTML and SVG, but no scripts
+      $qualifier = 'html+svg';
     }
-    elseif ($this->type=='date'){
-      //Check time against $format (which uses PHP date() format string)
-      if(date_create_from_format($this->format, $this->value)){
-        $date = date_create_from_format($this->format, $this->value);
-        $formatted = date_format($date, $this->format);
-        if ($formatted != $this->value){
-          $this->error = 52;
-          $this->message = 'Invalid: Value is not a valid date.';
-          return;
-        }
-      }
-      else{
-        $this->error = 51;
-        $this->message = 'Invalid: Date format is wrong.';
+    elseif($format=='html'){
+      // Allow most HTML, but no SVG and no scripts
+      $qualifier = 'html';
+    }
+    elseif($format=='basicsvg'){
+      // Allow basic HTML/SVG, but no raster images
+      $qualifier = 'basic+svg';
+    }
+    elseif($format=='basichtml'){
+      // Allow basic HTML, no images, no SVG
+      $qualifier = 'basic';
+    }
+    elseif($format=='simple'){
+      // Allow the nearly no tags, and definitely no links or styling
+      $qualifier = 'simple';
+    }
+    elseif($format=='nohtml'){
+      $this->value = htmlspecialchars($this->value);
+    }
+    
+    // Check for text types
+    elseif ($format=='password'){
+      //Allow nearly everything for a oneline password
+      if(fnmatch("*\t*",$this->value) || fnmatch("*\r*",$this->value) || fnmatch("*\n*",$this->value)){
+        $this->error = 41;
+        $this->message = 'Invalid: Please remove line breaks (hard returns) or tabs.';
         return;
       }
     }
-    elseif ($this->type=='num'){
-      if ($this->format=='int'){
+    elseif($format=='oneline'){
+      //$input = core_validate_descript($input);
+      //Allow only one line text, do not allow CR or LF
+      if(fnmatch("*\r*",$this->value) || fnmatch("*\n*",$this->value)){
+        $this->error = 42;
+        $this->message = 'Invalid: Please remove line breaks (hard returns).';
+        return;
+      }
+    }
+    elseif($format=='email'){
+      //Email formatting only
+      preg_match('/([\w\-\.%+-]+\@[\w\-]+\.[\w\-]+)/',$this->value, $matches);
+      if (count($matches)==0 || $matches[0] != $this->value){
+        $this->error = 43;
+        $this->message = 'Invalid: Not a valid email address.';
+        return;
+      }
+    }
+    elseif($format=='nowacky'){
+      //No special characters
+      preg_match('/[\w-]*/', $this->value, $matches);
+      if (count($matches)==0 || $matches[0] != $this->value){
+        $this->error = 44;
+        $this->message = 'Invalid: Special characters exist, please only use numbers, letters, hyphens, and underscores.';
+        return;
+      }
+    }
+
+    // Check for Numeric types
+    elseif ($format == 'num' || $format == 'int'){
+      if ($format=='int'){
         //Integer Numbers
         $this->value = str_replace(',','',$this->value);
         $this->value = str_replace(' ','',$this->value);
@@ -333,7 +348,7 @@ class Field{
           return;
         }
       }
-      elseif($this->format=='dec'){
+      elseif($format=='dec'){
         //Decimal Numbers
         $this->value = str_replace(',','',$this->value);
         $this->value = str_replace(" ","",$this->value);
@@ -392,6 +407,13 @@ class Field{
       }
     }
     
+    //Scrub HTML if requested from a format above
+    if (!is_null($qualifier) && $qualifier != ''){
+      $xml = new Xml($this->value, $qualifier);
+      $xml->scrub();
+      $this->value = $xml->markup;
+    }
+
     //successful output
     $this->error = 0;
     $this->message = '';
@@ -446,3 +468,4 @@ class Field{
     }
   }
 }
+

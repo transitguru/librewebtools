@@ -73,6 +73,8 @@ class Module{
    * @param Path $path Path information to be rendered in the template
    */
   public function loadTemplate($path){
+    $this->loadMods(1);
+    $this->loadMods(0);
     if (is_null($path->path_id) || $path->path_id < 0 || is_null($this->id)){
       $this->core = 1;
       $this->code = 'init';
