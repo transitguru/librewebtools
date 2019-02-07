@@ -1,0 +1,31 @@
+{
+  "test_series":[
+    {"type":"input", "code":"10","tests":[
+        { "error":0,
+          "inputs":{
+            "value":"",
+            "format":"preg:/[0-9a-zA-Z]*/",
+            "required":false,
+            "trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"",
+            "format":"memo",
+            "required":false,
+            "trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"",
+            "format":"text",
+            "required":false,
+            "trim":true
+          }
+        }
+      ]
+    }
+  ]
+}

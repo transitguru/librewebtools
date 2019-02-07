@@ -66,6 +66,8 @@ class Field extends Tester{
    * 
    */
   public function run(){
+    // Find out data directory
+    $directory = DOC_ROOT . 'app/modules/test/data/';
     $this->time = date('Y-m-d H:i:s');
 
     $terror = 0;
