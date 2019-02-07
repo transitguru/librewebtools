@@ -17,22 +17,17 @@ Class Test Extends \LWT\Subapp{
   public function ajax(){
     //This function will use properly formed JSON to call the appropriate test
     if (fnmatch('application/json*', $this->inputs->content_type) || fnmatch('text/json*', $this->inputs->content_type)){
-      header('Pragma: ');
-      header('Cache-Control: ');
-      $payload = (object)[
-        'status' => 'success',
-        'code' => 200,
-        'var_dump' => (object)[
-          'user_input' => $this->inputs,
-          'session' => $this->session,
-        ],
-      ];
-      echo json_encode($payload, JSON_UNESCAPED_SLASHES);
-      exit;
+      if (isset($this->inputs->post->command) && class_exists($this->inputs->post->command)){
+        $test = new $this->inputs->post->command($this->path, $this->inputs, $this->session);
+      }
+      else{
+        $test = new Tester($this->path, $this->inputs, $this->session);
+      }
+      $test->run();
     }
   }
 
   public function render(){
-    echo "<p>You did not send the proper payload for testing</p>";
+    echo "<p>Testing GUI is not yet enabled!</p>";
   }
 }

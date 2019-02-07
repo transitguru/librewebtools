@@ -79,6 +79,9 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
     $session = new LWT\Session($_COOKIE['librewebtools']);
   }
 }
+else{
+  define('BASE_URI', '/');
+}
 
 // Check to see if the application is installed
 $installer = new LWT\Installer($input->uri,$input->post);

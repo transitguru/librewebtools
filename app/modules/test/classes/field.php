@@ -12,20 +12,17 @@ namespace LWT\Modules\Test;
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class Field{
+class Field extends Tester{
   
   public $time = '1988-06-06 15:00:00'; /**< Date test object made, not really needed */
   
-  public function __construct(){
-    $this->time = date('Y-m-d H:i:s');
-  }
-
   /**
-   * Tests core_validate_inputs()
+   * Tests Field::validate()
    * 
    *  0 = no error
    * 11 = Empty value
    * 12 = String too long
+   * 13 = String too short
    * 21 = Does not match regex
    * 41 = Line breaks/tabs in password
    * 42 = Line breaks in oneline input
@@ -41,49 +38,24 @@ class Field{
    * 66 = Value greater than maximum
    * 67 = Value does not match resolution (too precise)
    * 
-   * @param array $inputs inputs that correspond with inputs for core_validate_inputs()
+   * @param Object $inputs Field definitions that correspond with inputs for Field::validate()
    * @param int $error Expected error number that should be returned
    * 
    * 
    */
   private function validation($inputs, $error=0){
     // try making the object
-    if(!isset($inputs[1])){
-      $field = new Field($inputs[0]);
-    }
-    elseif(!isset($inputs[2])){
-      $field = new Field($inputs[0], $inputs[1]);
-    }
-    elseif(!isset($inputs[3])){
-      $field = new Field($inputs[0], $inputs[1], $inputs[2]);
-    }
-    elseif(!isset($inputs[4])){
-      $field = new Field($inputs[0], $inputs[1], $inputs[2], $inputs[3]);
-    }
-    elseif(!isset($inputs[5])){
-      $field = new Field($inputs[0], $inputs[1], $inputs[2], $inputs[3], $inputs[4]);
-    }
-    else{
-      $field = new Field($inputs[0], $inputs[1], $inputs[2], $inputs[3], $inputs[4], $inputs[5]);
-    }
-    
-    // Set range
-    if (isset($inputs[6])){
-      $field->setRange($inputs[6][0],$inputs[6][1],$inputs[6][2]);
-    }
-    // Set bounds
-    if (isset($inputs[7])){
-      $field->setBounds($inputs[7][0],$inputs[7][1],$inputs[7][2]);
-    }
+    $field = new Field($inputs)
     
     $field->validate();
+
     // Break the object!
     if($field->error != $error){
       $status['message'] = "Failure, found {$field->error}, expected {$error}";
       $status['error'] = 1;
     }
     else{
-      $status['message'] = "Success";
+      $status['message'] = "Success, found {$field->error}, expected {$error}";
       $status['error'] = 0;
     }
     return $status;
@@ -92,36 +64,153 @@ class Field{
   /**
    * Batch-runs tests of the new field object
    * 
-   * 
    */
-  public function runvalidation(){
+  public function run(){
+    $this->time = date('Y-m-d H:i:s');
+
     $terror = 0;
     $tnum = 0;
-    $types = array('preg','memo','text','date','num');
-    $formats = array(
-      'preg' => array('/[0-9a-zA-Z]*/','/[0-9a-z]*/','/[a-z][0-9a-z]*/' ),
-      'memo' => array('all', 'noscript', 'somehtml', 'nohtml', 'htmlencode'),
-      'text' => array('password','oneline','email','nowacky','multiline'),
-      'date' => array('Y-m-d H:i:s', 'm/d/Y H:i'),
-      'num' => array('int','dec'),
+    $format_types = [
+      'preg',
+      'memo',
+      'svghtml',
+      'html',
+      'basicsvg',
+      'basichtml',
+      'simple',
+      'nohtml',
+      'text',
+      'email',
+      'password',
+      'oneline',
+      'nowacky',
+      'int',
+      'dec',
+      'date',
+    ];
+    $preg = ['/[0-9a-zA-Z]*/','/[0-9a-z]*/','/[a-z][0-9a-z]*/'];
+    $date = ['Y-m-d H:i:s', 'm/d/Y H:i'];
+    $ranges = [ 
+      [0,4,1],
+      [-2,3,0.5],
+      [0,1,null],
     );
-    $ranges = array( 
-      array(0,4,1),
-      array(-2,3,0.5),
-      array(0,1,NULL),
-    );
-    $range_flags = array(
-      array(TRUE, TRUE),
-      array(TRUE, TRUE, TRUE),
+    $range_flags = [
+      [true, true],
+      [true, true, true],
     );
     
+    //Build initial inputs object
+    $defs = (object) [
+      'label' => 'Label',
+      'name' => 'form_name_for_html',
+      'element' => 'text',
+      'list' => [
+        (object) ['name' => 'Pennsylvania', 'value', 'PA'],
+        (object) ['name' => 'Ohio', 'value', 'OH'],
+        (object) ['name' => 'West Virginia', 'value', 'WV'],
+      ],
+      'value' => '',
+      'format' => 'preg:/[0-9a-zA-Z]*/',
+      'required' => false,
+      'min_chars' => 0,
+      'max_chars' => 0,
+      'trim' => true,
+      'min' => null,
+      'max' => null,
+      'step' => null,
+      'inc_min' => null,
+      'inc_max' => null,
+      'auto_step' => null
+    ];
+
     //Test for empty string issues and numchars
-    
-    //$this->validation($input, $type, $format, $required=false, $chars=NULL, $notrim=false, $range=array(null, null, null), $range_flags=array(false, false, false))
-    
-    // Testing Input Errors
     echo "<pre>\n\nTesting 10 series (input) errors\n\n";
     $error = 0;
+    $tests = [];
+
+    //Allowing empty values
+    $tests[] = [$inputs, 0];
+    $inputs->format = 'memo';
+    $tests[] = [$inputs, 0];
+    $inputs->format = 'text';
+    $tests[] = [$inputs, 0];
+    $inputs->format = 'oneline';
+    $tests[] = [$inputs, 0];
+    $inputs->format = 'nohtml';
+    $tests[] = [$inputs, 0];
+    $inputs->format = 'date:Y-m-d H:i:s';
+    $tests[] = [$inputs, 0];
+    $inputs->format = 'dec';
+    $tests[] = [$inputs, 0];
+    $inputs->format = 'int';
+    $tests[] = [$inputs, 0];
+
+    //Disallowing empty values
+    $inputs->required = true;
+    $inputs->format = 'preg:/[0-9a-zA-Z]*/';
+    $tests[] = [$inputs, 11];
+    $inputs->format = 'memo';
+    $tests[] = [$inputs, 11];
+    $inputs->format = 'text';
+    $tests[] = [$inputs, 11];
+    $inputs->format = 'oneline';
+    $tests[] = [$inputs, 11];
+    $inputs->format = 'nohtml';
+    $tests[] = [$inputs, 11];
+    $inputs->format = 'date:Y-m-d H:i:s';
+    $tests[] = [$inputs, 11];
+    $inputs->format = 'dec';
+    $tests[] = [$inputs, 11];
+    $inputs->format = 'int';
+    $tests[] = [$inputs, 11];
+
+    //Test for long/short strings
+    $inputs->max_chars = 12;
+    $inputs->format = 'preg:/[0-9a-zA-Z]*/';
+    $inputs->value = 'Ab';
+    $tests[] = [$inputs, 0];
+    $inputs->format = 'memo';
+    $inputs->value = 'This';
+    $tests[] = [$inputs, 0];
+    $inputs->format = 'text';
+    $inputs->value = 'Testing this';
+    $tests[] = [$inputs, 0];
+    $inputs->format = 'date:Y-m-d H:i:s';
+    $inputs->max_chars = 20;
+    $inputs->value = '2013-01-01 00:00:00';
+    $tests[] = [$inputs, 0];
+    $inputs->max_chars = 2;
+    $inputs->format = 'int';
+    $inputs->value = 45;
+    $tests[] = [$inputs, 0];
+    $inputs->max_chars = 3;
+    $inputs->format = 'dec';
+    $inputs->value = 4.5;
+    $tests[] = [$inputs, 0];
+    $inputs->max_chars = 12;
+    $inputs->format = 'preg:/[0-9a-zA-Z]*/';
+    $inputs->value = 'Thisisalongstringthatshouldfail';
+    $tests[] = [$inputs, 12];
+    $inputs->format = 'memo';
+    $inputs->value = 'This is another long string that should fail';
+    $tests[] = [$inputs, 12];
+    $inputs->format = 'text';
+    $inputs->value = 'Testing this ';
+    $tests[] = [$inputs, 12];
+    $inputs->format = 'date:Y-m-d H:i:s';
+    $inputs->value = '2013-01-01 00:00:00';
+    $tests[] = [$inputs, 12];
+    $inputs->max_chars = 2;
+    $inputs->format = 'int';
+    $inputs->value = 455;
+    $tests[] = [$inputs, 12];
+    $inputs->max_chars = 3;
+    $inputs->format = 'dec';
+    $inputs->value = 4.54;
+    $tests[] = [$inputs, 12];
+
+
     $tests = array(
       array(array('', 'preg', $formats['preg'][0]),0),
       array(array('', 'memo', $formats['memo'][0]),0),

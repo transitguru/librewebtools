@@ -179,6 +179,7 @@ class Field{
    *  0 = no error
    * 11 = Empty value
    * 12 = String too long
+   * 13 = String too short
    * 21 = Does not match regex
    * 41 = Line breaks/tabs in password
    * 42 = Line breaks in oneline input
@@ -308,7 +309,7 @@ class Field{
         return;
       }
     }
-    elseif($format=='oneline'){
+    elseif($format=='oneline' || $format=='text'){
       //$input = core_validate_descript($input);
       //Allow only one line text, do not allow CR or LF
       if(fnmatch("*\r*",$this->value) || fnmatch("*\n*",$this->value)){

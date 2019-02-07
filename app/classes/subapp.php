@@ -17,7 +17,7 @@ class Subapp{
   /**
    * Generic constructor for a Module that would inherit this class
    *
-   * @param Path $path Path object
+   * @param \LWT\Path $path Path object
    * @param Object $user_input Inputs from user (URI, POST, GET, FILES)
    * @param \LWT\Session $session User Session object
    */

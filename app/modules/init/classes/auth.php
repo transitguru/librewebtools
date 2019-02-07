@@ -25,6 +25,7 @@ Class Auth Extends \LWT\Subapp{
         'var_dump' => (object)[
           'user_input' => $this->inputs,
           'session' => $this->session,
+          'path' => $this->path,
         ],
       ];
       echo json_encode($payload, JSON_UNESCAPED_SLASHES);
