@@ -229,7 +229,7 @@ class Field{
       return;
     }
     // Handle too few characters
-    if ($this->min_chars > 0 && ($this->max_chars >= $this->min_chars || $this->max_chars == 0) && mb_strlen($this->value) < $this->min_chars){
+    if ($this->min_chars > 0 && mb_strlen($this->value) < $this->min_chars){
       $this->error = 13;
       $this->message = "Invalid: Please enter a value with no less than {$this->min_chars} characters";
       return;
@@ -319,7 +319,6 @@ class Field{
       }
     }
     elseif($format=='oneline' || $format=='text'){
-      //$input = core_validate_descript($input);
       //Allow only one line text, do not allow CR or LF
       if(fnmatch("*\r*",$this->value) || fnmatch("*\n*",$this->value)){
         $this->error = 42;
