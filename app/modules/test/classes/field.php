@@ -55,7 +55,7 @@ class Field extends Tester{
       $status['error'] = 1;
     }
     else{
-      $status['message'] = "Success!";
+      $status['message'] = "Success! Found and expected {$field->error}";
       $status['error'] = 0;
     }
     return $status;
