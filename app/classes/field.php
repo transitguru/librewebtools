@@ -157,6 +157,15 @@ class Field{
     if (isset($defs->max_chars) && is_int($defs->max_chars)){
       $this->max_chars = $defs->max_chars;
     }
+    if (isset($defs->trim) && is_bool($defs->trim)){
+      $this->trim = $defs->trim;
+    }
+    if (isset($defs->min) && is_numeric($defs->min)){
+      $this->min = $defs->min;
+    }
+    if (isset($defs->max) && is_numeric($defs->max)){
+      $this->max = $defs->max;
+    }
     if (isset($defs->step) && is_numeric($defs->step)){
       $this->step = $defs->step;
     }
@@ -214,13 +223,13 @@ class Field{
     }
     
     //Handle too many characters
-    if ($this->max_chars > 0 && strlen($this->value) > $this->max_chars){
+    if ($this->max_chars > 0 && mb_strlen($this->value) > $this->max_chars){
       $this->error = 12;
       $this->message = "Invalid: Please enter a value with no more than {$this->max_chars} characters";
       return;
     }
     // Handle too few characters
-    if ($this->min_chars > 0 && $this->max_chars >= $this->min_chars && strlen($this->value) < $this->min_chars){
+    if ($this->min_chars > 0 && ($this->max_chars >= $this->min_chars || $this->max_chars == 0) && mb_strlen($this->value) < $this->min_chars){
       $this->error = 13;
       $this->message = "Invalid: Please enter a value with no less than {$this->min_chars} characters";
       return;
