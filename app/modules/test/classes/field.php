@@ -45,7 +45,7 @@ class Field extends Tester{
    */
   private function validation($inputs, $error=0){
     // try making the object
-    $field = new Field($inputs);
+    $field = new \LWT\Field($inputs);
     
     $field->validate();
 
@@ -67,7 +67,7 @@ class Field extends Tester{
    */
   public function run(){
     // Find out data directory
-    $directory = DOC_ROOT . 'app/modules/test/config/';
+    $directory = DOC_ROOT . '/app/modules/test/config/';
     $this->time = date('Y-m-d H:i:s');
     $json = file_get_contents($directory . 'field.json');
     $object = json_decode($json); /**< Unpacked JSON object of all tests */
@@ -94,6 +94,7 @@ class Field extends Tester{
 
     // Final Report
     echo "Total Error: {$terror}/{$tnum}\n\n";
+    exit;
   }
 
 

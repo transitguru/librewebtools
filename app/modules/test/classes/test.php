@@ -16,9 +16,11 @@ namespace LWT\Modules\Test;
 Class Test Extends \LWT\Subapp{
   public function ajax(){
     //This function will use properly formed JSON to call the appropriate test
+    $namespace = "\\LWT\\Modules\\Test\\";
     if (fnmatch('application/json*', $this->inputs->content_type) || fnmatch('text/json*', $this->inputs->content_type)){
-      if (isset($this->inputs->post->command) && class_exists($this->inputs->post->command)){
-        $test = new $this->inputs->post->command($this->path, $this->inputs, $this->session);
+      if (isset($this->inputs->post->command) && class_exists($namespace . $this->inputs->post->command)){
+        $class = $namespace . $this->inputs->post->command;
+        $test = new $class($this->path, $this->inputs, $this->session);
       }
       else{
         $test = new Tester($this->path, $this->inputs, $this->session);
