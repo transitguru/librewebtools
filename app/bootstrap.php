@@ -78,6 +78,9 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
   if (isset($_COOKIE) && isset($_COOKIE['librewebtools'])){
     $session = new LWT\Session($_COOKIE['librewebtools']);
   }
+  else{
+    $session = new LWT\Session(0);
+  }
 }
 else{
   define('BASE_URI', '/');
