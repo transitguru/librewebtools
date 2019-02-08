@@ -45,7 +45,7 @@ class Field extends Tester{
    */
   private function validation($inputs, $error=0){
     // try making the object
-    $field = new Field($inputs)
+    $field = new Field($inputs);
     
     $field->validate();
 
@@ -93,72 +93,7 @@ class Field extends Tester{
     }
 
     // Final Report
-    echo "Total Error: {$terror}/{$tnum}\n\n</pre>";  
-    
-    // Testing Number errors
-    echo "\n\nTesting 60 series (number) errors\n\n";
-    $error = 0;
-    $tests = array(
-      //Basic integer or float tests
-      array(array('21', 'num', $formats['num'][0]),0),
-      array(array('21.2', 'num', $formats['num'][0]),61),
-      array(array('foo', 'num', $formats['num'][0]),61),
-      array(array('21', 'num', $formats['num'][1]),0),
-      array(array('21.2', 'num', $formats['num'][1]),0),
-      array(array('foo', 'num', $formats['num'][1]),62),
-      
-      //Testing resolution
-      array(array('0', 'num', $formats['num'][1], true, null, false, array(0,3,0.5)),0),
-      array(array('3', 'num', $formats['num'][1], true, null, false, array(0,3,0.5)),0),
-      array(array('2.5', 'num', $formats['num'][1], true, null, false, array(0,3,0.5)),0),
-      array(array('2.51', 'num', $formats['num'][1], true, null, false, array(0,3,0.5), array(false,false,false)),67),
-      array(array('2.51', 'num', $formats['num'][1], true, null, false, array(0,3,0.5)),0),
-      array(array('3.2', 'num', $formats['num'][1], true, null, false, array(0,3.2,0.5)),0),
-      array(array('0', 'num', $formats['num'][0], true, null, false, array(0,50,5)),0),
-      array(array('5', 'num', $formats['num'][0], true, null, false, array(0,50,5)),0),
-      array(array('2.5', 'num', $formats['num'][0], true, null, false, array(0,50,5)),61),
-      array(array('25', 'num', $formats['num'][0], true, null, false, array(0,50,5)),0),
-      array(array('24', 'num', $formats['num'][0], true, null, false, array(0,50,5), array(false, false, false)),67),
-      array(array('24', 'num', $formats['num'][0], true, null, false, array(0,50,5)),0),
-      
-      //Testing ranges (integers)
-      array(array('-1', 'num', $formats['num'][0], true, null, false, array(0,3,null)),64),
-      array(array('0', 'num', $formats['num'][0], true, null, false, array(0,3,null)),0),
-      array(array('3', 'num', $formats['num'][0], true, null, false, array(0,3,null)),0),
-      array(array('4', 'num', $formats['num'][0], true, null, false, array(0,3,null)),66),
-      array(array('-1', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(false, false, true)),63),
-      array(array('0', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(false, false, true)),63),
-      array(array('1', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(false, false, true)),0),
-      array(array('2', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(false, false, true)),0),
-      array(array('3', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(false, false, true)),65),
-      array(array('4', 'num', $formats['num'][0], true, null, false, array(0,3,null), array(false, false, true)),65),
-      
-      //Testing ranges (floats)
-      array(array('-1', 'num', $formats['num'][1], true, null, false, array(0,3,null)),64),
-      array(array('0', 'num', $formats['num'][1], true, null, false, array(0,3,null)),0),
-      array(array('3', 'num', $formats['num'][1], true, null, false, array(0,3,null)),0),
-      array(array('4', 'num', $formats['num'][1], true, null, false, array(0,3,null)),66),
-      array(array('-1', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(false, false, true)),63),
-      array(array('0', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(false, false, true)),63),
-      array(array('0.00001', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(false, false, true)),0),
-      array(array('2.99999', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(false, false, true)),0),
-      array(array('3', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(false, false, true)),65),
-      array(array('4', 'num', $formats['num'][1], true, null, false, array(0,3,null), array(false, false, true)),65),
-      
-
-    );
-    $num = count($tests);
-    foreach ($tests as $test){
-      $result = $this->validation($test[0],$test[1]);
-      echo $result['message'] . "\n";
-      $error += $result['error'];
-    }
-    echo "Tests ran with {$error}/{$num} errors.\n";
-    $terror += $error;
-    $tnum += $num;
-    
-    // Final Report
-    echo "Total Error: {$terror}/{$tnum}\n\n</pre>";  
+    echo "Total Error: {$terror}/{$tnum}\n\n";
   }
 
 

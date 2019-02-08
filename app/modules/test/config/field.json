@@ -1,4 +1,12 @@
 {
+  "__comments__":{
+    "category"  : "Unit Testing",
+    "package"   : "LibreWebTools",
+    "author"    : "Michael Sypolt <msypolt@transitguru.limited>",
+    "copyright" : "Copyright (c) 2019",
+    "license"   : "http://www.gnu.org/licenses/gpl-3.0.txt",
+    "version"   : "Release: @package_version@"
+  },
   "test_series":[
     {"type":"input", "code":"10","tests":[
         { "error":0,
@@ -503,6 +511,174 @@
           "inputs":{
             "value":"foo8797kjlj",
             "format":"dec","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"0",
+            "format":"int","trim":true,"min":0,"max":50,"step":5
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"24",
+            "format":"int","trim":true,"min":0,"max":50,"step":5
+          }
+        },
+        { "error":67,
+          "inputs":{
+            "value":"24",
+            "format":"int","trim":true,"min":0,"max":50,"step":5,"auto_step":false
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"25",
+            "format":"int","trim":true,"min":0,"max":50,"step":5,"auto_step":false
+          }
+        },
+        { "error":61,
+          "inputs":{
+            "value":"2.4",
+            "format":"int","trim":true,"min":0,"max":50,"step":5
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"2.4",
+            "format":"dec","trim":true,"min":0,"max":5.5,"step":0.5
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"2.5",
+            "format":"dec","trim":true,"min":0,"max":5.5,"step":0.5,"auto_step":false
+          }
+        },
+        { "error":67,
+          "inputs":{
+            "value":"2.51",
+            "format":"dec","trim":true,"min":0,"max":5.5,"step":0.5,"auto_step":false
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"2.51",
+            "format":"dec","trim":true,"min":0,"max":5.5,"step":0.5
+          }
+        },
+        { "error":64,
+          "inputs":{
+            "value":"-1",
+            "format":"int","trim":true,"min":0,"max":3
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"1",
+            "format":"int","trim":true,"min":0,"max":3
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"3",
+            "format":"int","trim":true,"min":0,"max":3
+          }
+        },
+        { "error":66,
+          "inputs":{
+            "value":"4",
+            "format":"int","trim":true,"min":0,"max":3
+          }
+        },
+        { "error":63,
+          "inputs":{
+            "value":"-1",
+            "format":"int","trim":true,"min":0,"max":3,"inc_max":false,"inc_min":false
+          }
+        },
+        { "error":63,
+          "inputs":{
+            "value":"0",
+            "format":"int","trim":true,"min":0,"max":3,"inc_max":false,"inc_min":false
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"2",
+            "format":"int","trim":true,"min":0,"max":3,"inc_max":false,"inc_min":false
+          }
+        },
+        { "error":65,
+          "inputs":{
+            "value":"3",
+            "format":"int","trim":true,"min":0,"max":3,"inc_max":false,"inc_min":false
+          }
+        },
+        { "error":64,
+          "inputs":{
+            "value":"-0.000001",
+            "format":"dec","trim":true,"min":0,"max":3
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"0.000001",
+            "format":"dec","trim":true,"min":0,"max":3
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"0",
+            "format":"dec","trim":true,"min":0,"max":3
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"3",
+            "format":"dec","trim":true,"min":0,"max":3
+          }
+        },
+        { "error":66,
+          "inputs":{
+            "value":"3.6",
+            "format":"dec","trim":true,"min":0,"max":3
+          }
+        },
+        { "error":63,
+          "inputs":{
+            "value":"0",
+            "format":"dec","trim":true,"min":0,"max":3,"inc_max":false,"inc_min":false
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"0.0000001",
+            "format":"dec","trim":true,"min":0,"max":3,"inc_max":false,"inc_min":false
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"2",
+            "format":"dec","trim":true,"min":0,"max":3,"inc_max":false,"inc_min":false
+          }
+        },
+        { "error":65,
+          "inputs":{
+            "value":"3",
+            "format":"dec","trim":true,"min":0,"max":3,"inc_max":false,"inc_min":false
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"2.99999999",
+            "format":"dec","trim":true,"min":0,"max":3,"inc_max":false,"inc_min":false
+          }
+        },
+        { "error":65,
+          "inputs":{
+            "value":"4",
+            "format":"dec","trim":true,"min":0,"max":3,"inc_max":false,"inc_min":false
           }
         }
       ]
