@@ -192,7 +192,7 @@ class Installer{
    */
   private function install_db($post,$db_type){
     //Load installer file
-    $file = DOC_ROOT . '/app/json/install.json';
+    $file = DOC_ROOT . '/app/config/install.json';
     $json = file_get_contents($file);
 
     //Keep track of raw SQL for building the tables

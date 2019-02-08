@@ -1,0 +1,511 @@
+{
+  "test_series":[
+    {"type":"input", "code":"10","tests":[
+        { "error":0,
+          "inputs":{
+            "value":"",
+            "format":"preg:/[0-9a-zA-Z]*/","required":false,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"",
+            "format":"memo","required":false,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"",
+            "format":"text","required":false,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"",
+            "format":"oneline","required":false,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"",
+            "format":"email","required":false,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"",
+            "format":"date:Y-m-d H:i:s","required":false,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"",
+            "format":"int","required":false,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"",
+            "format":"dec","required":false,"trim":true
+          }
+        },
+        { "error":11,
+          "inputs":{
+            "value":"",
+            "format":"preg:/[0-9a-zA-Z]*/","required":true,"trim":true
+          }
+        },
+        { "error":11,
+          "inputs":{
+            "value":"",
+            "format":"memo","required":true,"trim":true
+          }
+        },
+        { "error":11,
+          "inputs":{
+            "value":"",
+            "format":"text","required":true,"trim":true
+          }
+        },
+        { "error":11,
+          "inputs":{
+            "value":"",
+            "format":"oneline","required":true,"trim":true
+          }
+        },
+        { "error":11,
+          "inputs":{
+            "value":"",
+            "format":"email","required":true,"trim":true
+          }
+        },
+        { "error":11,
+          "inputs":{
+            "value":"",
+            "format":"date:Y-m-d H:i:s","required":true,"trim":true
+          }
+        },
+        { "error":11,
+          "inputs":{
+            "value":"",
+            "format":"int","required":true,"trim":true
+          }
+        },
+        { "error":11,
+          "inputs":{
+            "value":"",
+            "format":"dec","required":true,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"Ab",
+            "format":"preg:/[0-9a-zA-Z]*/","max_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"Test this",
+            "format":"memo","max_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"Testing",
+            "format":"text","max_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"This is one",
+            "format":"oneline","max_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"foo@foo.com",
+            "format":"email","max_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"2013-01-01 00:00:00",
+            "format":"date:Y-m-d H:i:s","max_chars":22,"required":true,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":23,
+            "format":"int","max_chars":2,"required":true,"trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":4.7,
+            "format":"dec","max_chars":3,"required":true,"trim":true
+          }
+        },
+        { "error":12,
+          "inputs":{
+            "value":"Abbacadabra9909090",
+            "format":"preg:/[0-9a-zA-Z]*/","max_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":12,
+          "inputs":{
+            "value":"Test this longer string",
+            "format":"memo","max_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":12,
+          "inputs":{
+            "value":"Testing too long",
+            "format":"text","max_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":12,
+          "inputs":{
+            "value":"This is one is longer",
+            "format":"oneline","max_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":12,
+          "inputs":{
+            "value":"foo@librewebtools.org",
+            "format":"email","max_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":12,
+          "inputs":{
+            "value":"2013-01-01 00:00:00",
+            "format":"date:Y-m-d H:i:s","max_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":12,
+          "inputs":{
+            "value":2345,
+            "format":"int","max_chars":2,"required":true,"trim":true
+          }
+        },
+        { "error":12,
+          "inputs":{
+            "value":3.1416,
+            "format":"dec","max_chars":3,"required":true,"trim":true
+          }
+        },
+        { "error":13,
+          "inputs":{
+            "value":"Ab",
+            "format":"preg:/[0-9a-zA-Z]*/","min_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":13,
+          "inputs":{
+            "value":"Test this",
+            "format":"memo","min_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":13,
+          "inputs":{
+            "value":"Testing",
+            "format":"text","min_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":13,
+          "inputs":{
+            "value":"This is one",
+            "format":"oneline","min_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":13,
+          "inputs":{
+            "value":"foo@foo.com",
+            "format":"email","min_chars":12,"required":true,"trim":true
+          }
+        },
+        { "error":13,
+          "inputs":{
+            "value":"2013-01-01 00:00:00",
+            "format":"date:Y-m-d H:i:s","min_chars":22,"required":true,"trim":true
+          }
+        },
+        { "error":13,
+          "inputs":{
+            "value":23,
+            "format":"int","min_chars":4,"required":true,"trim":true
+          }
+        },
+        { "error":13,
+          "inputs":{
+            "value":4.7,
+            "format":"dec","min_chars":4,"required":true,"trim":true
+          }
+        }
+      ]
+    },
+    {"type":"regex", "code":"20","tests":[
+        { "error":0,
+          "inputs":{
+            "value":"15222",
+            "format":"preg:/[0-9a-zA-Z]*/","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"  word45  ",
+            "format":"preg:/[0-9a-zA-Z]*/","trim":true
+          }
+        },
+        { "error":21,
+          "inputs":{
+            "value":"  word45  ",
+            "format":"preg:/[0-9a-zA-Z]*/","trim":false
+          }
+        },
+        { "error":21,
+          "inputs":{
+            "value":"Something_With_some stuff",
+            "format":"preg:/[0-9a-zA-Z]*/","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"a9099898",
+            "format":"preg:/[a-z][0-9a-z]*/","trim":true
+          }
+        },
+        { "error":21,
+          "inputs":{
+            "value":"A90sase99898",
+            "format":"preg:/[a-z][0-9a-z]*/","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"a90sase99898",
+            "format":"preg:/[a-z][0-9a-z]*/","trim":true
+          }
+        },
+        { "error":21,
+          "inputs":{
+            "value":"TheCaps32",
+            "format":"preg:/[0-9a-z]*/","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"thecaps32",
+            "format":"preg:/[0-9a-z]*/","trim":true
+          }
+        }
+      ]
+    },
+    {"type":"string", "code":"40","tests":[
+        { "error":0,
+          "inputs":{
+            "value":"Password",
+            "format":"password","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"Password%$#WithspecialChars",
+            "format":"password","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"Password%$#WithspecialChars\t\r\n",
+            "format":"password","trim":true
+          }
+        },
+        { "error":41,
+          "inputs":{
+            "value":"Password%$#WithspecialChars\t\r\nikjkljlkjlk",
+            "format":"password","trim":true
+          }
+        },
+        { "error":41,
+          "inputs":{
+            "value":"Password%$#WithspecialChars\t\r\n",
+            "format":"password","trim":false
+          }
+        },
+        { "error":41,
+          "inputs":{
+            "value":"Password%$#Withspe\tcialChar",
+            "format":"password","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"Password%$#Withspe\tcialChar",
+            "format":"text","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"Password%$#Withspe\tcialChar\r\n",
+            "format":"text","trim":true
+          }
+        },
+        { "error":42,
+          "inputs":{
+            "value":"Password%$#Withspe\tcialChar\r\niklhlkhkj",
+            "format":"text","trim":true
+          }
+        },
+        { "error":43,
+          "inputs":{
+            "value":"Password",
+            "format":"email","trim":true
+          }
+        },
+        { "error":43,
+          "inputs":{
+            "value":"foo@dev",
+            "format":"email","trim":true
+          }
+        },
+        { "error":43,
+          "inputs":{
+            "value":"foo.dev@null",
+            "format":"email","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"foo.dev@librewebtools.org",
+            "format":"email","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"foo-dev@librewebtools.org",
+            "format":"email","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"foo+dev@librewebtools.org",
+            "format":"email","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"foo_dev@librewebtools.org",
+            "format":"email","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"15222sometext",
+            "format":"nowacky","trim":true
+          }
+        },
+        { "error":44,
+          "inputs":{
+            "value":"1i<5222so#9$metext",
+            "format":"nowacky","trim":true
+          }
+        }
+      ]
+    },
+    {"type":"date", "code":"50","tests":[
+        { "error":0,
+          "inputs":{
+            "value":"2018-02-11 09:00:00",
+            "format":"date:Y-m-d H:i:s","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"1988-04-04 09:00:00",
+            "format":"date:Y-m-d H:i:s","trim":true
+          }
+        },
+        { "error":52,
+          "inputs":{
+            "value":"2006-09-22 24:52:00",
+            "format":"date:Y-m-d H:i:s","trim":true
+          }
+        },
+        { "error":52,
+          "inputs":{
+            "value":"2011-04-29 12:52:60",
+            "format":"date:Y-m-d H:i:s","trim":true
+          }
+        },
+        { "error":51,
+          "inputs":{
+            "value":"2011-04-29 12:52:60",
+            "format":"date:m/d/Y H:i:s","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"04/29/2011 12:52:60",
+            "format":"date:m/d/Y H:i:s","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"09:00:00",
+            "format":"H:i:s","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"25:05:00",
+            "format":"H:i:s","trim":true
+          }
+        }
+      ]
+    },
+    {"type":"number", "code":"60","tests":[
+        { "error":0,
+          "inputs":{
+            "value":"2018",
+            "format":"int","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"201876544400",
+            "format":"int","trim":true
+          }
+        },
+        { "error":61,
+          "inputs":{
+            "value":"22.65",
+            "format":"int","trim":true
+          }
+        },
+        { "error":61,
+          "inputs":{
+            "value":"foo",
+            "format":"int","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"3.1416",
+            "format":"dec","trim":true
+          }
+        },
+        { "error":0,
+          "inputs":{
+            "value":"22",
+            "format":"dec","trim":true
+          }
+        },
+        { "error":62,
+          "inputs":{
+            "value":"foo8797kjlj",
+            "format":"dec","trim":true
+          }
+        }
+      ]
+    }
+  ]
+}
