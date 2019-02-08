@@ -347,7 +347,7 @@ class Field{
     }
 
     // Check for Numeric types
-    elseif ($format == 'num' || $format == 'int'){
+    elseif ($format == 'dec' || $format == 'int'){
       if ($format=='int'){
         //Integer Numbers
         $this->value = str_replace(',','',$this->value);

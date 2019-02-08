@@ -450,7 +450,7 @@
             "format":"date:m/d/Y H:i:s","trim":true
           }
         },
-        { "error":0,
+        { "error":52,
           "inputs":{
             "value":"04/29/2011 12:52:60",
             "format":"date:m/d/Y H:i:s","trim":true
