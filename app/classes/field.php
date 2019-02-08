@@ -148,25 +148,25 @@ class Field{
         $this->format = $defs->format;
       }
     }
-    if (is_bool($defs->required)){
+    if (isset($defs->required) && is_bool($defs->required)){
       $this->required = $defs->required;
     }
-    if (is_int($defs->min_chars)){
+    if (isset($defs->min_chars) && is_int($defs->min_chars)){
       $this->min_chars = $defs->min_chars;
     }
-    if (is_int($defs->max_chars)){
+    if (isset($defs->max_chars) && is_int($defs->max_chars)){
       $this->max_chars = $defs->max_chars;
     }
-    if (is_numeric($defs->step)){
+    if (isset($defs->step) && is_numeric($defs->step)){
       $this->step = $defs->step;
     }
-    if (is_bool($defs->inc_min)){
+    if (isset($defs->inc_min) && is_bool($defs->inc_min)){
       $this->inc_min = $defs->inc_min;
     }
-    if (is_bool($defs->inc_max)){
+    if (isset($defs->inc_max) && is_bool($defs->inc_max)){
       $this->inc_max = $defs->inc_max;
     }
-    if (is_bool($defs->auto_step)){
+    if (isset($defs->auto_step) && is_bool($defs->auto_step)){
       $this->auto_step = $defs->auto_step;
     }
   }
