@@ -29,6 +29,9 @@ Class Auth Extends \LWT\Subapp{
         ],
       ];
       echo json_encode($payload, JSON_UNESCAPED_SLASHES);
+      if (isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
+        $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
+      }
       exit;
     }
   }

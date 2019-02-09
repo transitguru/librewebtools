@@ -11,7 +11,14 @@ Here are a few simple steps for installing LibreWebTools
     the components of your server stack:
 
     - Apache (version 2.2 or greater) (https://httpd.apache.org/)
-    - PHP 7.1.0 (or greater) (https://secure.php.net/).
+    - PHP 7.1.0 (or greater) (https://secure.php.net/) and these PHP packages:
+      - php-curl
+      - php-gd
+      - php-mbstring
+      - php-mysql
+      - php-pgsql
+      - php-sqlite
+      - php-xml
     - One of the following databases:
       - MariaDB 5.5 (or greater) (https://mariadb.org/).
       - MySQL 5.5 (or greater) (https://www.mysql.com/). MariaDB is a fully
