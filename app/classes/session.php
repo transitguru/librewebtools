@@ -90,7 +90,7 @@ class Session{
 
     $db->fetch('users', null, array('login' => $user));
     if(is_array($db->output) && count($db->output)>0){
-      $user_id = $db->output[0]->id;
+      $user_id = $db->output[0]['id'];
     }
     $db->fetch('passwords', null, array('user_id' => $user_id), null, array('valid_date'));
     if(is_array($db->output) && count($db->output)>0){
