@@ -41,7 +41,7 @@ class Session{
         else{
           $this->data = json_decode($db->output[0]['data']);
           $this->user_id = $db->output[0]['user_id'];
-          $db->fetch('users', null, array('id' => $userid));
+          $db->fetch('users', null, array('id' => $this->user_id));
           if($db->error == 0 && count($db->output)>0){
             $success = true;
           }
@@ -95,7 +95,7 @@ class Session{
     $db->fetch('passwords', null, array('user_id' => $user_id), null, array('valid_date'));
     if(is_array($db->output) && count($db->output)>0){
       foreach ($db->output as $pwd){
-        $hash = $pwd['hash'];
+        $hash = $pwd['hashed'];
       }
       $success = password_verify($pass, $hash);
       if ($verify == true){

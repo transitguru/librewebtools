@@ -16,6 +16,9 @@ namespace LWT\Modules\Init;
 Class Auth Extends \LWT\Subapp{
   public function ajax(){
     if (fnmatch('application/json*', $this->inputs->content_type) || fnmatch('text/json*', $this->inputs->content_type)){
+      if (isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
+        $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
+      }
       header('Pragma: ');
       header('Cache-Control: ');
       header('Content-Type: application/json');
@@ -29,9 +32,6 @@ Class Auth Extends \LWT\Subapp{
         ],
       ];
       echo json_encode($payload, JSON_UNESCAPED_SLASHES);
-      if (isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
-        $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
-      }
       exit;
     }
   }
