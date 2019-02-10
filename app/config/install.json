@@ -484,6 +484,13 @@
       }
     },
     {
+      "table":"path_roles",
+      "inputs":{
+        "path_id":5,
+        "role_id":1
+      }
+    },
+    {
       "table":"path_content",
       "inputs":{
         "path_id":0,

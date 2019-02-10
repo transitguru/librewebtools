@@ -123,10 +123,11 @@ class Session{
           throw new Exception("Tried {$try} times to unsuccessfully create a token!");
         }
         $date = date('Y-m-d H:i:s');
+        $cookie_exp = time() + 30 * 24 * 60 * 60;
         $db->write('sessions', array('user_id' => $user_id, 'valid' => $date, 'data' => '{}', 'name' => $token));
         $this->__construct($token);
+        setcookie('librewebtools', $token, $cookie_exp, BASE_URI . '/');
         header('Location: ' . BASE_URI . '/');
-        setcookie('librewebtools', $token, 0, BASE_URI . '/');
         exit;
       }
     }
@@ -138,8 +139,10 @@ class Session{
   public function logout(){
     $db = new Db();
     $db->delete('sessions', ['name' => $this->id]);
-    setcookie('librewebtools', '', '/');
+    setcookie('librewebtools', '', 0, BASE_URI . '/');
     $this->__construct('');
+    header('Location: ' . BASE_URI . '/');
+    exit;
   }
 }
 
