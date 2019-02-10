@@ -17,18 +17,17 @@ Class Auth Extends \LWT\Subapp{
   public function ajax(){
     if (fnmatch('application/json*', $this->inputs->content_type) || fnmatch('text/json*', $this->inputs->content_type)){
 
-      
       $begin = mb_strlen($this->path->root);
-      if (strlen($this->inputs->uri) > $begin){
+      if (mb_strlen($this->inputs->uri) > $begin){
         $pathstring = mb_substr($this->inputs->uri, $begin);
       }
       else{
         $pathstring = '';
       }
-      if ($pathstring == '/login' && isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
+      if ($pathstring == 'login' && isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
         $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
       }
-      elseif ($pathstring == '/logout'){
+      elseif ($pathstring == 'logout'){
         $this->session->logout();
       }
       else{
@@ -42,6 +41,7 @@ Class Auth Extends \LWT\Subapp{
             'user_input' => $this->inputs,
             'session' => $this->session,
             'path' => $this->path,
+            'pathstring' => $pathstring,
           ],
         ];
         echo json_encode($payload, JSON_UNESCAPED_SLASHES);

@@ -20,7 +20,7 @@ Class Script Extends \LWT\Subapp{
   public function ajax(){
     // Find out the application's URL path
     $begin = mb_strlen($this->path->root);
-    if (strlen($this->inputs->uri) > $begin){
+    if (mb_strlen($this->inputs->uri) > $begin){
       $pathstring = mb_substr($this->inputs->uri, $begin);
     }
     else{
