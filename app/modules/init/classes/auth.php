@@ -16,22 +16,36 @@ namespace LWT\Modules\Init;
 Class Auth Extends \LWT\Subapp{
   public function ajax(){
     if (fnmatch('application/json*', $this->inputs->content_type) || fnmatch('text/json*', $this->inputs->content_type)){
-      if (isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
+
+      
+      $begin = mb_strlen($this->path->root);
+      if (strlen($this->inputs->uri) > $begin){
+        $pathstring = mb_substr($this->inputs->uri, $begin);
+      }
+      else{
+        $pathstring = '';
+      }
+      if ($pathstring == '/login' && isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
         $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
       }
-      header('Pragma: ');
-      header('Cache-Control: ');
-      header('Content-Type: application/json');
-      $payload = (object)[
-        'status' => 'success',
-        'code' => 200,
-        'var_dump' => (object)[
-          'user_input' => $this->inputs,
-          'session' => $this->session,
-          'path' => $this->path,
-        ],
-      ];
-      echo json_encode($payload, JSON_UNESCAPED_SLASHES);
+      elseif ($pathstring == '/logout'){
+        $this->session->logout();
+      }
+      else{
+        header('Pragma: ');
+        header('Cache-Control: ');
+        header('Content-Type: application/json');
+        $payload = (object)[
+          'status' => 'success',
+          'code' => 200,
+          'var_dump' => (object)[
+            'user_input' => $this->inputs,
+            'session' => $this->session,
+            'path' => $this->path,
+          ],
+        ];
+        echo json_encode($payload, JSON_UNESCAPED_SLASHES);
+      }
       exit;
     }
   }
