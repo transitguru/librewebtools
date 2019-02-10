@@ -24,8 +24,13 @@ Class Auth Extends \LWT\Subapp{
       else{
         $pathstring = '';
       }
-      if ($pathstring == 'login' && isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
-        $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
+      if ($pathstring == 'login'){
+        if (isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
+          $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
+        }
+        else{
+          echo '{"message":"Please login","form":["user","pass"]}';
+        }
       }
       elseif ($pathstring == 'logout'){
         $this->session->logout();
