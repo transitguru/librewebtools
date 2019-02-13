@@ -17,12 +17,14 @@ class Field{
   public $label = null;      /**< Human friendly name for form Label */
   public $name = '';         /**< Name for form element */
   public $element = '';      /**< Type of form element */
+  public $autocomplete= 'on';/**< Autocomplete behavior on form element */
+  public $autofocus = false; /**< Whether to allow autofocus on form element */
+  public $tabindex = 0;      /**< If non-zero, special rules for tab index */
   public $list = array();    /**< Array of list items to put in list type elements */
   public $value = '';        /**< value to be validated */
   public $message = '';      /**< message to be emitted based on validation */
   public $error = 0;         /**< int error number based on validation */
   
-  private $element_types = ['button','select','text','textarea'];
   private $format_types = [
     'preg',
     'memo',
@@ -62,17 +64,17 @@ class Field{
    * 'dec' Allows both integers and decimal numbers
    *
    */
-  private $format;
-  private $required = false; /**< Determines if the field is required */
-  private $min_chars=0;      /**< Minumum number of characters */
-  private $max_chars=0;      /**< Maximum number of characters, zero means no limit */
-  private $trim = true;      /**< Determines if automatic trimming is enabled */
-  private $min = null;       /**< Minumum numeric value, null if no limit */
-  private $max = null;       /**< Maximum numeric value, null if no limit */
-  private $step = null;      /**< Minumum "precision", null if no limit */
-  private $inc_min = true;   /**< Set to false for 'greater than' */
-  private $inc_max = true;   /**< Set to false for 'less than' */
-  private $auto_step = true; /**< set to false to throw error instead of 'auto rounding' */
+  public $format;
+  public $required = false; /**< Determines if the field is required */
+  public $min_chars=0;      /**< Minumum number of characters */
+  public $max_chars=0;      /**< Maximum number of characters, zero means no limit */
+  public $trim = true;      /**< Determines if automatic trimming is enabled */
+  public $min = null;       /**< Minumum numeric value, null if no limit */
+  public $max = null;       /**< Maximum numeric value, null if no limit */
+  public $step = null;      /**< Minumum "precision", null if no limit */
+  public $inc_min = true;   /**< Set to false for 'greater than' */
+  public $inc_max = true;   /**< Set to false for 'less than' */
+  public $auto_step = true; /**< set to false to throw error instead of 'auto rounding' */
   
   /**
    * Initializes new Field
@@ -84,6 +86,9 @@ class Field{
    *     'label' => 'Human-friendly label for field',
    *     'name' => 'form_name_for_html',
    *     'element' => 'text',
+   *     'autocomplete' => 'on',
+   *     'autofocus' => false,
+   *     'tabindex' => 0,
    *     'list' => [
    *       (object) ['name' => 'Pennsylvania', 'value', 'PA'],
    *       (object) ['name' => 'Ohio', 'value', 'OH'],
@@ -122,7 +127,7 @@ class Field{
     if (isset($defs->name)){
       $this->name = $defs->name;
     }
-    if (isset($defs->element) && in_array($defs->element, $this->element_types)){
+    if (isset($defs->element)){
       $this->element = $defs->element;
     }
     if (isset($defs->list) && is_array($defs->list)){
@@ -428,7 +433,56 @@ class Field{
     $this->message = '';
     return;
   }
-  
+
+  /**
+   * Builds form object to put into Form object for later JSON or HTML output
+   *
+   * @return Object $form data for later JSON or HTML conversion in Form object
+   */
+  public function build(){
+    $form->label = $this->$label;
+    $form->name = $this->name;
+    $form->element = $this->element;
+    $form->autocomplete = $this->autocomplete;
+    if ($this->autofocus == true){
+      $form->autofocus = true;
+    }
+    if ($this->tabindex != 0){
+      $form->tabindex = $this->tabindex;
+    }
+    if (count($list)>0){
+      $form->list = $this->list;
+    }
+    $form->value = $this->value;
+    $form->message = $this->message;
+    $form->error = $this->error;
+    $form->format = $this->format;
+    if ($this->required == true){
+      $form->required = true;
+    }
+    if ($this->min_chars > 0){
+      $form->min_chars = $this->min_chars;
+    }
+    if ($this->max_chars > 0){
+      $form->max_chars = $this->max_chars;
+    }
+    $form->trim = $this->trim;
+    if ($this->min > 0){
+      $form->min = $this->min;
+    }
+    if ($this->max > 0){
+      $form->max = $this->max;
+    }
+    if ($this->step !== null){
+      $form->step = $this->step;
+    }
+    $form->inc_min = $this->inc_min;
+    $form->inc_max = $this->inc_max;
+    $form->auto_step = $this->auto_step;
+
+    return $form;
+  }
+
   /**
    * Rendering function (maybe moved to a form object)
    */
