@@ -4,7 +4,7 @@ namespace LWT;
  * @file
  * Field Class
  * 
- * creates, collectes, and validates user inputs for data fields
+ * Creates, collects, and validates user inputs for data fields
  *
  * @category Processing and Validation
  * @package LibreWebTools
@@ -19,12 +19,17 @@ class Field{
   public $element = '';      /**< Type of form element */
   public $autocomplete= 'on';/**< Autocomplete behavior on form element */
   public $autofocus = false; /**< Whether to allow autofocus on form element */
+  public $onstar = [];       /**< Object of on* javascript actions (omit 'on' in key)*/
+  public $datadash = [];     /**< Object of data-* attributes (omit 'data-' in key) */
+  public $classes = [];      /**< Array of CSS classes */
+  public $styles = [];       /**< Object of CSS styles */
   public $tabindex = 0;      /**< If non-zero, special rules for tab index */
   public $list = array();    /**< Array of list items to put in list type elements */
   public $value = '';        /**< value to be validated */
-  public $message = '';      /**< message to be emitted based on validation */
-  public $error = 0;         /**< int error number based on validation */
   
+  /**
+   * Valid format types that can be referenced in a Field object
+   */
   private $format_types = [
     'preg',
     'memo',
@@ -75,7 +80,10 @@ class Field{
   public $inc_min = true;   /**< Set to false for 'greater than' */
   public $inc_max = true;   /**< Set to false for 'less than' */
   public $auto_step = true; /**< set to false to throw error instead of 'auto rounding' */
-  
+
+  public $message = '';      /**< message to be emitted based on validation */
+  public $error = 0;         /**< int error number based on validation */
+
   /**
    * Initializes new Field
    *
@@ -88,11 +96,24 @@ class Field{
    *     'element' => 'text',
    *     'autocomplete' => 'on',
    *     'autofocus' => false,
+   *     'onstar' => (object) [
+   *       'blur' => 'somefunction()',
+   *       'keyup' => 'someotherfunction()',
+   *     ],
+   *     'datadash' => (object) [
+   *       'lwt-attribute' => 'some_value',
+   *       'lwt-maplocation' => 'some_other_value',
+   *     ],
+   *     'classes' => ['awesome','success'],
+   *     'styles' => (object) [
+   *       'color' => 'blue',
+   *       'font-color' => '#ffffff'
+   *     ],
    *     'tabindex' => 0,
    *     'list' => [
-   *       (object) ['name' => 'Pennsylvania', 'value', 'PA'],
-   *       (object) ['name' => 'Ohio', 'value', 'OH'],
-   *       (object) ['name' => 'West Virginia', 'value', 'WV'],
+   *       (object) ['name' => 'Pennsylvania', 'value' => 'PA'],
+   *       (object) ['name' => 'Ohio', 'value' => 'OH'],
+   *       (object) ['name' => 'West Virginia', 'value' => 'WV'],
    *     ],
    *     'value' => 'some_value_to_test',
    *     'format' => 'nowacky',
@@ -118,9 +139,10 @@ class Field{
    * Updates definitions for the Field
    *
    * @param Object $defs Definitions for the Field in the form of the object in constructor above
-   *
    */
   public function update_defs($defs){
+    $this->error = 0;
+    $this->message = '';
     if (isset($defs->label)){
       $this->label = $defs->label;
     }
@@ -129,6 +151,24 @@ class Field{
     }
     if (isset($defs->element)){
       $this->element = $defs->element;
+    }
+    if (isset($defs->autocomplete)){
+      $this->autocomplete = $defs->autocomplete;
+    }
+    if (isset($defs->autofocus)){
+      $this->autofocus = $defs->autofocus;
+    }
+    if (isset($defs->onstar) && is_object($defs->onstar)){
+      $this->onstar = $defs->onstar;
+    }
+    if (isset($defs->datadash) && is_object($defs->datadash)){
+      $this->datadash = $defs->datadash;
+    }
+    if (isset($defs->classes) && is_array($defs->classes)){
+      $this->classes = $defs->classes;
+    }
+    if (isset($defs->styles) && is_object($defs->styles)){
+      $this->styles = $defs->styles;
     }
     if (isset($defs->list) && is_array($defs->list)){
       $this->list = [];
@@ -435,7 +475,7 @@ class Field{
   }
 
   /**
-   * Builds form object to put into Form object for later JSON or HTML output
+   * Builds field object to put into Form object for later JSON or HTML output
    *
    * @return Object $form data for later JSON or HTML conversion in Form object
    */
@@ -449,6 +489,18 @@ class Field{
     }
     if ($this->tabindex != 0){
       $form->tabindex = $this->tabindex;
+    }
+    if (isset($this->onstar) && is_object($this->onstar)){
+      $form->onstar = $this->onstar;
+    }
+    if (isset($this->datadash) && is_object($this->datadash)){
+      $form->datadash = $this->datadash;
+    }
+    if (isset($this->classes) && is_array($this->classes)){
+      $form->classes = $this->classes;
+    }
+    if (isset($defs->styles) && is_object($this->styles)){
+      $this->styles = $this->styles;
     }
     if (count($list)>0){
       $form->list = $this->list;
