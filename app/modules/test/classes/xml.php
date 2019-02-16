@@ -74,7 +74,7 @@ class Xml extends Tester{
 
     echo "\n\nTesting XML with empty attributes\n\n";
     
-    $input = file_get_contents($directory . 'test2.html');
+    $input = file_get_contents($directory . 'test3.html');
     echo $input ."\nAfter scrubbing..\n\n";
     $elements = array('svg', 'g', 'circle', 'path', 'text', 'style');
     $attributes = array ('cx' => array(), 'cy' => array(), 'r' => array(), 'style' => array(), 'd' => array('path'));
@@ -84,16 +84,16 @@ class Xml extends Tester{
     echo $svg->markup;
 
     echo "\nTesting \"pretty\" flag\n";
-    $input = file_get_contents($directory . 'test3.html');
+    $input = file_get_contents($directory . 'test4.html');
 
     echo $input;
 
-    echo "\nLeaving it ugly....\n"
+    echo "\nLeaving it ugly....\n";
     $svg = new \LWT\Xml($input, 'html', $elements, $attributes);
     $svg->scrub();
     echo $svg->markup;
 
-    echo "\nMaking it pretty....\n"
+    echo "\nMaking it pretty....\n";
     $svg->scrub(true);
     echo $svg->markup;
     
