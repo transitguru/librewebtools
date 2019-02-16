@@ -326,8 +326,10 @@ class Xml{
   }
   /**
    * Scrubs the markup
+   *
+   * @param bool $pretty Whether to create extra output with space and indentation
    */
-  public function scrub(){
+  public function scrub($pretty = false){
     // Load input into dom document and find the Body
     $input_doc = new \DOMDocument('1.0');
     libxml_use_internal_errors(true);
@@ -341,6 +343,7 @@ class Xml{
       $output_doc->formatOutput = true;
       $root = $output_doc->createElement('root');
       $output_doc->appendChild($root);
+      $output_doc->formatOutput = $pretty;
       $root = $this->buildxml($output_doc, $input_root, $root);
       
       //Saving only the contents of the Body tag

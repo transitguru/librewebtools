@@ -27,6 +27,9 @@ class Tester{
     $this->session = $session;
   }
 
+  /**
+   * Default function to run if an inherited object does not exist
+   */
   public function run(){
     $dump = (object) [
       'status' => 404,

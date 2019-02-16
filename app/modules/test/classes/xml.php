@@ -82,6 +82,20 @@ class Xml extends Tester{
     $svg = new \LWT\Xml($input, 'html', $elements, $attributes);
     $svg->scrub();
     echo $svg->markup;
+
+    echo "\nTesting \"pretty\" flag\n";
+    $input = file_get_contents($directory . 'test3.html');
+
+    echo $input;
+
+    echo "\nLeaving it ugly....\n"
+    $svg = new \LWT\Xml($input, 'html', $elements, $attributes);
+    $svg->scrub();
+    echo $svg->markup;
+
+    echo "\nMaking it pretty....\n"
+    $svg->scrub(true);
+    echo $svg->markup;
     
     echo "\n\nTest Complete!\n";
     exit;

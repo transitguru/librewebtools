@@ -174,10 +174,19 @@ class Form{
    *
    * @return String $json JSON encoded representation of Form
    */
-  public function json(){
+  public function export_json(){
     $object = $this->build();
     $json = json_encode($object, JSON_UNESCAPED_SLASHES);
     return $json;
+  }
+
+  /**
+   * Creates HTML string of Form object
+   *
+   * @return String $html HTML representation of Form
+   */
+  public function export_html(){
+
   }
 }
 
