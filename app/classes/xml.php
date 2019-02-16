@@ -340,10 +340,9 @@ class Xml{
       
       // Begin to build output document
       $output_doc = new \DOMDocument('1.0');
-      $output_doc->formatOutput = true;
+      $output_doc->formatOutput = $pretty;
       $root = $output_doc->createElement('root');
       $output_doc->appendChild($root);
-      $output_doc->formatOutput = $pretty;
       $root = $this->buildxml($output_doc, $input_root, $root);
       
       //Saving only the contents of the Body tag
