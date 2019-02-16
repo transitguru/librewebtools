@@ -24,52 +24,31 @@ class Field{
   public $classes = [];      /**< Array of CSS classes */
   public $styles = [];       /**< Object of CSS styles */
   public $tabindex = 0;      /**< If non-zero, special rules for tab index */
-  public $list = array();    /**< Array of list items to put in list type elements */
+  public $list = [];         /**< Array of list items to put in list type elements */
   public $value = '';        /**< value to be validated */
   
   /**
    * Valid format types that can be referenced in a Field object
    */
   private $format_types = [
-    'preg',
-    'memo',
-    'svghtml',
-    'html',
-    'basicsvg',
-    'basichtml',
-    'simple',
-    'nohtml',
-    'text',
-    'email',
-    'password',
-    'oneline',
-    'nowacky',
-    'int',
-    'dec',
-    'date',
+    'preg',       /**< Test against regular expression shown after the colon */
+    'date',       /**< test against the date format shown after the colon */
+    'memo',       /**< longer, multi-line text with no filtering */
+    'svghtml',    /**< Allows nearly all SVG + HTML tags */
+    'html',       /**< Allows nearly all HTML tags, but excludes SVG */
+    'basichtml',  /**< Allows a few HTML tags and attributes */
+    'simple',     /**< Allows no HTML attributes and barely any tags */
+    'nohtml',     /**< Does not allow HTML */
+    'text',       /**< oneline text with no filtering */
+    'email',      /**< format for an email address */
+    'password',   /**< No tabs, or any type of return character */
+    'oneline',    /**< No return characters (tabs are allowed) */
+    'nowacky',    /**< No special characters allowed */
+    'int',        /**< Integer numbers only */
+    'dec',        /**< Allows both integers and decimal numbers */
   ];
 
-  /**
-   * Qualitative name of format type
-   *
-   * 'preg:' test against the regular expression shown after the colon
-   * 'date:' test against the date format shown after the colon
-   * 'memo' longer, multi-line text with no filtering
-   * 'svghtml' Allows nearly all SVG + HTML tags
-   * 'html' Allows nearly all HTML tags, but excludes SVG
-   * 'basichtml' Allows a few HTML tags and attributes
-   * 'simple' Allows no HTML attributes and barely any tags
-   * 'nohtml' Does not allow HTML
-   * 'text' oneline text with no filtering
-   * 'email' format for an email address
-   * 'password' No tabs, or any type of return character
-   * 'oneline' Same as password
-   * 'nowacky' No special characters allowed
-   * 'int' Integer numbers only
-   * 'dec' Allows both integers and decimal numbers
-   *
-   */
-  public $format;
+  public $format;           /**< Qualitative name of format (see format_types) */
   public $required = false; /**< Determines if the field is required */
   public $min_chars=0;      /**< Minumum number of characters */
   public $max_chars=0;      /**< Maximum number of characters, zero means no limit */
@@ -288,7 +267,7 @@ class Field{
 
       //Regular expression
       if ($type == 'preg'){
-        $matches = array();
+        $matches = [];
         preg_match($format, $this->value, $matches);
         if (count($matches)==0 || $matches[0] != $this->value){
           $this->error = 21;

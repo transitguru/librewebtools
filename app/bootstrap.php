@@ -66,7 +66,7 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
       }
     }
     else{
-      $parsed = array();
+      $parsed = [];
       $raw = file_get_contents('php://input');
       mb_parse_str($raw, $parsed);
       $input->post = json_decode(json_encode($parsed));
