@@ -340,25 +340,21 @@ class Xml{
       
       // Begin to build output document
       $output_doc = new \DOMDocument('1.0');
-      $output_doc->formatOutput = $pretty;
+      if ($pretty == true){
+        $output_doc->preserveWhiteSpace = false;
+        $output_doc->formatOutput = true;
+      }
       $root = $output_doc->createElement('root');
       $output_doc->appendChild($root);
       $root = $this->buildxml($output_doc, $input_root, $root);
       
       //Saving only the contents of the Body tag
 
-      $markup = ""; 
+      $this->markup = ""; 
       $children  = $root->childNodes;
       foreach ($children as $child){ 
-        $markup .= $output_doc->saveXML($child);
+        $this->markup .= $output_doc->saveXML($child);
       }
-      $reload = new \DOMDocument('1.0');
-      if ($pretty == true){
-        $reload->preserveWhiteSpace = false;
-        $reload->formatOutput = $pretty;
-      }
-      $reload->loadXML($markup);
-      $this->markup = $reload->saveXML();
       return true;
     }
     else{
