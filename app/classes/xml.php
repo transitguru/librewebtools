@@ -347,11 +347,18 @@ class Xml{
       
       //Saving only the contents of the Body tag
 
-      $this->markup = ""; 
+      $markup = ""; 
       $children  = $root->childNodes;
       foreach ($children as $child){ 
-        $this->markup .= $output_doc->saveXML($child);
+        $markup .= $output_doc->saveXML($child);
       }
+      $reload = new \DOMDocument('1.0');
+      if ($pretty == true){
+        $reload->preserveWhiteSpace = false;
+        $reload->formatOutput = $pretty;
+      }
+      $reload->loadXML($markup);
+      $this->markup = $reload->saveXML();
       return true;
     }
     else{
