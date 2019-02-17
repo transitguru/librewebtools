@@ -3,9 +3,9 @@ namespace LWT;
 /**
  * @file
  * Tree Class
- * 
+ *
  * provides a way to get tree information (there are inherited classes)
- * 
+ *
  * @category Data Abstraction
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
@@ -16,7 +16,7 @@ namespace LWT;
 class Tree{
   public $table = '';  /**< DB Table name, must be set by inherited object */
   public $id = 0;
-  
+
   /**
    * Provides IDs for items that are traversable in the tree
    *
@@ -30,7 +30,7 @@ class Tree{
    *                         / \   \
    *                        5   6   7
    *
-   * Say the input $id is 3 and an empty array. As designed, the 
+   * Say the input $id is 3 and an empty array. As designed, the
    * method would return [3,5,6,1,0] because it first gets all descendents of
    * the subject tree id number, then gets direct ancestors. No siblings or
    * ancestor's siblings (a.k.a. "aunts/uncles") would be returned.
@@ -38,10 +38,10 @@ class Tree{
    * The current assumptions are the following:
    *  - the 'id' is the ID, and the 'parent_id' is Parent ID in the database
    *  - Both fields are in the same table, and both fields are any INT() type
-   *  - the root ID of the tree is 0 
+   *  - the root ID of the tree is 0
    *  - the parent ID of the root item is NULL
    *  - the key for parent ID is named 'parent_id'
-   * 
+   *
    * @param array $ids Array of ids already found from previous iterations
    *
    * @return array All IDs that are above or below the item in question
@@ -51,10 +51,10 @@ class Tree{
     if ($id == NULL){
       return $ids;
     }
-    
+
     //find children
     $ids = $this->children($id, $ids);
-    
+
     //find parents until we reach root
     $search = $id;
     $loop = true;
@@ -69,12 +69,12 @@ class Tree{
         $ids[$search] = $search = $db->output[0]['parent_id'];
       }
     }
-    return $ids;  
+    return $ids;
   }
 
   /**
    * Finds children to the group IDs for a given parent (including the parent)
-   * 
+   *
    * @param int $parent Parent ID to find the children
    * @param array $ids Array of IDs that are available to keep appending
    * @return array Array of IDs (this gets appended to the input)

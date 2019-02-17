@@ -64,17 +64,17 @@ class Xml{
       'div', 'footer', 'header', 'article', 'aside', 'nav', 'section', //sections
       'a', 'img', 'figure', 'figcaption', 'map', 'area',  //Image and link support
       'style', //Custom styling
-      
+
     ),
     'svg' => array(
        'g', 'marker', 'mask', 'pattern', 'svg', 'symbol', 'defs', //containers
        'lineargradient', 'radialgradient', 'stop', //gradients
        'circle', 'ellipse', 'image', 'line', 'path', 'polygon', 'polyline', 'rect', 'use',//drawing
-       'textPath', 'text', 'tref', 'tspan', //text   
+       'textPath', 'text', 'tref', 'tspan', //text
        'view' //others
     ),
   );
-  
+
   /**
    * Allowable Attributes
    */
@@ -83,51 +83,51 @@ class Xml{
       // No attributes allowed
     ),
     'basic' => array(
-      'id' => array(), 
+      'id' => array(),
       'cite' => array('blockquote', 'del', 'ins', 'q'),
       'class' => array(),
       'colspan' => array('td', 'th'),
       'datetime' => array('del', 'ins', 'time'),
       'dir' => array(),
       'headers' => array('td', 'th'),
-      'reversed' => array('ol'), 
+      'reversed' => array('ol'),
       'rowspan' => array('td', 'th'),
-      'scope' => array('th'),    
-      'start' => array('ol'), 
-      'summary' => array('table'),     
+      'scope' => array('th'),
+      'start' => array('ol'),
+      'summary' => array('table'),
       'title' => array(),
     ),
     'html' => array(
       'accesskey' => array(),
-      'alt' => array('applet', 'area', 'img', 'input'), 
+      'alt' => array('applet', 'area', 'img', 'input'),
       'coords' => array('area'),
-      'download' => array('a', 'area'), 
+      'download' => array('a', 'area'),
       'height' => array('canvas', 'embed', 'iframe', 'img', 'input', 'object', 'video'),
       'hidden' => array(),
       'href' => array('a','area', 'base', 'link'),
       'hreflang' => array('a', 'area', 'link'),
-      'lang' => array(), 
-      'media' => array('a', 'area', 'link', 'source', 'style'), 
+      'lang' => array(),
+      'media' => array('a', 'area', 'link', 'source', 'style'),
       'rel' => array('a', 'area', 'link'),
-      'scoped' => array('style'),     
-      'shape' => array('a', 'area'),    
-      'src' => array('audio', 'embed', 'iframe', 'img', 'input', 'script', 'source', 'track', 'video'), 
+      'scoped' => array('style'),
+      'shape' => array('a', 'area'),
+      'src' => array('audio', 'embed', 'iframe', 'img', 'input', 'script', 'source', 'track', 'video'),
       'srcset' => array('img'),
       'style' => array(),
-      'target' => array('a', 'area', 'base', 'form'),     
-      'usemap' => array('img', 'input', 'object'),     
+      'target' => array('a', 'area', 'base', 'form'),
+      'usemap' => array('img', 'input', 'object'),
       'width' => array('canvas', 'embed', 'iframe', 'img', 'input', 'object', 'video'),
     ),
     'svg' => array(
       //Core Attributes
-      'id' => array(), 
-      'xml:base' => array(), 
+      'id' => array(),
+      'xml:base' => array(),
       'xml:lang' => array(),
       'xml:space' => array(),
       'class' => array(),
       'href' => array(),
       'style' => array(),
-     
+
       //Presentation attributes
       'alignment-baseline' => array(),
       'baseline-shift' => array(),
@@ -188,7 +188,7 @@ class Xml{
       'visibility' => array(),
       'word-spacing' => array(),
       'writing-mode' => array(),
-      
+
       //Drawing attributes
       'cx' => array(),
       'cy' => array(),
@@ -208,7 +208,7 @@ class Xml{
       'y' => array(),
       'y1' => array(),
       'y2' => array(),
-      
+
       //Xlink attributes
       'xlink:href' => array(),
       'xlink:type' => array(),
@@ -217,7 +217,7 @@ class Xml{
       'xlink:title' => array(),
       'xlink:show' => array(),
       'xlink:actuate' => array(),
-      
+
       //Text element attributes
       'dx' => array(),
       'dy' => array(),
@@ -228,13 +228,13 @@ class Xml{
       'startOffset' => array(),
       'text-anchor' => array(),
       'textLength' => array(),
-      
+
     ),
   );
-  
+
   /**
    * Initializes new XML
-   * 
+   *
    * @param string $markup untrusted markup
    * @param string $type Qualitative name of format type
    * @param array $elements Allowable elements
@@ -254,7 +254,7 @@ class Xml{
     if (is_bool($comments)){
       $this->comments = $comments;
     }
-    
+
     // Build defaults
     if ((!is_array($this->elements) || count($this->elements)==0) && (!is_array($this->attributes) || count($this->attributes)==0)){
       $this->buildDefaults();
@@ -262,7 +262,7 @@ class Xml{
   }
   /**
    * Sets qualitative type
-   * 
+   *
    * @param string $type Qualitative name of format type
    */
   public function setType($type){
@@ -270,7 +270,7 @@ class Xml{
   }
   /**
    * Sets elements
-   * 
+   *
    * @param array $elements Allowable elements
    */
   public function setElements($elements){
@@ -280,7 +280,7 @@ class Xml{
   }
   /**
    * Sets attributes
-   * 
+   *
    * @param array $attributes Allowable attributes
    */
   public function setAttributes($attributes){
@@ -291,7 +291,7 @@ class Xml{
   }
   /**
    * Sets comments
-   * 
+   *
    * @param boolean $comments Allow comments nodes
    */
   public function setComments($comments){
@@ -313,15 +313,15 @@ class Xml{
     }
     elseif($this->type == 'basic+svg'){
       $this->elements = array_merge($this->allow_elem['simple'], $this->allow_elem['basic'], $this->allow_elem['svg']);
-      $this->attributes = array_merge($this->allow_attr['simple'], $this->allow_attr['basic'], $this->allow_attr['svg']);      
+      $this->attributes = array_merge($this->allow_attr['simple'], $this->allow_attr['basic'], $this->allow_attr['svg']);
     }
     elseif($this->type == 'html'){
       $this->elements = array_merge($this->allow_elem['simple'], $this->allow_elem['basic'], $this->allow_elem['html']);
-      $this->attributes = array_merge($this->allow_attr['simple'], $this->allow_attr['basic'], $this->allow_attr['html']);            
+      $this->attributes = array_merge($this->allow_attr['simple'], $this->allow_attr['basic'], $this->allow_attr['html']);
     }
     elseif($this->type == 'html+svg'){
       $this->elements = array_merge($this->allow_elem['simple'], $this->allow_elem['basic'], $this->allow_elem['html'], $this->allow_elem['svg']);
-      $this->attributes = array_merge($this->allow_attr['simple'], $this->allow_attr['basic'], $this->allow_attr['html'], $this->allow_attr['svg']);            
+      $this->attributes = array_merge($this->allow_attr['simple'], $this->allow_attr['basic'], $this->allow_attr['html'], $this->allow_attr['svg']);
     }
   }
   /**
@@ -337,7 +337,7 @@ class Xml{
     libxml_clear_errors();
     if ($success){
       $input_root = $input_doc->getElementsByTagName('root')->item(0);
-      
+
       // Begin to build output document
       $output_doc = new \DOMDocument('1.0');
       if ($pretty == true){
@@ -347,12 +347,12 @@ class Xml{
       $root = $output_doc->createElement('root');
       $output_doc->appendChild($root);
       $root = $this->buildxml($output_doc, $input_root, $root);
-      
+
       //Saving only the contents of the Body tag
 
-      $this->markup = ""; 
+      $this->markup = "";
       $children  = $root->childNodes;
-      foreach ($children as $child){ 
+      foreach ($children as $child){
         $this->markup .= $output_doc->saveXML($child);
       }
       return true;

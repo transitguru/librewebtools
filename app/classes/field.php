@@ -3,7 +3,7 @@ namespace LWT;
 /**
  * @file
  * Field Class
- * 
+ *
  * Creates, collects, and validates user inputs for data fields
  *
  * @category Processing and Validation
@@ -26,7 +26,7 @@ class Field{
   public $tabindex = 0;      /**< If non-zero, special rules for tab index */
   public $list = [];         /**< Array of list items to put in list type elements */
   public $value = '';        /**< value to be validated */
-  
+
   /**
    * Valid format types that can be referenced in a Field object
    */
@@ -207,7 +207,7 @@ class Field{
 
   /**
    * Tests the value for validity for database import and application safety
-   * 
+   *
    * Error Numbers:
    *  0 = no error
    * 11 = Empty value
@@ -227,13 +227,13 @@ class Field{
    * 65 = Value greater than or equal to maximum
    * 66 = Value greater than maximum
    * 67 = Value does not match resolution (too precise)
-   */  
+   */
   public function validate(){
     //handle trimming
     if ($this->trim){
       $this->value = trim($this->value);
     }
-    
+
     //Handle empty inputs
     if ($this->required && $this->value === ''){
       $this->error = 11;
@@ -245,7 +245,7 @@ class Field{
       $this->message = "";
       return;
     }
-    
+
     //Handle too many characters
     if ($this->max_chars > 0 && mb_strlen($this->value) > $this->max_chars){
       $this->error = 12;
@@ -258,7 +258,7 @@ class Field{
       $this->message = "Invalid: Please enter a value with no less than {$this->min_chars} characters";
       return;
     }
-    
+
     //Formats that have a colon separator
     $length = mb_strpos($this->format, ':');
     if ($length >0){
@@ -307,7 +307,7 @@ class Field{
     //Check for Memo Types
     if ($format == 'memo'){
       // Allow everything (this is dangerous, unless this is HTML encoded somewhere else)
-      
+
     }
     elseif($format =='svghtml'){
       // Allow most HTML and SVG, but no scripts
@@ -332,7 +332,7 @@ class Field{
     elseif($format=='nohtml'){
       $this->value = htmlspecialchars($this->value);
     }
-    
+
     // Check for text types
     elseif ($format=='password'){
       //Allow nearly everything for a oneline password
@@ -391,8 +391,8 @@ class Field{
           return;
         }
       }
-      
-      
+
+
       //swap min and max if they are transposed
       if (!is_null($this->max) && !is_null($this->min) && $this->min > $this->max){
         $temp = $this->max;
@@ -419,7 +419,7 @@ class Field{
         $this->message = "Out of Range: Must at most {$this->max}.";
         return;
       }
-      
+
       //Check for step (or autoround)
       if (!is_null($this->step)){
         if (!$this->auto_step && fmod($this->value - $this->min , $this->step) != 0 && $this->value != $this->max){
@@ -439,7 +439,7 @@ class Field{
         }
       }
     }
-    
+
     //Scrub HTML if requested from a format above
     if (!is_null($qualifier) && $qualifier != ''){
       $xml = new Xml($this->value, $qualifier);

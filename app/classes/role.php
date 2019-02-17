@@ -5,7 +5,7 @@ namespace LWT;
  * Role Class
  *
  * allows for loading and editing of role information
- * 
+ *
  * @category Data Abstraction
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
@@ -21,7 +21,7 @@ class Role{
   public $desc = '';      /**< Description */
   public $error = 0;      /**< Error number */
   public $message = '';   /**< Message for error reporting */
-  
+
   /**
    * Constructs role based on role ID in database, or creates new empty role
    *
@@ -53,7 +53,7 @@ class Role{
       $this->id = $id;
     }
   }
-  
+
   /**
    * Clears the variables
    *
@@ -67,7 +67,7 @@ class Role{
     $this->error = 0;
     $this->message = '';
   }
-  
+
   /**
    * Writes the data to the database
    *
@@ -84,7 +84,7 @@ class Role{
     }
     else{
       $inputs['created'] = date('Y-m-d H:i:s');
-      $db->write('roles', $inputs); 
+      $db->write('roles', $inputs);
       $this->error = $db->error;
       $this->message = $db->message;
       if (!$db->error){
@@ -92,7 +92,7 @@ class Role{
       }
     }
   }
-  
+
   /**
    * Deletes the record, then clears the object
    */

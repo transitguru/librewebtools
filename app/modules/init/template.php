@@ -17,7 +17,7 @@ http_response_code($path->http_status);
 if (!is_null($sub_app) && method_exists($path->app, 'ajax')){
   $sub_app->ajax();
 }
-?>              
+?>
 <!DOCTYPE html>
 <html>
   <head>
@@ -29,7 +29,7 @@ if (!is_null($sub_app) && method_exists($path->app, 'ajax')){
     <div class="container">
       <div class="content">
         <h1><?php echo $path->title; ?></h1>
-<?php 
+<?php
 if (!is_null($path->path_id) && $path->path_id >= 0){
   echo $path->content;
   if (!is_null($sub_app) && method_exists($path->app, 'render')){
@@ -39,7 +39,7 @@ if (!is_null($path->path_id) && $path->path_id >= 0){
 else{
   $sub_app->render_404();
 }
-?>     
+?>
       </div>
 <?php $sub_app->render_copyright(); ?>
     </div>

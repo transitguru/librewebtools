@@ -39,8 +39,8 @@ Class Download Extends \LWT\Subapp{
       header('Content-Length: ' . $size);
       header('Content-Type: ' .$type);
       sleep(0); // gives browser a second to digest headers
-      readfile($included);  
-      exit;  
+      readfile($included);
+      exit;
     }
     http_response_code(404);
     echo '{"error":{"status":404,"message":"Not Found"}}';

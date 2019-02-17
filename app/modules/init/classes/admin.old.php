@@ -3,7 +3,7 @@
 /**
  * @file
  * Administrative functions for core LibreWebTools
- * 
+ *
  * @category   Bootstrap
  * @package    LibreWebTools
  * @author     Michael Sypolt <msypolt@transitguru.limited>
@@ -18,9 +18,9 @@
 
 /**
  * Processes user admin form submission
- * 
+ *
  * @param string $forms Forms path data
- * 
+ *
  */
 function core_admin_process_user($forms){
   if (isset($_POST['command']) && $_POST['command'] == 'delete' && isset($_POST['user']['id']) && is_numeric($_POST['user']['id']) && isset($_POST['confirmed']) && $_POST['confirmed'] == 1){
@@ -39,7 +39,7 @@ function core_admin_process_user($forms){
     $inputs = array();
     $success = true;
     $payload = array();
-    
+
     if ($id < 0){
       $where = null;
       $inputs['created'] = date('Y-m-d H:i:s');
@@ -47,7 +47,7 @@ function core_admin_process_user($forms){
     else{
       $where = array('id' => $id);
     }
-    
+
     // Define form fields (for validation only)
     $fields = array();
     $fields['login'] = new coreField('', 'text', 'nowacky', true, 40);
@@ -55,7 +55,7 @@ function core_admin_process_user($forms){
     $fields['lastname'] = new coreField('', 'text', 'oneline', true, 100);
     $fields['email'] = new coreField('', 'text', 'email', true, 255);
     $fields['desc'] = new coreField('', 'memo', 'all', false, 1000);
-    
+
     foreach ($fields as $key => $data){
       if (isset($_POST['user'][$key])){
         $fields[$key]->value = $_POST['user'][$key];
@@ -87,7 +87,7 @@ function core_admin_process_user($forms){
         $groups[] = $group;
       }
     }
-    
+
     // Check for unique indexes
     if ($success){
       $db = new coreDb();
@@ -104,7 +104,7 @@ function core_admin_process_user($forms){
         $payload['email']['error'] = 5000;
       }
     }
-    
+
     //write inputs
     if ($success){
       $db->write('users', $inputs, $where);
@@ -115,19 +115,19 @@ function core_admin_process_user($forms){
           $user->setpassword();
           $_POST['path'] = "user/{$id}";
         }
-        
+
         // Apply roles
         $db->write_raw("DELETE FROM `user_roles` WHERE `user_id` = {$id}");
         foreach ($roles as $role){
           $db->write('user_roles', array('role_id' => $role, 'user_id' => $id));
         }
-        
+
         //Apply groups
         $db->write_raw("DELETE FROM `user_groups` WHERE `user_id` = {$id}");
         foreach ($groups as $group){
           $db->write('user_groups', array('group_id' => $group, 'user_id' => $id));
         }
-        
+
         //Reset if requested
         if (isset($_POST['reset']) && $_POST['reset'] == 1){
           $user = new coreUser($id);
@@ -143,16 +143,16 @@ function core_admin_process_user($forms){
       $_SESSION['message'] = '<span class="error">Please fix the invalid inputs</span>';
       $_SESSION['repost'] = $payload;
     }
-    
+
   }
 
 }
 
 /**
  * Processes group admin form submission
- * 
+ *
  * @param string $forms Forms path data
- * 
+ *
  */
 function core_admin_process_group($forms){
   if (isset($_POST['command']) && $_POST['command'] == 'delete' && isset($_POST['group']['id']) && is_numeric($_POST['group']['id']) && $_POST['group']['id'] > 0 && isset($_POST['confirmed']) && $_POST['confirmed'] == 1){
@@ -179,13 +179,13 @@ function core_admin_process_group($forms){
     else{
       $where = array('id' => $id);
     }
-    
+
     // Define form fields (for validation only)
     $fields = array();
     $fields['sortorder'] = new coreField('', 'num', 'int', false, 40);
     $fields['name'] = new coreField('', 'text', 'oneline', true, 100);
     $fields['desc'] = new coreField('', 'memo', 'all', false, 1000);
-    
+
     foreach ($fields as $key => $data){
       if (isset($_POST['group'][$key])){
         $fields[$key]->value = $_POST['group'][$key];
@@ -201,7 +201,7 @@ function core_admin_process_group($forms){
         'value' => $fields[$key]->value,
       );
     }
-    
+
     // Validate the parent ID
     if ($id == 0){
       $inputs['parent_id'] = null;
@@ -223,7 +223,7 @@ function core_admin_process_group($forms){
         }
       }
     }
-    
+
     // Check for unique indexes
     if ($success){
       $db->fetch('groups', array('id'), array('name' => $inputs['name']));
@@ -233,7 +233,7 @@ function core_admin_process_group($forms){
         $payload['name']['error'] = 5000;
       }
     }
-    
+
     //write inputs
     if ($success){
       $db->write('groups', $inputs, $where);
@@ -252,7 +252,7 @@ function core_admin_process_group($forms){
       $_SESSION['message'] = '<span class="error">Please fix the invalid inputs</span>';
       $_SESSION['repost'] = $payload;
     }
-    
+
   }
 
 
@@ -260,9 +260,9 @@ function core_admin_process_group($forms){
 
 /**
  * Processes role admin form submission
- * 
+ *
  * @param string $forms Forms path data
- * 
+ *
  */
 function core_admin_process_role($forms){
   if (isset($_POST['command']) && $_POST['command'] == 'delete' && isset($_POST['role']['id']) && is_numeric($_POST['role']['id']) && $_POST['role']['id'] > 2 && isset($_POST['confirmed']) && $_POST['confirmed'] == 1){
@@ -290,13 +290,13 @@ function core_admin_process_role($forms){
     else{
       $where = array('id' => $id);
     }
-    
+
     // Define form fields (for validation only)
     $fields = array();
     $fields['sortorder'] = new coreField('', 'num', 'int', false, 40);
     $fields['name'] = new coreField('', 'text', 'oneline', true, 100);
     $fields['desc'] = new coreField('', 'memo', 'all', false, 1000);
-    
+
     foreach ($fields as $key => $data){
       if (isset($_POST['role'][$key])){
         $fields[$key]->value = $_POST['role'][$key];
@@ -312,7 +312,7 @@ function core_admin_process_role($forms){
         'value' => $fields[$key]->value,
       );
     }
-    
+
     // Check for unique indexes
     if ($success){
       $db->fetch('roles', array('id'), array('name' => $inputs['name']));
@@ -322,7 +322,7 @@ function core_admin_process_role($forms){
         $payload['name']['error'] = 5000;
       }
     }
-    
+
     //write inputs
     if ($success){
       $db->write('roles', $inputs, $where);
@@ -341,15 +341,15 @@ function core_admin_process_role($forms){
       $_SESSION['message'] = '<span class="error">Please fix the invalid inputs</span>';
       $_SESSION['repost'] = $payload;
     }
-    
+
   }
 
 }
 
 /**
  * Processes page admin form submission
- * 
- * @param string $forms Forms path data 
+ *
+ * @param string $forms Forms path data
  */
 function core_admin_process_page($forms){
   if (isset($_POST['command']) && $_POST['command'] == 'delete' && isset($_POST['page']['id']) && is_numeric($_POST['page']['id']) && $_POST['page']['id'] > 0 && isset($_POST['confirmed']) && $_POST['confirmed'] == 1){
@@ -382,7 +382,7 @@ function core_admin_process_page($forms){
     else{
       $where = array('id' => $id);
     }
-    
+
     // Define form fields (for validation only)
     $fields = array();
     $fields['url_code'] = new coreField('', 'text', 'nowacky', true, 100);
@@ -393,7 +393,7 @@ function core_admin_process_page($forms){
     $fields['deactivated'] = new coreField('', 'date', 'Y-m-d H:i:s', false, 20);
     $fields['summary'] = new coreField('', 'memo', 'all', false, 100000);
     $fields['content'] = new coreField('', 'memo', 'all', false, 100000);
-    
+
     foreach ($fields as $key => $data){
       if (isset($_POST['page'][$key])){
         $fields[$key]->value = $_POST['page'][$key];
@@ -420,7 +420,7 @@ function core_admin_process_page($forms){
         );
       }
     }
-    
+
     // Validate the parent ID
     if ($id == 0){
       $inputs['parent_id'] = null;
@@ -442,7 +442,7 @@ function core_admin_process_page($forms){
         }
       }
     }
-    
+
     // Validate booleans, just in case
     if (isset($_POST['page']['app_root']) && is_numeric($_POST['page']['app_root']) && ($_POST['page']['app_root'] == 0 || $_POST['page']['app_root'] == 1)){
       $inputs['app_root'] = $_POST['page']['app_root'];
@@ -456,7 +456,7 @@ function core_admin_process_page($forms){
     else{
       $inputs['core_page'] = 0;
     }
-    
+
     // Make sure the theme is an int
     $inputs['theme_id'] = null;
     if (isset($_POST['page']['theme_id']) && is_numeric($_POST['page']['theme_id'])){
@@ -466,7 +466,7 @@ function core_admin_process_page($forms){
         $inputs['theme_id'] = $field->value;
       }
     }
-    
+
     $roles = array();
     foreach ($_POST['roles'] as $role){
       $field = new coreField($role, 'num', 'int');
@@ -483,7 +483,7 @@ function core_admin_process_page($forms){
         $groups[] = $group;
       }
     }
-    
+
     // Check for unique indexes
     if ($success){
       $db->fetch('pages', array('id'), array('url_code' => $inputs['url_code'], 'parent_id' => $inputs['parent_id']));
@@ -493,7 +493,7 @@ function core_admin_process_page($forms){
         $payload['login']['error'] = 5000;
       }
     }
-    
+
     $inputs['created'] = date('Y-m-d H:i:s');
 
     //write inputs
@@ -523,30 +523,30 @@ function core_admin_process_page($forms){
           $id = $db->insert_id;
           $_POST['path'] = "page/{$id}";
         }
-        
-        
+
+
         // Apply roles
         $db->write_raw("DELETE FROM `page_roles` WHERE `page_id` = {$id}");
         foreach ($roles as $role){
           $db->write('page_roles', array('role_id' => $role, 'page_id' => $id));
         }
-        
+
         //Apply groups
         $db->write_raw("DELETE FROM `page_groups` WHERE `page_id` = {$id}");
         foreach ($groups as $group){
           $db->write('page_groups', array('group_id' => $group, 'page_id' => $id));
         }
-        
+
         // Apply page content (only if necessary)
         $content_inputs = array(
           'page_id' => $id,
-          'user_id' => $_SESSION['authenticated']['id'],      
+          'user_id' => $_SESSION['authenticated']['id'],
           'title' => $inputs['title'],
           'created' => $date,
-          'summary' => $inputs['summary'],        
+          'summary' => $inputs['summary'],
           'content' => $inputs['content'],
         );
-        
+
         $db->fetch_raw("SELECT * FROM `page_content` WHERE `page_id` = {$id} ORDER BY `created` DESC LIMIT 1");
         $content_pages = $db->output;
         if (
@@ -555,7 +555,7 @@ function core_admin_process_page($forms){
         ){
           $db->write('page_content', $content_inputs);
         }
-        
+
         $_SESSION['message'] = '<span class="success">The page has been successfully saved</span>';
       }
       else{
@@ -566,16 +566,16 @@ function core_admin_process_page($forms){
       $_SESSION['message'] = '<span class="error">Please fix the invalid inputs</span>';
       $_SESSION['repost'] = $payload;
     }
-    
+
   }
 
 }
 
 /**
  * Processes file admin form submission
- * 
+ *
  * @param string $forms Forms path data
- * 
+ *
  */
 function core_admin_process_file($forms){
 
@@ -583,9 +583,9 @@ function core_admin_process_file($forms){
 
 /**
  * Processes menu admin form submission
- * 
+ *
  * @param string $forms Forms path data
- * 
+ *
  */
 function core_admin_process_menu($forms){
 
@@ -593,9 +593,9 @@ function core_admin_process_menu($forms){
 
 /**
  * Processes module admin form submission
- * 
+ *
  * @param string $forms Forms path data
- * 
+ *
  */
 function core_admin_process_module($forms){
 
@@ -608,9 +608,9 @@ function core_admin_process_module($forms){
 
 /**
  * Renders user admin form
- * 
+ *
  * @param array $paths Navigation path data
- * 
+ *
  */
 function core_admin_render_user($paths){
   if (isset($paths[1]) && $paths[1] != ''){
@@ -620,7 +620,7 @@ function core_admin_render_user($paths){
     $db = new coreDb();
     $user = array();
     if (is_numeric($paths[1])){
-      $id = $paths[1]; 
+      $id = $paths[1];
       // Negative ID is used for creating a new user
       if($id < 0){
         $user = array(
@@ -640,7 +640,7 @@ function core_admin_render_user($paths){
         if ($db->affected_rows > 0){
           // Set user to database record
           $user = $db->output[0];
-          
+
           // Load current user roles
           $user['roles'] = array();
           $db->fetch('user_roles', null, array('user_id' => $id));
@@ -649,7 +649,7 @@ function core_admin_render_user($paths){
               $user['roles'][] = $role['role_id'];
             }
           }
-          
+
           // Load current user groups
           $user['groups'] = array();
           $db->fetch('user_groups', null, array('user_id' => $id));
@@ -668,7 +668,7 @@ function core_admin_render_user($paths){
 ?>
       <p>It is not possible to delete <strong><?php echo "{$user['firstname']} {$user['lastname']}"; ?></strong> as this user is the site adminstrator</p>
       <a class="button" href="<?php echo APP_ROOT; ?>user/<?php echo $id; ?>" >Cancel</a>
-<?php        
+<?php
         }
         else{
           // User delete confirmation
@@ -680,10 +680,10 @@ function core_admin_render_user($paths){
     <input type="hidden" name="user[id]" value="<?php echo $user['id']; ?>" />
     <input type="hidden" name="confirmed" value="1" />
     <input type="hidden" name="command" value="delete" />
-    <a class="button" href="<?php echo APP_ROOT; ?>user/<?php echo $user['id']; ?>" >Cancel</a> 
-    <input class="button alert" type="submit" name="send" value="Delete" />   
+    <a class="button" href="<?php echo APP_ROOT; ?>user/<?php echo $user['id']; ?>" >Cancel</a>
+    <input class="button alert" type="submit" name="send" value="Delete" />
   </form>
-<?php        
+<?php
         }
       }
       else{
@@ -707,12 +707,12 @@ function core_admin_render_user($paths){
           }
         }
         // User form
-?>   
-  <h3>User administration Form</h3>   
+?>
+  <h3>User administration Form</h3>
   <form method="post" action="" id="admin/user" >
     <input type="hidden" name="formid" value="admin/user" />
     <input type="hidden" name="command" value="write" />
-    <input type="hidden" name="user[id]" value="<?php echo $user['id']; ?>" />    
+    <input type="hidden" name="user[id]" value="<?php echo $user['id']; ?>" />
     <label for="user[login]">Login<?php echo $msg['login']; ?></label><input class="required <?php echo $class['login']; ?>" name="user[login]" type="text" maxlength="40" value="<?php echo $user['login']; ?>" />
     <label for="user[firstname]">First Name<?php echo $msg['firstname']; ?></label><input class="required <?php echo $class['firstname']; ?>" name="user[firstname]" type="text" maxlength="100" value="<?php echo $user['firstname']; ?>" />
     <label for="user[lastname]">Last Name<?php echo $msg['lastname']; ?></label><input class="required <?php echo $class['lastname']; ?>" name="user[lastname]" type="text" maxlength="100" value="<?php echo $user['lastname']; ?>" />
@@ -732,18 +732,18 @@ function core_admin_render_user($paths){
           }
 ?>
       <li><input id="checkbox_role_<?php echo $role['id']; ?>" type="checkbox" value="<?php echo $role['id']; ?>" name="roles[]" <?php echo $checked; ?> /><span class="hand" onclick="document.getElementById('checkbox_role_<?php echo $role['id']; ?>').click();" ><?php echo $role['name']; ?></span></li>
-<?php      
+<?php
         }
 ?>
     </ul>
     <label for="groups[]">Groups</label>
-<?php   
-        core_admin_render_grouptree($user['groups']);  
+<?php
+        core_admin_render_grouptree($user['groups']);
 ?>
     <input class="button" type="submit" name="send" value="Save" />
     <a class="button" href="<?php echo APP_ROOT; ?>user/<?php echo $user['id']; ?>/" >Reset</a>
     <a class="button" href="<?php echo APP_ROOT; ?>user/" >Close</a>
-<?php 
+<?php
         if ($user['id']>0){
 ?>
     <a class="right button alert" href="<?php echo APP_ROOT; ?>user/<?php echo $user['id']; ?>/delete/" >Delete...</a>
@@ -758,10 +758,10 @@ function core_admin_render_user($paths){
     else{
 ?>
     <p>Page not found, please go <a href="<?php echo APP_ROOT; ?>user/">back</a>.</p>
-<?php 
+<?php
     }
   }
-  else{  
+  else{
     // Navigation to select users
 ?>
   <h2>Users</h2>
@@ -786,15 +786,15 @@ function core_admin_render_user($paths){
 ?>
     <p>There are no users, that is a problem!</p>
 <?php
-    }  
+    }
   }
 }
 
 /**
  * Renders group admin form
- * 
+ *
  * @param array $paths Navigation path data
- * 
+ *
  */
 function core_admin_render_group($paths){
   if (isset($paths[1]) && $paths[1] != ''){
@@ -804,7 +804,7 @@ function core_admin_render_group($paths){
     $db = new coreDb();
     $group = array();
     if (is_numeric($paths[1])){
-      $id = $paths[1]; 
+      $id = $paths[1];
       // Negative ID is used for creating a new group
       if($id < 0){
         $group = array(
@@ -832,13 +832,13 @@ function core_admin_render_group($paths){
 ?>
       <p>It is not possible to delete <strong><?php echo $group['name']; ?></strong> as it reflects the root of the group tree.</p>
       <a class="button" href="<?php echo APP_ROOT; ?>group/<?php echo $id; ?>/" >Cancel</a>
-<?php        
+<?php
         }
         elseif($db->affected_rows > 0){
 ?>
       <p>It is not possible to delete <strong><?php echo $group['name']; ?></strong> as it has subgroups attached to it.</p>
-      <a class="button" href="<?php echo APP_ROOT; ?>group/<?php echo $id; ?>/" >Cancel</a> 
-<?php       
+      <a class="button" href="<?php echo APP_ROOT; ?>group/<?php echo $id; ?>/" >Cancel</a>
+<?php
         }
         else{
           // Group delete confirmation
@@ -850,10 +850,10 @@ function core_admin_render_group($paths){
     <input type="hidden" name="group[id]" value="<?php echo $group['id']; ?>" />
     <input type="hidden" name="confirmed" value="1" />
     <input type="hidden" name="command" value="delete" />
-    <a class="button" href="<?php echo APP_ROOT; ?>group/<?php echo $group['id']; ?>/" >Cancel</a> 
-    <input class="button alert" type="submit" name="send" value="Delete" />   
+    <a class="button" href="<?php echo APP_ROOT; ?>group/<?php echo $group['id']; ?>/" >Cancel</a>
+    <input class="button alert" type="submit" name="send" value="Delete" />
   </form>
-<?php        
+<?php
         }
       }
       else{
@@ -875,26 +875,26 @@ function core_admin_render_group($paths){
           }
         }
         // Group form
-?>   
-  <h3>Group administration Form</h3>   
+?>
+  <h3>Group administration Form</h3>
   <form method="post" action="" id="admin/group" >
     <input type="hidden" name="formid" value="admin/group" />
     <input type="hidden" name="command" value="write" />
-    <input type="hidden" name="group[id]" value="<?php echo $group['id']; ?>" />    
+    <input type="hidden" name="group[id]" value="<?php echo $group['id']; ?>" />
     <label for="group[sortorder]">Sort Order (integer)<?php echo $msg['sortorder']; ?></label><input class="<?php echo $class['sortorder']; ?>" name="group[sortorder]" type="text" maxlength="10" value="<?php echo $group['sortorder']; ?>" />
     <label for="group[name]">Group Name<?php echo $msg['name']; ?></label><input class="required <?php echo $class['name']; ?>" name="group[name]" type="text" maxlength="100" value="<?php echo $group['name']; ?>" />
     <label for="group[desc]">Description<?php echo $msg['desc']; ?></label><textarea class="<?php echo $class['desc']; ?>" name="group[desc]" type="text" maxlength="1000" /><?php echo $group['desc']; ?></textarea>
     <label for="group[parent_id]">Parent Group</label>
-<?php   
+<?php
         $disabled_ids = array();
         $groupobj = new coreGroup($group['id']);
         $disabled_ids = $groupobj->children($group['id'], $disabled_ids);
-        core_admin_render_grouptree(array($group['parent_id']), 'group[parent_id]', 'radio', null, $disabled_ids);  
+        core_admin_render_grouptree(array($group['parent_id']), 'group[parent_id]', 'radio', null, $disabled_ids);
 ?>
     <input class="button" type="submit" name="send" value="Save" />
     <a class="button" href="<?php echo APP_ROOT; ?>group/<?php echo $group['id']; ?>/" >Reset</a>
     <a class="button" href="<?php echo APP_ROOT; ?>group/" >Close</a>
-<?php 
+<?php
         if ($group['id']>0){
 ?>
     <a class="right button alert" href="<?php echo APP_ROOT; ?>group/<?php echo $group['id']; ?>/delete/" >Delete...</a>
@@ -909,10 +909,10 @@ function core_admin_render_group($paths){
     else{
 ?>
     <p>Page not found, please go <a href="<?php echo APP_ROOT; ?>group/">back</a>.</p>
-<?php 
+<?php
     }
   }
-  else{  
+  else{
     // Navigation to select Groups
 ?>
   <h2>Groups</h2>
@@ -929,15 +929,15 @@ function core_admin_render_group($paths){
 ?>
     <p>There are no groups, that is a problem!</p>
 <?php
-    }  
+    }
   }
 }
 
 /**
  * Renders role admin form
- * 
+ *
  * @param array $paths Navigation path data
- * 
+ *
  */
 function core_admin_render_role($paths){
   if (isset($paths[1]) && $paths[1] != ''){
@@ -947,7 +947,7 @@ function core_admin_render_role($paths){
     $db = new coreDb();
     $role = array();
     if (is_numeric($paths[1])){
-      $id = $paths[1]; 
+      $id = $paths[1];
       // Negative ID is used for creating a new role
       if($id < 0){
         $role = array(
@@ -973,7 +973,7 @@ function core_admin_render_role($paths){
 ?>
       <p>It is not possible to delete <strong><?php echo $role['name']; ?></strong> as it reflects a system required role.</p>
       <a class="button" href="<?php echo APP_ROOT; ?>role/<?php echo $id; ?>" >Cancel</a>
-<?php        
+<?php
         }
         else{
           // Role delete confirmation
@@ -985,10 +985,10 @@ function core_admin_render_role($paths){
     <input type="hidden" name="role[id]" value="<?php echo $role['id']; ?>" />
     <input type="hidden" name="confirmed" value="1" />
     <input type="hidden" name="command" value="delete" />
-    <a class="button" href="<?php echo APP_ROOT; ?>role/<?php echo $role['id']; ?>/" >Cancel</a> 
-    <input class="button alert" type="submit" name="send" value="Delete" />   
+    <a class="button" href="<?php echo APP_ROOT; ?>role/<?php echo $role['id']; ?>/" >Cancel</a>
+    <input class="button alert" type="submit" name="send" value="Delete" />
   </form>
-<?php        
+<?php
         }
       }
       else{
@@ -1010,12 +1010,12 @@ function core_admin_render_role($paths){
           }
         }
         // Role form
-?>   
-  <h3>Role administration Form</h3>   
+?>
+  <h3>Role administration Form</h3>
   <form method="post" action="" id="admin/role" >
     <input type="hidden" name="formid" value="admin/role" />
     <input type="hidden" name="command" value="write" />
-    <input type="hidden" name="role[id]" value="<?php echo $role['id']; ?>" />    
+    <input type="hidden" name="role[id]" value="<?php echo $role['id']; ?>" />
     <label for="role[sortorder]">Sort Order (integer)<?php echo $msg['sortorder']; ?></label><input class="<?php echo $class['sortorder']; ?>" name="role[sortorder]" type="text" maxlength="10" value="<?php echo $role['sortorder']; ?>" />
     <label for="role[name]">Role Name<?php echo $msg['name']; ?></label><input class="required <?php echo $class['name']; ?>" name="role[name]" type="text" maxlength="100" value="<?php echo $role['name']; ?>" />
     <label for="role[desc]">Description<?php echo $msg['desc']; ?></label><textarea class="<?php echo $class['desc']; ?>" name="role[desc]" type="text" maxlength="1000" /><?php echo $role['desc']; ?></textarea>
@@ -1023,7 +1023,7 @@ function core_admin_render_role($paths){
     <input class="button" type="submit" name="send" value="Save" />
     <a class="button" href="<?php echo APP_ROOT; ?>role/<?php echo $role['id']; ?>/" >Reset</a>
     <a class="button" href="<?php echo APP_ROOT; ?>role/" >Close</a>
-<?php 
+<?php
         if ($role['id']>2){
 ?>
     <a class="right button alert" href="<?php echo APP_ROOT; ?>role/<?php echo $role['id']; ?>/delete/" >Delete...</a>
@@ -1038,10 +1038,10 @@ function core_admin_render_role($paths){
     else{
 ?>
     <p>Page not found, please go <a href="<?php echo APP_ROOT; ?>role/">back</a>.</p>
-<?php 
+<?php
     }
   }
-  else{  
+  else{
     // Navigation to select Roles
 ?>
   <h2>Roles</h2>
@@ -1066,16 +1066,16 @@ function core_admin_render_role($paths){
 ?>
     <p>There are no roles, that is a problem!</p>
 <?php
-    }  
+    }
   }
 
 }
 
 /**
  * Renders page admin form
- * 
+ *
  * @param array $paths Navigation path data
- * 
+ *
  */
 function core_admin_render_page($paths){
   if (isset($paths[1]) && $paths[1] != ''){
@@ -1085,7 +1085,7 @@ function core_admin_render_page($paths){
     $db = new coreDb();
     $page = array();
     if (is_numeric($paths[1])){
-      $id = $paths[1]; 
+      $id = $paths[1];
       // Negative ID is used for creating a new page
       if($id < 0){
         $page = array(
@@ -1138,7 +1138,7 @@ function core_admin_render_page($paths){
               $page['groups'][] = $group['group_id'];
             }
           }
-          
+
         }
       }
     }
@@ -1150,13 +1150,13 @@ function core_admin_render_page($paths){
 ?>
       <p>It is not possible to delete <strong><?php echo $page['title']; ?></strong> as it is a core page.</p>
       <a class="button" href="<?php echo APP_ROOT; ?>page/<?php echo $id; ?>/" >Cancel</a>
-<?php        
+<?php
         }
         elseif($db->affected_rows > 0){
 ?>
       <p>It is not possible to delete <strong><?php echo $page['title']; ?></strong> as it has subpages attached to it.</p>
-      <a class="button" href="<?php echo APP_ROOT; ?>page/<?php echo $id; ?>/" >Cancel</a> 
-<?php       
+      <a class="button" href="<?php echo APP_ROOT; ?>page/<?php echo $id; ?>/" >Cancel</a>
+<?php
         }
         else{
           // Page delete confirmation
@@ -1168,10 +1168,10 @@ function core_admin_render_page($paths){
     <input type="hidden" name="page[id]" value="<?php echo $page['id']; ?>" />
     <input type="hidden" name="confirmed" value="1" />
     <input type="hidden" name="command" value="delete" />
-    <a class="button" href="<?php echo APP_ROOT; ?>page/<?php echo $page['id']; ?>/" >Cancel</a> 
-    <input class="button alert" type="submit" name="send" value="Delete" />   
+    <a class="button" href="<?php echo APP_ROOT; ?>page/<?php echo $page['id']; ?>/" >Cancel</a>
+    <input class="button alert" type="submit" name="send" value="Delete" />
   </form>
-<?php        
+<?php
         }
       }
       else{
@@ -1197,16 +1197,16 @@ function core_admin_render_page($paths){
             }
           }
         }
-        
+
         // Load theme list
         $db->fetch_raw("SELECT * FROM `modules` WHERE `type`='theme' ORDER BY `core` DESC, `name` ASC");
         $themes = $db->output;
-?>   
-  <h3>Page administration Form</h3>   
+?>
+  <h3>Page administration Form</h3>
   <form method="post" action="" id="admin/page" >
     <input type="hidden" name="formid" value="admin/page" />
     <input type="hidden" name="command" value="write" />
-    <input type="hidden" name="page[id]" value="<?php echo $page['id']; ?>" />   
+    <input type="hidden" name="page[id]" value="<?php echo $page['id']; ?>" />
     <label for="page[theme_id]">Theme</label><select name="page[theme_id]">
       <option value="">None</option>
 <?php
@@ -1219,25 +1219,25 @@ function core_admin_render_page($paths){
           }
 ?>
       <option value="<?php echo $theme['id']; ?>" <?php echo $selected; ?>><?php echo $theme['name'];?></option>
-<?php        
+<?php
         }
 ?>
     </select>
     <label for="page[url_code]">URL code (for that level, no slashes!)<?php echo $msg['url_code']; ?></label><input class="required <?php echo $class['url_code']; ?>" name="page[url_code]" type="text" maxlength="100" value="<?php echo $page['url_code']; ?>" />
     <label for="page[title]">Page Title<?php echo $msg['title']; ?></label><input class="required <?php echo $class['title']; ?>" name="page[title]" type="text" maxlength="100" value="<?php echo $page['title']; ?>" />
     <label for="page[parent_id]">Parent Page</label>
-<?php   
+<?php
         $disabled_ids = array();
         $pageobj = new corePage($page['id'], 1);
         $disabled_ids = $pageobj->children($page['id'], $disabled_ids);
-        core_admin_render_pagetree(array($page['parent_id']), 'page[parent_id]', 'radio', null, $disabled_ids);  
+        core_admin_render_pagetree(array($page['parent_id']), 'page[parent_id]', 'radio', null, $disabled_ids);
 ?>
     <h4>Publishing</h4>
     <fieldset id="publishing" >
       <label for="page[activated]">Publish Date (set if you want it to auto-publish at a certain time)<?php echo $msg['activated']; ?></label><input class="<?php echo $class['activated']; ?>" name="page[activated]" type="text" maxlength="100" value="<?php echo $page['activated']; ?>" />
       <label for="page[deactivated]">Unpublish Date (set if you want it to auto-unpublish at a certain time)<?php echo $msg['deactivated']; ?></label><input class="<?php echo $class['deactivated']; ?>" name="page[deactivated]" type="text" maxlength="100" value="<?php echo $page['deactivated']; ?>" />
       <label for="page[summary]">Optional Summary<?php echo $msg['summary']; ?></label><textarea class="<?php echo $class['summary']; ?>" name="page[summary]" maxlength="100000" ><?php echo $page['summary']; ?></textarea>
-      <label for="page[content]">Content<?php echo $msg['content']; ?></label><textarea class="<?php echo $class['content']; ?>" name="page[content]" maxlength="100000" ><?php echo $page['content']; ?></textarea>      
+      <label for="page[content]">Content<?php echo $msg['content']; ?></label><textarea class="<?php echo $class['content']; ?>" name="page[content]" maxlength="100000" ><?php echo $page['content']; ?></textarea>
     </fieldset>
     <h4>Advanced</h4>
     <fieldset id="advanced">
@@ -1262,19 +1262,19 @@ function core_admin_render_page($paths){
           }
 ?>
       <li><input id="checkbox_role_<?php echo $role['id']; ?>" type="checkbox" value="<?php echo $role['id']; ?>" name="roles[]" <?php echo $checked; ?> /><span class="hand" onclick="document.getElementById('checkbox_role_<?php echo $role['id']; ?>').click();" ><?php echo $role['name']; ?></span></li>
-<?php      
+<?php
         }
 ?>
     </ul>
     <label for="groups[]">Groups</label>
-<?php   
-        core_admin_render_grouptree($page['groups']);  
+<?php
+        core_admin_render_grouptree($page['groups']);
 ?>
     </fieldset>
     <input class="button" type="submit" name="send" value="Save" />
     <a class="button" href="<?php echo APP_ROOT; ?>page/<?php echo $page['id']; ?>/" >Reset</a>
     <a class="button" href="<?php echo APP_ROOT; ?>page/" >Close</a>
-<?php 
+<?php
         if ($page['id']>0){
 ?>
     <a class="right button alert" href="<?php echo APP_ROOT; ?>page/<?php echo $page['id']; ?>/delete/" >Delete...</a>
@@ -1289,10 +1289,10 @@ function core_admin_render_page($paths){
     else{
 ?>
     <p>Page not found, please go <a href="<?php echo APP_ROOT; ?>page/">back</a>.</p>
-<?php 
+<?php
     }
   }
-  else{  
+  else{
     // Navigation to select Pages
 ?>
   <h2>Pages</h2>
@@ -1309,7 +1309,7 @@ function core_admin_render_page($paths){
 ?>
     <p>There are no pages, that is a problem!</p>
 <?php
-    }  
+    }
   }
 
 
@@ -1317,45 +1317,45 @@ function core_admin_render_page($paths){
 
 /**
  * Renders file admin form
- * 
+ *
  * @param array $paths Navigation path data
- * 
+ *
  */
 function core_admin_render_file($paths){
   // Navigation to select files
-  
-  
-  
+
+
+
   // File delete confirmation
-  
-  
+
+
   // File form
 
 }
 
 /**
  * Renders menu admin form
- * 
+ *
  * @param array $paths Navigation path data
- * 
+ *
  */
 function core_admin_render_menu($paths){
   // Navigation to select menus (tree)
-  
-  
-  
+
+
+
   // Menu delete confirmation
-  
-  
+
+
   // Menu form
 
 }
 
 /**
  * Renders module admin form
- * 
+ *
  * @param array $paths Navigation path data
- * 
+ *
  */
 function core_admin_render_module($paths){
   $db = new coreDb();
@@ -1378,7 +1378,7 @@ function core_admin_render_module($paths){
   $DIR = DOC_ROOT . '/core/modules/';
   $modules = scandir($DIR);
   foreach ($modules as $module){
-    if (is_dir($DIR . '/' . $module) && $module != '..' && $module != '.'){ 
+    if (is_dir($DIR . '/' . $module) && $module != '..' && $module != '.'){
       echo $module . "<br />";
     }
   }
@@ -1386,7 +1386,7 @@ function core_admin_render_module($paths){
   $DIR = DOC_ROOT . '/custom/modules/';
   $modules = scandir($DIR);
   foreach ($modules as $module){
-    if (is_dir($DIR . '/' . $module) && $module != '..' && $module != '.'){ 
+    if (is_dir($DIR . '/' . $module) && $module != '..' && $module != '.'){
       echo $module . "<br />";
     }
   }
@@ -1394,7 +1394,7 @@ function core_admin_render_module($paths){
   $DIR = DOC_ROOT . '/core/themes/';
   $modules = scandir($DIR);
   foreach ($modules as $module){
-    if (is_dir($DIR . '/' . $module) && $module != '..' && $module != '.'){ 
+    if (is_dir($DIR . '/' . $module) && $module != '..' && $module != '.'){
       echo $module . "<br />";
     }
   }
@@ -1402,12 +1402,12 @@ function core_admin_render_module($paths){
   $DIR = DOC_ROOT . '/custom/themes/';
   $modules = scandir($DIR);
   foreach ($modules as $module){
-    if (is_dir($DIR . '/' . $module) && $module != '..' && $module != '.'){ 
+    if (is_dir($DIR . '/' . $module) && $module != '..' && $module != '.'){
       echo $module . "<br />";
     }
   }
   echo "Done";
-  
+
   // User can activate, update, or deactivate (keep core modules locked, update only)
 
 }
@@ -1417,14 +1417,14 @@ function core_admin_render_module($paths){
 
 /**
  * Renders recursive group tree admin form
- * 
+ *
  * @param array $selected Array of selected group IDs
  * @param string $varname Basename of input elements
  * @param string $type Type of tree (checkbox or radio)
  * @param int $parent_id ID of parent group
  * @param array $disabled_ids Array of IDs of children of current group
- * 
- */ 
+ *
+ */
 function core_admin_render_grouptree($selected, $varname='group', $type='checkbox', $parent_id=null, $disabled_ids=array()){
   // Do stuff at top level
   $db = new coreDb();
@@ -1466,10 +1466,10 @@ function core_admin_render_grouptree($selected, $varname='group', $type='checkbo
 
 /**
  * Renders recursive group navigation
- * 
+ *
  * @param int $parent_id Parent ID of group
- * 
- */ 
+ *
+ */
 function core_admin_render_groupnav($parent_id=null){
   // Do stuff at top level
   $db = new coreDb();
@@ -1493,14 +1493,14 @@ function core_admin_render_groupnav($parent_id=null){
 
 /**
  * Renders recursive page tree admin form
- * 
+ *
  * @param array $selected Array of selected page IDs
  * @param string $varname Basename of input elements
  * @param string $type Type of tree (checkbox or radio)
  * @param int $parent_id ID of parent page
  * @param array $disabled_ids Array of IDs of children of current page
- * 
- */ 
+ *
+ */
 function core_admin_render_pagetree($selected, $varname='page', $type='checkbox', $parent_id=null, $disabled_ids=array()){
   // Do stuff at top level
   $db = new coreDb();
@@ -1546,10 +1546,10 @@ function core_admin_render_pagetree($selected, $varname='page', $type='checkbox'
 
 /**
  * Renders recursive page navigation
- * 
+ *
  * @param int $parent_id Parent ID of page
- * 
- */ 
+ *
+ */
 function core_admin_render_pagenav($parent_id=null){
   // Do stuff at top level
   $db = new coreDb();

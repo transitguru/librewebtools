@@ -3,9 +3,9 @@ namespace LWT\Modules\Test;
 /**
  * @file
  * Tester Class
- * 
+ *
  * Facilitates the construction of individual tests within the Test module
- * 
+ *
  * @category Unit Testing
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>

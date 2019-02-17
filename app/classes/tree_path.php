@@ -3,7 +3,7 @@ namespace LWT;
 /**
  * @file
  * Path Class
- * 
+ *
  * This object handles path requests from the user
  *
  * @category Path Handling
@@ -27,7 +27,7 @@ class Path extends Tree{
   public $module_id = null; /**< Default template to use when rendering the path */
   public $root = ''; /**< Application root where database stopped */
   public $content = ''; /**< Path content to be shown if valid content */
-  
+
   /**
    * Creates request
    *
@@ -87,7 +87,7 @@ class Path extends Tree{
         }
       }
     }
-    
+
     // Check permissions
     if (count($user->roles)>0){
       $roles = $user->roles;
@@ -121,14 +121,14 @@ class Path extends Tree{
       $this->module_id = null;
     }
   }
-  
+
   /**
    * Processes permissions to content based on group and role
    *
    * @param User $user User object containing authentication information
    *
    * @return boolean $access Whether the user is allowed to access the location
-   */ 
+   */
   private function permissions($user){
     //First, never ever lockout THE Admin user
     if ($user->id == 1){
@@ -137,7 +137,7 @@ class Path extends Tree{
 
     //Assume no access
     $access = false;
-    
+
     //Load the user's grouptree
     $all_groups = array();
     if (count($user->groups) > 0){
@@ -149,7 +149,7 @@ class Path extends Tree{
     else{
       $group = new Group(1);
       $all_groups = $group->traverse($all_groups);
-    } 
+    }
 
     // Get the allowable groups for the path
     $db = new Db();
@@ -161,7 +161,7 @@ class Path extends Tree{
         }
       }
     }
-    
+
     // Check for Role overrides (if unset, means everyone can access!)
     $db->fetch('path_roles', NULL, array('path_id' => $this->path_id));
     if ($db->affected_rows > 0){

@@ -3,7 +3,7 @@ namespace LWT;
 /**
  * @file
  * File Class
- * 
+ *
  * This object processes files
  *
  * @category Data Abstraction
@@ -57,9 +57,9 @@ class File{
       $this->clear();
       $this->id = $id;
     }
-    
+
   }
-  
+
   /**
    * Clears the variables
    *
@@ -77,7 +77,7 @@ class File{
     $this->error = 0;
     $this->message = '';
   }
-  
+
   /**
    * Writes the data to the database
    *
@@ -98,7 +98,7 @@ class File{
     }
     else{
       $inputs['uploaded'] = date('Y-m-d H:i:s');
-      $db->write('files', $inputs); 
+      $db->write('files', $inputs);
       $this->error = $db->error;
       $this->message = $db->message;
       if (!$db->error){
@@ -106,7 +106,7 @@ class File{
       }
     }
   }
-  
+
   /**
    * Deletes the record, then clears the object
    */

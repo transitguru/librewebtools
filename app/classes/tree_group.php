@@ -3,9 +3,9 @@ namespace LWT;
 /**
  * @file
  * Group Class
- * 
+ *
  * displays and modifies group information
- * 
+ *
  * @category Data Abstraction
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
@@ -24,7 +24,7 @@ class Group extends Tree{
   public $error = 0;        /**< Error number */
   public $message = '';     /**< Message for error reporting */
 
-  
+
   public function __construct($id = 0){
     if ($id>=0){
       $this->table = 'groups';
@@ -53,7 +53,7 @@ class Group extends Tree{
       $this->id = $id;
     }
   }
-  
+
   /**
    * Clears the variables
    *
@@ -69,7 +69,7 @@ class Group extends Tree{
     $this->error = 0;
     $this->message = '';
   }
-  
+
   /**
    * Writes the data to the database
    *
@@ -87,7 +87,7 @@ class Group extends Tree{
     }
     else{
       $inputs['created'] = date('Y-m-d H:i:s');
-      $db->write($this->table, $inputs); 
+      $db->write($this->table, $inputs);
       $this->error = $db->error;
       $this->message = $db->message;
       if (!$db->error){
@@ -95,7 +95,7 @@ class Group extends Tree{
       }
     }
   }
-  
+
   /**
    * Deletes the record, then clears the object
    */

@@ -26,9 +26,9 @@ Here are a few simple steps for installing LibreWebTools
         features that would be common among both MariaDB and MySQL.
       - PostgreSQL 9.1 (or greater) (https://www.postgresql.org/).
       - SQLite 3.14 (or greater) (https://sqlite.org/).
- 
- 1. Copy the app/settings.php.example to app/settings.php. Then edit the 
-    app/settings.php to your desired database user and password settings. Make 
+
+ 1. Copy the app/settings.php.example to app/settings.php. Then edit the
+    app/settings.php to your desired database user and password settings. Make
     sure you use a different password than the one given in the default file.
 
  2. Follow the particular database type's INSTALL file for more information to
@@ -44,8 +44,8 @@ Here are a few simple steps for installing LibreWebTools
 
  4. Navigate to your website using your web browser. It will do a few checks and
     if it is determined that the database is not installed, a form will appear
-    to collect basic information to build your database based on the 
-    instructions in the app/settings.php and your form data regarding the 
+    to collect basic information to build your database based on the
+    instructions in the app/settings.php and your form data regarding the
     administrative website user. At this moment, it will remove the database
     if it exists then add it back in based on the inputs in `app/settings.php`.
 

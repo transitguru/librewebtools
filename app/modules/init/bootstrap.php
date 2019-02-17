@@ -24,11 +24,11 @@ foreach ($includes as $include){
 
 /**
  * Processes any AJAX request for the Admin application
- * 
- * @param boolean $wrapper Designated as true if called within full page load 
- * 
+ *
+ * @param boolean $wrapper Designated as true if called within full page load
+ *
  * @return void
- * 
+ *
  */
 function core_admin_ajax($wrapper = false){
   // Only run when this variable is set, to prevent double rendering
@@ -46,7 +46,7 @@ function core_admin_ajax($wrapper = false){
     else{
       $_POST['path'] = '';
     }
-    
+
     // Process forms
     unset($_SESSION['repost']);
     if(isset($_POST['formid']) && isset($_POST['command'])){
@@ -78,10 +78,10 @@ function core_admin_ajax($wrapper = false){
     else{
       $_SESSION['message'] = '';
     }
-    
+
     // Explode the path string
     $paths = explode('/', $_POST['path']);
-    
+
     // Set current class
     $class = array(
       'user' => '',
@@ -92,7 +92,7 @@ function core_admin_ajax($wrapper = false){
       'menu' => '',
       'module' => '',
     );
-    
+
     if (isset($paths[0])){
       $class["{$paths[0]}"] = 'current';
     }
@@ -109,7 +109,7 @@ function core_admin_ajax($wrapper = false){
     </ul>
 
 <?php
-    
+
     // Process URL path to render forms
     if (isset($paths[0]) && $paths[0] != ''){
       if ($paths[0] === 'user'){
@@ -143,20 +143,20 @@ function core_admin_ajax($wrapper = false){
   <p>Welcome to the administration area. Please choose a task from above to begin administering the site.</p>
 <?php
     }
-    
+
     //exit if this was not inside a wrapper (using ajax)
     if (!$wrapper){
       exit;
     }
   }
 }
- 
+
 /**
  * Renders the Admin user page when loading the site within wrapper
  */
 function core_admin_page(){
   $_POST['ajax'] = 1;
-  
+
   //Render application in preparation for making ajax content
 ?>
   <div id="adminarea">
@@ -169,9 +169,9 @@ function core_admin_page(){
 
 /**
  * Processes Login on login page (must be tied to a content item in the database)
- * 
+ *
  * @return void
- * 
+ *
  */
 function core_auth_authentication(){
   if (isset($_SESSION['redirect']) && $_SESSION['redirect'] != ''){

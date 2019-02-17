@@ -3,9 +3,9 @@ namespace LWT;
 /**
  * @file
  * Subapp Class
- * 
+ *
  * Facilitates the construction of subapps within modules
- * 
+ *
  * @category Request Handling
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>

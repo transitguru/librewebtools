@@ -19,19 +19,19 @@ class Db{
   public $message = '';       /**< Error or success message */
   public $affected_rows = 0;  /**< Number of affected rows */
   public $insert_id = null;   /**< ID of record that was recently inserted */
-  
+
   /** Types that are recognized by this DB connector */
-  protected $types = array( 
-    'mysql', 
-    'pgsql', 
+  protected $types = array(
+    'mysql',
+    'pgsql',
     'sqlite',
-  ); 
+  );
   protected $db = null;       /**< DB information for this object */
   protected $pdo = null;      /**< PDO object to use for querying */
-  
+
   /**
    * Create the database object
-   * 
+   *
    * @param string $name Database name
    */
   public function __construct($src = null){
@@ -242,10 +242,10 @@ class Db{
     }
     $this->write_raw($sql);
   }
-  
+
   /**
    * Fetches array of table data (uses the raw fetch to do the actual db fetch)
-   * 
+   *
    * @param string $table Table where info is coming from
    * @param array $fields Fields that are needed from database (if null, all)
    * @param array $where Optional associative array of WHERE ids/values to filter info
@@ -308,7 +308,7 @@ class Db{
 
   /**
    * Raw database Write
-   * 
+   *
    * @param string $sql Raw SQL Query
    */
   public function write_raw($sql){
@@ -329,7 +329,7 @@ class Db{
 
   /**
    * Raw Database fetch: creating an array of table data
-   * 
+   *
    * @param string $sql raw query to send to the database
    * @param string $id Optional field to use as index instead of numeric index
    */

@@ -24,7 +24,7 @@ where:
 - `password` is the password required for that username
 
 Note: Unless the database user/host combination for your LWT installation
-has all of the privileges listed above you will not be able to install or run 
+has all of the privileges listed above you will not be able to install or run
 LWT. This information should also be entered into the appropriate lines
 of the `app/settings.php` configuration file.
 

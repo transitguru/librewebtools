@@ -7,7 +7,7 @@ must be enabled. It is recommended to use PostgreSQL v9.0 or later.
 You will need to log into psql as postgres to create your database user if it
 hasn't already been created for you. Log into the mysql prompt with
 `sudo -u postgres psql` assuming 'postgres' is the user that manages psql.
-Once you see the psql prompt, enter the following command. 
+Once you see the psql prompt, enter the following command.
 
 
 ```

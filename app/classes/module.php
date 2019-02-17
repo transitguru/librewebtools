@@ -3,7 +3,7 @@ namespace LWT;
 /**
  * @file
  * Module Class
- * 
+ *
  * This object keeps track of the modules
  *
  * @category Data Abstraction
@@ -54,7 +54,7 @@ class Module{
       $this->clear();
     }
   }
-  
+
   /**
    * Clears values to defaults (for writing)
    */
@@ -67,7 +67,7 @@ class Module{
     $this->id = null;
     $this->user_input = (object)[];
   }
-  
+
   /**
    * Load the module's template and related code for rendering
    * @param Path $path Path information to be rendered in the template
@@ -95,7 +95,7 @@ class Module{
       require_once ($file);
     }
   }
-  
+
   /**
    * Load all enabled modules
    * @param int $core Whether loading core (1) or custom (0) modules
@@ -132,7 +132,7 @@ class Module{
       }
     }
   }
-  
+
   /**
    * Load all Javascripts and CSS in the template
    */
@@ -143,7 +143,7 @@ class Module{
       $path = $db->output[0]['url_code'];
       while ($db->output[0]['parent_id'] != 0){
         $db->fetch('paths', array('url_code', 'parent_id'), array('id' => $db->output[0]['parent_id']));
-        $path = $db->output[0]['url_code'] . '/' . $path; 
+        $path = $db->output[0]['url_code'] . '/' . $path;
       }
       if (count($this->javascripts)>0){
         foreach ($this->javascripts as $script){
@@ -176,7 +176,7 @@ class Module{
       $this->message = $db->message;
     }
     else{
-      $db->write('modules', $inputs); 
+      $db->write('modules', $inputs);
       $this->error = $db->error;
       $this->message = $db->message;
       if (!$db->error){
@@ -184,7 +184,7 @@ class Module{
       }
     }
   }
-  
+
   /**
    * Deletes the record, then clears the object
    */

@@ -2,7 +2,7 @@
 namespace LWT\Modules\Test;
 /**
  * Test Field Class
- * 
+ *
  * Testing for the Field Xml class
  *
  * @category Unit Testing
@@ -13,10 +13,10 @@ namespace LWT\Modules\Test;
  * @version Release: @package_version@
  */
 class Field extends Tester{
-  
+
   /**
    * Tests Field::validate()
-   * 
+   *
    *  0 = no error
    * 11 = Empty value
    * 12 = String too long
@@ -35,16 +35,16 @@ class Field extends Tester{
    * 65 = Value greater than or equal to maximum
    * 66 = Value greater than maximum
    * 67 = Value does not match resolution (too precise)
-   * 
+   *
    * @param Object $inputs Field definitions that correspond with inputs for Field::validate()
    * @param int $error Expected error number that should be returned
-   * 
-   * 
+   *
+   *
    */
   private function validation($inputs, $error=0){
     // try making the object
     $field = new \LWT\Field($inputs);
-    
+
     $field->validate();
 
     // Break the object!
@@ -61,7 +61,7 @@ class Field extends Tester{
 
   /**
    * Batch-runs tests of the new field object
-   * 
+   *
    */
   public function run(){
     // Find out data directory

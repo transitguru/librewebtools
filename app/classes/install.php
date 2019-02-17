@@ -3,9 +3,9 @@ namespace LWT;
 /**
  * @file
  * Installer Class
- * 
+ *
  * Checks for installation, then installs the site
- * 
+ *
  * @category Bootstrap
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
@@ -18,19 +18,19 @@ class Installer{
   public $error = 0; /**< set to non-zero if an error occurs */
   public $message = ''; /**< Message to show error if it occurs */
   public $console = ''; /**< Console to write progress in case error is emitted */
-  
+
   /**
    * Constructs the installer object, checking to see if it is installed
-   */  
+   */
   public function __construct($uri, $post){
     $this->install = false;
-    
+
     // Check to see if the DB can even connect
     $db = new Db();
     if ($db->error){
       $this->install = true;
     }
-    
+
     // Check for existence of admin user password or homepage
     if (!$this->install){
       $db->fetch('passwords', NULL, array('user_id' => 1));
@@ -40,7 +40,7 @@ class Installer{
       $db->fetch('paths', NULL, array('id' => 0));
       if ($db->affected_rows == 0){
         $this->install = true;
-      }    
+      }
     }
     if ($this->install == true && $uri !== '/install'){
       header('Location: ' . BASE_URI . '/install');
@@ -53,7 +53,7 @@ class Installer{
       $this->view();
     }
   }
-  
+
   /**
    * Render installation page
    *
@@ -83,9 +83,9 @@ class Installer{
   </body>
 </html>
 <?php
-    exit;  
+    exit;
   }
-  
+
   /**
    * Installs the site
    *
@@ -100,7 +100,7 @@ class Installer{
       $db_host = $settings->db['host'];
       $db_user = $settings->db['user'];
       $db_port = $settings->db['port'];
-      
+
       // If confirmed password, attempt to install by creating empty db connection
       if (isset ($post->db->admin_pass) && $post->db->admin_pass == $post->db->confirm_pass){
         $src = ['type'=>$db_type,'pass'=>$db_pass,'host'=>$db_host,'user'=>$db_user,'port'=>$db_port];
@@ -130,7 +130,7 @@ class Installer{
             $this->error = 1;
             $this->console .= "Broken drop\n";
           }
-          
+
           // Create the LWT database
           if ($db_type == 'mysql' || $db_type == 'pgsql'){
             $sql = 'CREATE DATABASE "' . $db_name . '" DEFAULT CHARACTER SET utf8';
@@ -153,10 +153,10 @@ class Installer{
             $this->error = 1;
             $this->console .= "Broken create\n";
           }
-          
+
           // Unset the empty db connection
           unset($db);
-          
+
           if ($this->error){
             // Show that there is an error
             $this->message = 'Error creating database';

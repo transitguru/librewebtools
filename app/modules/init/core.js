@@ -18,23 +18,23 @@
 
 /**
  * Activates a hidden field to submit an AJAX request
- * This is useful when buttons are used to activate a variable and there is a 
- * chance that buttons would have been the same name. 
- * 
- * This works best if all buttons call this, and there is one 
+ * This is useful when buttons are used to activate a variable and there is a
+ * chance that buttons would have been the same name.
+ *
+ * This works best if all buttons call this, and there is one
  * hidden input that would be edited as a result of calling this. Using
  * many hidden inputs could cause names to stick and confuse the server
  * AJAX page. It is best NOT to define the button as a type="submit", however
- * some web browsers would also submit the form a second time when using 
+ * some web browsers would also submit the form a second time when using
  * buttons. Stylized anchor links work the best on ensuring the invisible
  * submit button is "clicked" and the form is submitted only once.
- * 
+ *
  * @param {string} button_id ID of a hidden input that will have its name changed
  * @param {string} name Name of input (preferred to be hidden) that the button would have been named
  * @param {string} value Value of the input that the button would have taken
  * @param {string} submit_id ID of a submit button (can be hidden or shown) so that the form is submitted
  * @param {string} submit_value Value of submit button (to allow for control of AJAX div id update)
- * 
+ *
  * @returns {void}
  */
 function click_a_button(button_id, name, value, submit_id, submit_value, validate){
@@ -46,23 +46,23 @@ function click_a_button(button_id, name, value, submit_id, submit_value, validat
 
 /**
  * This is the engine of the client side request to the server.
- * 
+ *
  * Note: Buttons that have same name will inherit the name of one of the
  * buttons which may or may not be the one clicked. It is best to use
  * click_a_button() to populate a hidden input with a name and value
- * for this to work as intended. 
- * 
+ * for this to work as intended.
+ *
  * @param {string} formobject Object instance of form that the javascript will send to server
  * @param {string} responsediv ID of div (or other element) that will update when server responds
  * @param {string} responsemsg Markup to place within responsediv while waiting for the server
- * 
+ *
  * @returns {void}
  */
 function ajaxPost(formobject,responsediv,responsemsg) {
   var xmlHttpReq = false;
   var strURL = formobject.action;
-  
-  
+
+
   // Webkit(Chrome/Safari), Gecko(Mozilla), IE >= 7
   if (window.XMLHttpRequest) {
     xmlHttpReq = new XMLHttpRequest();
@@ -72,7 +72,7 @@ function ajaxPost(formobject,responsediv,responsemsg) {
     xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
   }
   xmlHttpReq.open('post', strURL, true);
-  
+
   try{
     var dataSend = new FormData(formobject);
     xmlHttpReq.send(dataSend);
@@ -81,7 +81,7 @@ function ajaxPost(formobject,responsediv,responsemsg) {
     xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xmlHttpReq.send(getquerystring(formobject));
   }
-  
+
   xmlHttpReq.onreadystatechange = function() {
     if (xmlHttpReq.readyState == 4) {
       // Show response when server responds
@@ -95,9 +95,9 @@ function ajaxPost(formobject,responsediv,responsemsg) {
 }
 
 /**
- * Provides a fallback method of creating Form Data 
- * for older version of IE. 
- * 
+ * Provides a fallback method of creating Form Data
+ * for older version of IE.
+ *
  * @param {object} form Form object that contains elements
  * @returns {String} Stringified contents of form elements for use in XMLHttpReq
  */
@@ -137,8 +137,8 @@ function getquerystring(form) {
 
 /**
  * A simpler way to handle AJAX data where only a small portion of the
- * page is updated. 
- * 
+ * page is updated.
+ *
  * @param {string} data Stringified post inputs data
  * @param {string} action URL for where to handle POST data
  * @param {string} responsediv ID of div (or other element) that will update when server responds
@@ -148,8 +148,8 @@ function getquerystring(form) {
 function ajaxPostLite(data, action, responsediv,responsemsg){
   var xmlHttpReq = false;
   var strURL = action;
-  
-  
+
+
   // Webkit(Chrome/Safari), Gecko(Mozilla), IE >= 7
   if (window.XMLHttpRequest) {
     xmlHttpReq = new XMLHttpRequest();
@@ -161,7 +161,7 @@ function ajaxPostLite(data, action, responsediv,responsemsg){
   xmlHttpReq.open('post', strURL, true);
   xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xmlHttpReq.send('write_lite=1&' + data);
-  
+
   xmlHttpReq.onreadystatechange = function() {
     if (xmlHttpReq.readyState == 4) {
       // Show response when server responds
@@ -177,7 +177,7 @@ function ajaxPostLite(data, action, responsediv,responsemsg){
 
 /**
  * Toggle the hiding or showing of an element
- * 
+ *
  * @param {string} id ID of element that is being hidden or shown
  * @returns {Boolean}
  */
@@ -198,7 +198,7 @@ function toggle_hide(id,classes){
 
 /**
  * Lets your javascript take a little nap
- * 
+ *
  * @param {int} milliseconds Length of time that javascript should wait in milliseconds
  * @returns {void}
  */
@@ -213,7 +213,7 @@ function sleep(milliseconds) {
 
 /**
  * Allow a checkbox to be checked or unchecked
- * 
+ *
  * @param {string} id
  * @returns {void}
  */
@@ -230,7 +230,7 @@ function toggle_checkbox(id){
 
 /**
  * Shows tooltip using a hidden div
- *  
+ *
  * @param {object} evt
  * @returns {void}
  */
@@ -250,9 +250,9 @@ function showTooltip(evt, text){
 
   //Don't write below this line!
   var tooltip = document.getElementById('tooltip');
-  var mx = evt.clientX + xOffset; 
-  var my = evt.clientY + yOffset; 
-  
+  var mx = evt.clientX + xOffset;
+  var my = evt.clientY + yOffset;
+
   var fontString = fontSize.toString();
   var tooltipStyle = "";
   tooltipStyle = tooltipStyle.concat("font-size: ", fontString, "px; font-family:", fontFamily, "; font-weight:", fontWeight, "; font-color:", textColor, "; background-color: " ,boxFill, "; border:", boxStrokeWidth, "px solid" + boxStroke, "; opacity:", boxOpacity, ";", "top: ", my, "px; left: ", mx, "px; z-index:9; position:fixed; padding: 2px; border-radius: 5px;");
@@ -263,7 +263,7 @@ function showTooltip(evt, text){
 
 /**
  * Hides a tooltip
- * 
+ *
  * @param {object} evt
  * @returns {void}
  */
@@ -294,7 +294,7 @@ function hideDialogue(){
 
 function confirmDelete(name, postdata, responsediv){
   var text = '<p>Are you sure you want to delete <strong>' + name + '</strong></p><p><button onclick="event.preventDefault();hideDialogue();ajaxPostLite(\'' + postdata + '\',\'\',\'' + responsediv + '\',\'\');">Delete</button><button onclick="event.preventDefault();hideDialogue();">cancel</button></p>';
-  document.getElementById('dialogue-content').innerHTML = text;  
+  document.getElementById('dialogue-content').innerHTML = text;
 }
 
 function uploadFile(path){
@@ -314,7 +314,7 @@ function makeDir(path){
 
 /**
  * Pads characters to the left of a string if shorter than length
- * 
+ *
  * @param {string} str String that will be left-padded
  * @param {string} padString String to pad to the left of the string
  * @param {int} length The number of characters for the resulting string
@@ -329,7 +329,7 @@ function leftPad(str, padString, length) {
 
 /**
  * Activates a date-picker
- * 
+ *
  * @param {object} e Event handler from mouse-click
  * @param {string} responsediv ID of calendar div to fill with calendar info
  * @param {element} input Input element where the click originated
@@ -338,7 +338,7 @@ function leftPad(str, padString, length) {
  * @returns {void}
  */
 function showCalendar(e,responsediv, input, min, max){
-  var mx = e.clientX; 
+  var mx = e.clientX;
   var my = e.clientY;
   var id = input.getAttribute('id');
   var startpoint = input.getAttribute('value');
@@ -351,7 +351,7 @@ function showCalendar(e,responsediv, input, min, max){
 
 /**
  * Renders a calendar
- * 
+ *
  * @param {int} ax clientX position of mouse
  * @param {int} ay clientY position of mouse
  * @param {int} year Year for calendar
@@ -370,32 +370,32 @@ function getCalendar(ax,ay, year, mo, startpoint, min, max, responsediv,id){
   // Determine previous and next year
   var year1 = year - 1;
   var year2 = year - 0 + 1;
-  
+
   // Today's date
   var today = new Date();
   var ty = today.getFullYear();
   var tm = today.getMonth() + 1;
   var td = today.getDate();
-  
+
   // Current selection's date
   var datearray = startpoint.split("-");
   var sy = datearray[0];
   var sm = datearray[1];
   var sd = datearray[2];
-  
+
   // Create the beginning point for the calendar
   var y = year;
   var m = mo - 1;
   var d = 1;
   var date = new Date(y,m,d);
   var start = date.getDay();
-  
+
   // Initialize variables for HTML output
   var css = 'othermonth';
   var dates = [];
   var nums = [];
   var classes = [];
-  
+
   // Fill in previous months info if month does not begin on Sunday
   if (start > 0){
     var end = 42 - start;
@@ -411,7 +411,7 @@ function getCalendar(ax,ay, year, mo, startpoint, min, max, responsediv,id){
       nums[i] = d;
       var dd = leftPad(d + '', '0', 2);
       dates[i] = '' + yyyy + '-' + mm + '-' + dd + '';
-      
+
       // Styling for certain days
       if(ty == y && tm == m && td == d){
         classes[i] = 'today';
@@ -441,7 +441,7 @@ function getCalendar(ax,ay, year, mo, startpoint, min, max, responsediv,id){
     var now = date.getMonth();
     end = 42;
   }
-  
+
   // Now work on this month
   var offset = 0;
   for (var i=0; i<=end; i++){
@@ -465,7 +465,7 @@ function getCalendar(ax,ay, year, mo, startpoint, min, max, responsediv,id){
       offset = i;
       now = m;
     }
-    
+
     // Styling for certain days
     if(ty == y && tm == m && td == d){
       classes[i + start] = 'today';
@@ -477,14 +477,14 @@ function getCalendar(ax,ay, year, mo, startpoint, min, max, responsediv,id){
       classes[i + start] = css;
     }
   }
-  
+
   // Load next month's info for fetching a next calendar
   var nyr = date.getFullYear();
   var nmo = date.getMonth() + 1;
-  
+
   // Dump data into HTML to render the calendar
   var i =0;
-  
+
   // Navigation
   var html = '<span class="bold">' + monthNames[mo - 1] + ' ' + year + '</span>';
   html = html + '<button class="right" style="font-weight:normal" onclick="removeCalendar(\'' + responsediv + '\')">x</button><br /><br />';
@@ -510,7 +510,7 @@ function getCalendar(ax,ay, year, mo, startpoint, min, max, responsediv,id){
     html = html + '</tr>';
   }
   html = html + '</tbody></table>';
-  
+
   //Inject calendar into calendar div and use mouse event to locate it on the page
   document.getElementById(responsediv).innerHTML = html;
   var my = ay - 0;
@@ -520,7 +520,7 @@ function getCalendar(ax,ay, year, mo, startpoint, min, max, responsediv,id){
 
 /**
  * Sets the date in an input from the datepicker
- * 
+ *
  * @param {string} date Date for input element (yyyy-mm-dd)
  * @param {string} id ID of input element to update
  * @param {string} responsediv ID of calendar that will be closed
@@ -535,7 +535,7 @@ function setDay(date, id, responsediv){
 
 /**
  * Removes calendar information and hides the container div
- * 
+ *
  * @param {string} responsediv ID of calendar that will be closed
  * @returns {void}
  */
@@ -546,7 +546,7 @@ function removeCalendar(responsediv){
 
 /**
  * Updates an end date so that it is not before than the start date
- * 
+ *
  * @param {element} input Begin date input element
  * @param {string} update ID of end date to update
  * @returns {void}
@@ -566,5 +566,5 @@ function updateTime(input, update, date1, date2){
   var da2 = document.getElementById(date2).getAttribute('value');
   if (da1 == da2 && time1 > time2){
     document.getElementById(update + '___' + time2).selected=true;
-  } 
+  }
 }

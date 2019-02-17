@@ -2,7 +2,7 @@
 namespace LWT\Modules\Test;
 /**
  * Test Xml Class
- * 
+ *
  * Testing for the Xml class
  *
  * @category Unit Testing
@@ -25,14 +25,14 @@ class Xml extends Tester{
     echo $input ."\nAfter scrubbing..\n\n";
     $elements = array('p', 'em', 'ul', 'li');
     $attributes = array ('class' => array(), 'style' => array('p'));
-    
+
     $xml = new \LWT\Xml($input, 'html', $elements, $attributes, true);
     $xml->scrub();
     echo $xml->markup;
 
-    
+
     echo "\n\nTesting something a bit more complex\n\n";
-    
+
     $input = file_get_contents($directory . 'test2.html');
     echo $input ."\nAfter scrubbing..\n\n";
     $elements = array('svg', 'g', 'circle', 'path', 'text', 'style');
@@ -41,11 +41,11 @@ class Xml extends Tester{
     $svg = new \LWT\Xml($input, 'html', $elements, $attributes);
     $svg->scrub();
     echo $svg->markup;
-    
+
     echo "\n\nA very simple text String\n\n";
-    
+
     $input = "This is a basic String";
-    
+
     echo $input ."\nAfter scrubbing..\n\n";
 
     $xml = new \LWT\Xml($input, 'basic');
@@ -53,9 +53,9 @@ class Xml extends Tester{
     echo $xml->markup;
 
     echo "\n\nA very basic text String\n\n";
-    
+
     $input = "This is another <em>basic</em> String";
-    
+
     echo $input ."\nAfter scrubbing..\n\n";
 
     $xml = new \LWT\Xml($input, 'basic');
@@ -63,9 +63,9 @@ class Xml extends Tester{
     echo $xml->markup;
 
     echo "\n\nHow about mal-formed XML?\n\n";
-    
+
     $input = "This is a <strong> Broken <em>file with </strong> misnested</em> Strings";
-    
+
     echo $input ."\nAfter scrubbing..\n\n";
 
     $xml = new \LWT\Xml($input, 'basic');
@@ -73,7 +73,7 @@ class Xml extends Tester{
     echo $xml->markup;
 
     echo "\n\nTesting XML with empty attributes\n\n";
-    
+
     $input = file_get_contents($directory . 'test3.html');
     echo $input ."\nAfter scrubbing..\n\n";
     $elements = array('svg', 'g', 'circle', 'path', 'text', 'style');
@@ -96,7 +96,7 @@ class Xml extends Tester{
     echo "\nMaking it pretty....\n";
     $svg->scrub(true);
     echo $svg->markup;
-    
+
     echo "\n\nTest Complete!\n";
     exit;
   }

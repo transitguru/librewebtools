@@ -3,9 +3,9 @@ namespace LWT;
 /**
  * @file
  * User Class
- * 
+ *
  * allows for loading and editing of user information and authentication
- * 
+ *
  * @category Data Abstraction
  * @package LibreWebTools
  * @author Michael Sypolt <msypolt@transitguru.limited>
@@ -25,7 +25,7 @@ class User{
   public $roles = array();      /**< Roles that a user is a member of */
   public $message = '';         /**< Message to view when editing or viewing a profile */
   public $error = 0;            /**< Error (zero means no error) */
-  
+
   /**
    * Constructs user based on user ID in database, or makes an empty user
    *
@@ -69,7 +69,7 @@ class User{
       $this->id = $id;
     }
   }
-  
+
   /**
    * Removes User information from object, but does not destroy the object
    */
@@ -84,7 +84,7 @@ class User{
     $this->groups = array();
     $this->roles = array();
   }
-  
+
   /**
    * Renders User Login Form
    */
@@ -101,7 +101,7 @@ class User{
     </p>
 <?php
   }
-  
+
   /**
    * Sets user information using login credentials
    *
@@ -113,7 +113,7 @@ class User{
     $user = trim(strtolower($username));
     $pass = trim($password);
     $db = new Db();
-    
+
     //lookup the user by ID
     $db->fetch('users', array('id'), array('login' => $user));
     if ($db->affected_rows > 0){
@@ -135,10 +135,10 @@ class User{
       }
     }
   }
-  
+
   /**
    * Sets a password for a user (User must be loaded)
-   * 
+   *
    * @param string $pass password
    */
   public function setpassword($pass=null){
@@ -157,10 +157,10 @@ class User{
     $db = new Db();
     $db->write('passwords', array('user_id' => $this->id, 'valid_date' => $current_date, 'hashed' => $hashed));
   }
-  
+
   /**
    * Resets a user's lost password
-   * 
+   *
    * @param string $email User's email address
    *
    */
@@ -214,39 +214,39 @@ class User{
     if ($this->id > 0){
       $this->message = '';
       $this->error = 0;
-      
+
       // Define form fields
       $fields = array();
       $fields['login'] = new Field($this->login, 'text', 'nowacky', true, 40);
       $fields['login']->element = 'text';
       $fields['login']->label = 'Login';
       $fields['login']->name = 'login';
-      
+
       $fields['firstname'] = new Field($this->firstname, 'text', 'oneline', true, 100);
       $fields['firstname']->element = 'text';
       $fields['firstname']->label = 'First Name';
       $fields['firstname']->name = 'firstname';
-      
+
       $fields['lastname'] = new Field($this->lastname, 'text', 'oneline', true, 100);
       $fields['lastname']->element = 'text';
       $fields['lastname']->label = 'Last Name';
       $fields['lastname']->name = 'lastname';
-      
+
       $fields['email'] = new Field($this->email, 'text', 'email', true, 255);
       $fields['email']->element = 'text';
       $fields['email']->label = 'Email';
       $fields['email']->name = 'email';
-      
+
       if (isset($_POST['submit']) && $_POST['submit']=='Update'){
         $this->message = '<span class="success">Success!</span>';
         $this->error = 0;
-        
+
         // Set values to User POST
         $fields['login']->value = $_POST['login'];
         $fields['firstname']->value = $_POST['firstname'];
         $fields['lastname']->value = $_POST['lastname'];
         $fields['email']->value = $_POST['email'];
-        
+
         // Validate the fields
         foreach ($fields as $key => $field){
           $fields[$key]->validate();
@@ -254,7 +254,7 @@ class User{
             $this->error = $fields[$key]->error;
           }
         }
-        
+
         // Check for unique login
         if (!$this->error && $this->login != $fields['login']->value){
           $test = new Db();
@@ -264,7 +264,7 @@ class User{
             $this->error = 9999;
           }
         }
-        
+
         if (!$this->error){
           $this->login = $fields['login']->value;
           $this->firstname = $fields['firstname']->value;
@@ -282,7 +282,7 @@ class User{
       elseif (isset($_POST['submit']) && $_POST['submit']=='Cancel'){
         $this->message = '<span class="warning">Profile was not changed.</span>';
       }
-      
+
       echo $this->message; ?><br />
       <h1>Edit your Profile</h1>
       <form action="" method="post" name="update_profile" id="update_profile">
@@ -292,11 +292,11 @@ class User{
       }
 ?>
         <input type="submit" name="submit" value="Update" /><input type="submit" name="submit" value="Cancel" />
-      </form>      
-<?php      
+      </form>
+<?php
     }
   }
-  
+
   /**
    * Renders the reset password page (for those already logged in)
    */
@@ -329,7 +329,7 @@ class User{
     if (isset($_POST['submit']) && $_POST['submit']=='Cancel'){
       $message = '<span class="warning">Password was not changed.</span>';
     }
-      
+
 ?>
 <?php echo $message; ?><br />
   <form action='' method='post' name='update_profile' id='update_profile'>
@@ -340,7 +340,7 @@ class User{
   </form>
 <?php
   }
-  
+
   /**
    * Renders the forgot password page
    */
@@ -370,16 +370,16 @@ class User{
   <?php
       }
       else{
-        $_SESSION['reset_user'] = $db->output[0]['user_id'];  
+        $_SESSION['reset_user'] = $db->output[0]['user_id'];
         $submit = 'Update';
-      
+
         // Check if _POST is set and process form
         $message = '';
         if ($_POST['submit']=='Update'){
           // Define form fields
           $inputs['pwd'] = $_POST['pwd'];
           $inputs['conf_pwd'] = $_POST['conf_pwd'];
-        
+
           if ($inputs['pwd'] != $inputs['conf_pwd']){
             $message = '<span class="error">New Passwords do not match.</span>';
             $error = true;
@@ -400,7 +400,7 @@ class User{
         if ($_POST['submit']=='Cancel'){
           $message = '<span class="warning">Password was not changed.</span>';
         }
-      
+
   ?>
   <?php echo $message; ?><br />
   <h1>Edit your Password</h1>
@@ -412,9 +412,9 @@ class User{
   <?php
       }
     }
-  
+
   }
-  
+
   /**
    * Writes a user profile
    */
@@ -433,7 +433,7 @@ class User{
     elseif ($this->id < 0){
       $inputs['created'] = date('Y-m-d H:i:s');
       $this->created = $inputs['created'];
-      $db->write('users', $inputs);      
+      $db->write('users', $inputs);
       $this->error = $db->error;
       $this->message = $db->message;
       if (!$db->error){
