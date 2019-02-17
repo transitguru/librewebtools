@@ -513,53 +513,5 @@ class Field{
 
     return $form;
   }
-
-  /**
-   * Rendering function (maybe moved to a form object)
-   */
-  public function render(){
-    if (!is_null($this->label)){
-      $label = '<label for "' . $this->name . '">' . $this->label;
-    }
-    else{
-      $label = '';
-    }
-    if ($this->error){
-      $label .= " <strong>{$this->message}</strong></label>";
-      $class = 'invalid ';
-    }
-    else{
-      $label .= "</label>";
-      $class = '';
-    }
-    if ($this->required){
-      $class .= 'required';
-    }
-    else{
-      $class .= '';
-    }
-    if ($this->max_chars > 0){
-      $maxlength = "maxlength=\"{$this->max_chars}\"";
-    }
-    else{
-      $maxlength = '';
-    }
-    if ($this->element == 'button'){
-      echo "$label<input class=\"{$class}\" type=\"button\" value=\"{$this->value}\" name=\"{$this->name}\" {$maxlength} />\n";
-    }
-    elseif($this->element == 'text'){
-      echo "$label<input class=\"{$class}\" type=\"text\" value=\"{$this->value}\" name=\"{$this->name}\" {$maxlength} />\n";
-    }
-    elseif($this->element == 'textarea'){
-      echo "$label<textarea class=\"{$class}\" name=\"{$this->name}\" {$maxlength} >{$this->value}</textarea>\n";    
-    }
-    elseif($this->element == 'select' && is_array($this->list) && count($this->list)>0){
-      echo "$label<select class=\"{$class}\" name=\"{$this->name}\">\n";
-      foreach ($this->list as $items){
-        echo "  <option value=\"{$items['value']}\" >{$items['name']}</option>\n";
-      }
-      echo "</select>\n";
-    }
-  }
 }
 

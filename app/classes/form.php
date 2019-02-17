@@ -3,7 +3,7 @@ namespace LWT;
 /**
  * @file
  * Form Class
- * 
+ *
  * Combines user data fields into forms
  *
  * @category Processing and Validation
@@ -18,6 +18,7 @@ class Form{
   public $name = '';         /**< Name for form element */
   public $desc = '';         /**< Text description for form introducing form */
   public $action = '';       /**< Location where form submits */
+  public $method = 'post';   /**< HTTP method the form would use */
   public $onstar = [];       /**< Object of on* javascript actions (omit 'on' in key)*/
   public $datadash = [];     /**< Object of data-* attributes (omit 'data-' in key) */
   public $fields = [];       /**< Array of Field objects */
@@ -38,6 +39,7 @@ class Form{
    *     'name' => 'form_name_for_html',
    *     'desc' => 'Some text that would be shown to user of form.',
    *     'action' => '/',
+   *     'method' => 'post',
    *     'onstar' => (object) [
    *       'blur' => 'somefunction()',
    *       'keyup' => 'someotherfunction()',
@@ -83,6 +85,9 @@ class Form{
     }
     if (isset($defs->action)){
       $this->action = $defs->action;
+    }
+    if (isset($defs->method)){
+      $this->method = $defs->method;
     }
     if (isset($defs->onstar) && is_object($defs->onstar)){
       $this->onstar = $defs->onstar;
@@ -142,6 +147,7 @@ class Form{
     $form->name = $this->name;
     $form->desc = $this->desc;
     $form->action = $this->action;
+    $form->method = $this->method;
     if (isset($this->onstar) && is_object($this->onstar)){
       $form->onstar = $this->onstar;
     }
@@ -186,7 +192,83 @@ class Form{
    * @return String $html HTML representation of Form
    */
   public function export_html(){
-
+    $html = '';
+    if (!is_null($this->title)){
+      $html .= '<h3>' . $this->title . "</h3>\n";
+    }
+    if (!is_null($this->desc)){
+      $html .= '<p>' . $this->desc . "</p>\n";
+    }
+    $html .= '<p>' . $this->message . "</p>\n";
+    $html .= '<form action="' . $this->action . '" method="' . $this->method . '" ';
+    if (count($this->onstar) > 0){
+      foreach ($this->onstar as $key => $value){
+        $html .= 'on' . $key . '="' . $value . '" ';
+      }
+    }
+    if (count($this->datadash) > 0){
+      foreach ($this->datadash as $key => $value){
+        $html .= 'data-' . $key . '="' . $value . '" ';
+      }
+    }
+    if (count($this->classes) > 0){
+      $class = implode(' ' , $this->classes);
+      $html .= 'class="' . $class . '" ';
+    }
+    if (count($this->styles) > 0){
+      $style = '';
+      foreach ($this->styles as $key => $value){
+        $style .= $key . ':' . $value . ';';
+      }
+      $html .= 'style="' . $style . '" ';
+    }
+    if (count($this->fields) > 0){
+      foreach ($this->fields as $f){
+        if (!is_null($f->label)){
+          $label = '<label for "' . $f->name . '">' . $f->label;
+        }
+        else{
+          $label = '';
+        }
+        if ($f->error){
+          $label .= " <strong>{$f->message}</strong></label>";
+          $class = 'invalid ';
+        }
+        else{
+          $label .= "</label>";
+          $class = '';
+        }
+        if ($f->required){
+          $class .= 'required';
+        }
+        else{
+          $class .= '';
+        }
+        if ($f->max_chars > 0){
+          $maxlength = "maxlength=\"{$f->max_chars}\"";
+        }
+        else{
+          $maxlength = '';
+        }
+        if ($f->element == 'button'){
+          $html .= "$label<input class=\"{$class}\" type=\"button\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
+        }
+        elseif($f->element == 'text'){
+          $html .= "$label<input class=\"{$class}\" type=\"text\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
+        }
+        elseif($f->element == 'textarea'){
+          $html .= "$label<textarea class=\"{$class}\" name=\"{$f->name}\" {$maxlength} >{$f->value}</textarea>\n";
+        }
+        elseif($f->element == 'select' && is_array($f->list) && count($f->list)>0){
+          $html .= "$label<select class=\"{$class}\" name=\"{$f->name}\">\n";
+          foreach ($f->list as $items){
+            $html .= "  <option value=\"{$items['value']}\" >{$items['name']}</option>\n";
+          }
+          $html .= "</select>\n";
+        }
+      }
+    }
+    return $html;
   }
 }
 
