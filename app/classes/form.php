@@ -14,7 +14,7 @@ namespace LWT;
  * @version Release: @package_version@
  */
 class Form{
-  public $title = null;      /**< Human friendly name for form title */
+  public $title = '';        /**< Human friendly name for form title */
   public $name = '';         /**< Name for form element */
   public $desc = '';         /**< Text description for form introducing form */
   public $action = '';       /**< Location where form submits */

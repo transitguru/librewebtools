@@ -14,7 +14,7 @@ namespace LWT;
  * @version Release: @package_version@
  */
 class Field{
-  public $label = null;      /**< Human friendly name for form Label */
+  public $label = '';        /**< Human friendly name for form Label */
   public $name = '';         /**< Name for form element */
   public $element = '';      /**< Type of form element */
   public $autocomplete= 'on';/**< Autocomplete behavior on form element */
