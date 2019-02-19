@@ -256,6 +256,9 @@ class Form{
         elseif($f->element == 'text'){
           $html .= "$label<input class=\"{$class}\" type=\"text\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
         }
+        elseif($f->element == 'password'){
+          $html .= "$label<input class=\"{$class}\" type=\"password\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
+        }
         elseif($f->element == 'textarea'){
           $html .= "$label<textarea class=\"{$class}\" name=\"{$f->name}\" {$maxlength} >{$f->value}</textarea>\n";
         }

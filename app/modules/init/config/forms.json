@@ -1,0 +1,23 @@
+{
+  "__comments__":{
+    "category"  : "configuration",
+    "package"   : "LibreWebTools",
+    "author"    : "Michael Sypolt <msypolt@transitguru.limited>",
+    "copyright" : "Copyright (c) 2019",
+    "license"   : "http://www.gnu.org/licenses/gpl-3.0.txt",
+    "version"   : "Release: @package_version@"
+  },
+  "forms":{
+    "login":{
+      "title":"Login",
+      "desc":"Please enter your username and password to login",
+      "name":"form_login",
+      "fields":[
+        {"name":"user","label":"Username","element":"text",
+          "format":"oneline","required":true},
+        {"name":"pass","label":"Password","element":"password",
+          "format":"password","required":true}
+      ]
+    }
+  }
+}

@@ -15,8 +15,13 @@ namespace LWT\Modules\Init;
  */
 Class Auth Extends \LWT\Subapp{
   public function ajax(){
-    if (fnmatch('application/json*', $this->inputs->content_type) || fnmatch('text/json*', $this->inputs->content_type)){
+    if (fnmatch('application/json*', $this->inputs->content_type)){
+      // Load the forms
+      $directory = DOC_ROOT . '/app/modules/init/config/';
+      $form_doc = file_get_contents($directory . 'forms.json');
+      $forms = json_decode($form_doc)->forms;
 
+      // Process the path
       $begin = mb_strlen($this->path->root);
       if (mb_strlen($this->inputs->uri) > $begin){
         $pathstring = mb_substr($this->inputs->uri, $begin);
@@ -24,12 +29,16 @@ Class Auth Extends \LWT\Subapp{
       else{
         $pathstring = '';
       }
+
+      // Do something based on path
       if ($pathstring == 'login'){
         if (isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
           $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
         }
         else{
-          echo '{"message":"Please login","form":["user","pass"]}';
+          $form = new \LWT\Form($forms->login);
+          $json = $form->export_json();
+          echo $json;
         }
       }
       elseif ($pathstring == 'logout'){
@@ -40,14 +49,8 @@ Class Auth Extends \LWT\Subapp{
         header('Cache-Control: ');
         header('Content-Type: application/json');
         $payload = (object)[
-          'status' => 'success',
-          'code' => 200,
-          'var_dump' => (object)[
-            'user_input' => $this->inputs,
-            'session' => $this->session,
-            'path' => $this->path,
-            'pathstring' => $pathstring,
-          ],
+          'status' => 'Not Found',
+          'code' => 404
         ];
         echo json_encode($payload, JSON_UNESCAPED_SLASHES);
       }
