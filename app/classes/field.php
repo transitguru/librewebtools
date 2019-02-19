@@ -459,7 +459,7 @@ class Field{
    * @return Object $form data for later JSON or HTML conversion in Form object
    */
   public function build(){
-    $form->label = $this->$label;
+    $form->label = $this->label;
     $form->name = $this->name;
     $form->element = $this->element;
     $form->autocomplete = $this->autocomplete;
@@ -481,7 +481,7 @@ class Field{
     if (isset($defs->styles) && is_object($this->styles)){
       $this->styles = $this->styles;
     }
-    if (count($list)>0){
+    if (count($this->list)>0){
       $form->list = $this->list;
     }
     $form->value = $this->value;

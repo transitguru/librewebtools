@@ -143,7 +143,7 @@ class Form{
    * @return Object $form data for JSON or HTML conversion
    */
   public function build(){
-    $form->title = $this->$title;
+    $form->title = $this->title;
     $form->name = $this->name;
     $form->desc = $this->desc;
     $form->action = $this->action;
@@ -164,7 +164,7 @@ class Form{
       $this->error = 0;
       $this->message = '';
       $form->fields = [];
-      foreach ($this->field as $field){
+      foreach ($this->fields as $field){
         $obj = $field->build();
         $form->fields[] = $obj;
       }
