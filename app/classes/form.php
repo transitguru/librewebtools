@@ -174,6 +174,8 @@ class Form{
       $this->error = 90;
       $this->message = 'No fields exist in this form!';
     }
+
+    return $form;
   }
 
   /**
