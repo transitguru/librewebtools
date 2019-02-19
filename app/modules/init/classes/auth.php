@@ -15,36 +15,39 @@ namespace LWT\Modules\Init;
  */
 Class Auth Extends \LWT\Subapp{
   public function ajax(){
-    if (fnmatch('application/json*', $this->inputs->content_type)){
-      // Load the forms
-      $directory = DOC_ROOT . '/app/modules/init/config/';
-      $form_doc = file_get_contents($directory . 'forms.json');
-      $forms = json_decode($form_doc)->forms;
+    // Load the applicable forms
+    $directory = DOC_ROOT . '/app/modules/init/config/';
+    $form_doc = file_get_contents($directory . 'forms.json');
+    $forms = json_decode($form_doc)->auth;
+    $this->form = (object)[];
 
-      // Process the path
-      $begin = mb_strlen($this->path->root);
-      if (mb_strlen($this->inputs->uri) > $begin){
-        $pathstring = mb_substr($this->inputs->uri, $begin);
-      }
-      else{
-        $pathstring = '';
-      }
+    // Process the path
+    $begin = mb_strlen($this->path->root);
+    if (mb_strlen($this->inputs->uri) > $begin){
+      $this->pathstring = mb_substr($this->inputs->uri, $begin);
+    }
+    else{
+      $this->pathstring = '';
+    }
 
-      // Do something based on path
-      if ($pathstring == 'login'){
-        if (isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
-          $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
-        }
-        else{
-          $form = new \LWT\Form($forms->login);
-          $json = $form->export_json();
-          echo $json;
-        }
+    // Do something based on path
+    if ($this->pathstring == 'login'){
+      $this->form = new \LWT\Form($forms->login);
+      if (isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
+        $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
       }
-      elseif ($pathstring == 'logout'){
-        $this->session->logout();
+      elseif (fnmatch('application/json*', $this->inputs->content_type)){
+        $json = $this->form->export_json();
+        echo $json;
+        exit;
       }
-      else{
+    }
+    elseif ($this->pathstring == 'logout'){
+      $this->session->logout();
+    }
+    else{
+      http_response_code(404);
+      if (fnmatch('application/json*', $this->inputs->content_type)){
         header('Pragma: ');
         header('Cache-Control: ');
         header('Content-Type: application/json');
@@ -53,22 +56,19 @@ Class Auth Extends \LWT\Subapp{
           'code' => 404
         ];
         echo json_encode($payload, JSON_UNESCAPED_SLASHES);
+        exit;
       }
-      exit;
     }
   }
 
   public function render(){
-    $this->auth(false);
-  }
-
-  private function auth($ajax = false){
-    echo "<p>You have successfully constructed the path, see dump below</p><pre>\n";
-    $everything = (object)[];
-    $everything->user_input = $this->inputs;
-    $everything->session = $this->session;
-    var_dump($everything);
-    echo "</pre>";
+    if ($this->pathstring == 'login'){
+      $html = $this->form->export_html();
+      echo $html;
+    }
+    else{
+      $this->render_404();
+    }
   }
 }
 

@@ -55,7 +55,7 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
     $input->content_type = 'text/plain';
   }
   if (isset($_POST)){
-    if (fnmatch('application/json*', $input->content_type) || fnmatch('text/json*', $input->content_type)){
+    if (fnmatch('application/json*', $input->content_type)){
       $raw = file_get_contents('php://input');
       $input->post = json_decode($raw);
     }
@@ -97,9 +97,8 @@ else{
   $user = new LWT\User(0);
 }
 
-$path = new LWT\Path($input->uri,$user);
-
 // Load enabled modules and chosen theme
+$path = new LWT\Path($input->uri,$user);
 $module = new LWT\Module($path->module_id,$input,$session);
 $module->loadTemplate($path);
 

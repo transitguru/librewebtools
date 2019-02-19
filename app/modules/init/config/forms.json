@@ -7,7 +7,7 @@
     "license"   : "http://www.gnu.org/licenses/gpl-3.0.txt",
     "version"   : "Release: @package_version@"
   },
-  "forms":{
+  "auth":{
     "login":{
       "title":"Login",
       "desc":"Please enter your username and password to login",
