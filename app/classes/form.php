@@ -29,6 +29,11 @@ class Form{
   public $error = 0;         /**< int error number based on validation */
 
   /**
+   * Permissible types for input element in this implementation
+   */
+  private $input_types = ['button','checkbox','file','password','submit','text'];
+
+  /**
    * Initializes new Form
    *
    * @param Object $defs Definitions for the Form as presented in the object below
@@ -254,14 +259,8 @@ class Form{
         else{
           $maxlength = '';
         }
-        if ($f->element == 'button'){
-          $html .= "$label  <input class=\"{$class}\" type=\"button\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
-        }
-        elseif($f->element == 'text'){
-          $html .= "$label  <input class=\"{$class}\" type=\"text\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
-        }
-        elseif($f->element == 'password'){
-          $html .= "$label  <input class=\"{$class}\" type=\"password\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
+        if (in_array($f->element, $this->input_types)){
+          $html .= "$label  <input class=\"{$class}\" type=\"{$f->element}\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
         }
         elseif($f->element == 'textarea'){
           $html .= "$label  <textarea class=\"{$class}\" name=\"{$f->name}\" {$maxlength} >{$f->value}</textarea>\n";
