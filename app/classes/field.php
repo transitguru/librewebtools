@@ -459,6 +459,7 @@ class Field{
    * @return Object $form data for later JSON or HTML conversion in Form object
    */
   public function build(){
+    $form = (object)[];
     $form->label = $this->label;
     $form->name = $this->name;
     $form->element = $this->element;

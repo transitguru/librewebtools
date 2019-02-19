@@ -143,6 +143,7 @@ class Form{
    * @return Object $form data for JSON or HTML conversion
    */
   public function build(){
+    $form = (object)[];
     $form->title = $this->title;
     $form->name = $this->name;
     $form->desc = $this->desc;
