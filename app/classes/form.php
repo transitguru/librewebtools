@@ -105,13 +105,13 @@ class Form{
       $this->fields = [];
       foreach ($defs->fields as $obj){
         $field = new Field($obj);
-      }
-      if ($field->error == 0){
-        $this->fields[] = $field;
-      }
-      else{
-        $this->error = 99;
-        $this->message = 'Some fields were not imported properly!';
+        if ($field->error == 0){
+          $this->fields[] = $field;
+        }
+        else{
+          $this->error = 99;
+          $this->message = 'Some fields were not imported properly!';
+        }
       }
     }
   }
@@ -225,10 +225,11 @@ class Form{
       }
       $html .= 'style="' . $style . '" ';
     }
+    $html .= ">\n";
     if (count($this->fields) > 0){
       foreach ($this->fields as $f){
         if (!is_null($f->label)){
-          $label = '<label for "' . $f->name . '">' . $f->label;
+          $label = '  <label for="' . $f->name . '">' . $f->label;
         }
         else{
           $label = '';
@@ -238,7 +239,7 @@ class Form{
           $class = 'invalid ';
         }
         else{
-          $label .= "</label>";
+          $label .= "</label>\n";
           $class = '';
         }
         if ($f->required){
@@ -254,26 +255,27 @@ class Form{
           $maxlength = '';
         }
         if ($f->element == 'button'){
-          $html .= "$label<input class=\"{$class}\" type=\"button\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
+          $html .= "$label  <input class=\"{$class}\" type=\"button\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
         }
         elseif($f->element == 'text'){
-          $html .= "$label<input class=\"{$class}\" type=\"text\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
+          $html .= "$label  <input class=\"{$class}\" type=\"text\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
         }
         elseif($f->element == 'password'){
-          $html .= "$label<input class=\"{$class}\" type=\"password\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
+          $html .= "$label  <input class=\"{$class}\" type=\"password\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
         }
         elseif($f->element == 'textarea'){
-          $html .= "$label<textarea class=\"{$class}\" name=\"{$f->name}\" {$maxlength} >{$f->value}</textarea>\n";
+          $html .= "$label  <textarea class=\"{$class}\" name=\"{$f->name}\" {$maxlength} >{$f->value}</textarea>\n";
         }
         elseif($f->element == 'select' && is_array($f->list) && count($f->list)>0){
-          $html .= "$label<select class=\"{$class}\" name=\"{$f->name}\">\n";
+          $html .= "$label  <select class=\"{$class}\" name=\"{$f->name}\">\n";
           foreach ($f->list as $items){
-            $html .= "  <option value=\"{$items['value']}\" >{$items['name']}</option>\n";
+            $html .= "    <option value=\"{$items['value']}\" >{$items['name']}</option>\n";
           }
-          $html .= "</select>\n";
+          $html .= "  </select>\n";
         }
       }
     }
+    $html .= "</form>\n";
     return $html;
   }
 }
