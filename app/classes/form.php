@@ -21,7 +21,7 @@ class Form{
   public $method = 'post';   /**< HTTP method the form would use */
   public $onstar = [];       /**< Object of on* javascript actions (omit 'on' in key)*/
   public $datadash = [];     /**< Object of data-* attributes (omit 'data-' in key) */
-  public $fields = [];       /**< Array of Field objects */
+  public $fields = [];       /**< Object of Field objects */
   public $classes = [];      /**< Array of CSS classes */
   public $styles = [];       /**< Object of CSS styles */
 
@@ -58,10 +58,10 @@ class Form{
    *       'color' => 'blue',
    *       'font-color' => '#ffffff'
    *     ],
-   *     'fields' => [
-   *       (object) ['name' => 'element1', 'value' => ''], //See Field object
-   *       (object) ['name' => 'element2', 'value' => ''], //See Field object
-   *       (object) ['name' => 'element3', 'value' => ''], //See Field object
+   *     'fields' => (object) [
+   *       'id1' => (object) ['name' => 'element1', 'value' => ''], //See Field object
+   *       'id2' => (object) ['name' => 'element2', 'value' => ''], //See Field object
+   *       'id3' => (object) ['name' => 'element3', 'value' => ''], //See Field object
    *     ],
    *   ];
    * @endcode
@@ -106,12 +106,12 @@ class Form{
     if (isset($defs->styles) && is_object($defs->styles)){
       $this->styles = $defs->styles;
     }
-    if (isset($defs->fields) && is_array($defs->fields)){
-      $this->fields = [];
-      foreach ($defs->fields as $obj){
+    if (isset($defs->fields) && is_object($defs->fields)){
+      $this->fields = (object)[];
+      foreach ($defs->fields as $id => $obj){
         $field = new Field($obj);
         if ($field->error == 0){
-          $this->fields[] = $field;
+          $this->fields->{$id} = $field;
         }
         else{
           $this->error = 99;
@@ -125,12 +125,12 @@ class Form{
    * Batch tests the values in the form for validity
    */
   public function validate(){
-    if (isset($this->fields) && is_array($this->fields)){
+    if (isset($this->fields) && is_object($this->fields) && count($this->fields)>0){
       $this->error = 0;
       $this->message = '';
       foreach ($this->field as $i => $field){
-        $this->field[$i]->validate();
-        if ($this->field[$i]->error != 0){
+        $this->field->{$i}->validate();
+        if ($this->field->{$i}->error != 0){
           $this->error = 11;
           $this->message = 'There are some errors, see highlighted fields';
         }
@@ -160,11 +160,11 @@ class Form{
     $form->datadash = $this->datadash;
     $form->classes = $this->classes;
     $form->styles = $this->styles;
-    $form->fields = [];
-    if (isset($this->fields) && is_array($this->fields)){
-      foreach ($this->fields as $field){
+    $form->fields = (object)[];
+    if (isset($this->fields) && is_object($this->fields)){
+      foreach ($this->fields as $id => $field){
         $obj = $field->build();
-        $form->fields[] = $obj;
+        $form->fields->{$id} = $obj;
       }
     }
 
@@ -225,7 +225,7 @@ class Form{
     }
     $html .= ">\n";
     if (count($object->fields) > 0){
-      foreach ($object->fields as $f){
+      foreach ($object->fields as $i => $f){
         if (!is_null($f->label)){
           $label = '  <label for="' . $f->name . '">' . $f->label;
         }
@@ -257,11 +257,11 @@ class Form{
         }
         if (in_array($f->element, $this->input_types)){
           $html .= '  <input class="' . $class . '" type="' . $f->element . '" value="' . 
-            $f->value . '" name="' . $f->name . '" ' . $maxlength . " />\n";
+            $f->value . '" id="' . $i . '" name="' . $f->name . '" ' . $maxlength . " />\n";
         }
         elseif($f->element == 'textarea'){
           $html .= '  <textarea class="' . $class . '" name="' . $f->name . '" ' . 
-            $maxlength . ' >' . $f->value . "</textarea>\n";
+            $maxlength . ' id="' . $i . '" >' . $f->value . "</textarea>\n";
         }
         elseif($f->element == 'select' && is_array($f->list) && count($f->list)>0){
           $html .= '  <select class="' . $class . '" name="' . $f->name . "\">\n";
