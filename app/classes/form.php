@@ -156,20 +156,12 @@ class Form{
     $form->method = $this->method;
     $form->error = $this->error;
     $form->message = $this->message;
-    if (isset($this->onstar) && is_object($this->onstar)){
-      $form->onstar = $this->onstar;
-    }
-    if (isset($this->datadash) && is_object($this->datadash)){
-      $form->datadash = $this->datadash;
-    }
-    if (isset($this->classes) && is_array($this->classes)){
-      $form->classes = $this->classes;
-    }
-    if (isset($defs->styles) && is_object($this->styles)){
-      $this->styles = $this->styles;
-    }
+    $form->onstar = $this->onstar;
+    $form->datadash = $this->datadash;
+    $form->classes = $this->classes;
+    $form->styles = $this->styles;
+    $form->fields = [];
     if (isset($this->fields) && is_array($this->fields)){
-      $form->fields = [];
       foreach ($this->fields as $field){
         $obj = $field->build();
         $form->fields[] = $obj;
