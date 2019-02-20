@@ -91,44 +91,44 @@ class Session{
     $db->fetch('users', null, array('login' => $user));
     if(is_array($db->output) && count($db->output)>0){
       $user_id = $db->output[0]['id'];
-    }
-    $db->fetch('passwords', null, array('user_id' => $user_id), null, array('valid_date'));
-    if(is_array($db->output) && count($db->output)>0){
-      foreach ($db->output as $pwd){
-        $hash = $pwd['hashed'];
-      }
-      $success = password_verify($pass, $hash);
-      if ($verify == true){
-        return $success;
-      }
-      if ($success == true){
-        for ($try=0; $try <= 15; $try ++){
-          $token = '';
-          $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-          $len = strlen($chars);
-          for ($i = 0; $i<48; $i++){
-            $num = rand(0,$len-1);
-            $token .= substr($chars, $num, 1);
-          }
-          $db->fetch('sessions', array('name'), array('name' => $token));
-          if ($db->error == 0 && count($db->output) == 0){
-            $ready = true;
-            break;
-          }
-          else{
-            echo "Tried token {$token} with error {$db->error}\n";
-          }
+      $db->fetch('passwords', null, array('user_id' => $user_id), null, array('valid_date'));
+      if(is_array($db->output) && count($db->output)>0){
+        foreach ($db->output as $pwd){
+          $hash = $pwd['hashed'];
         }
-        if ($ready == false){
-          throw new Exception("Tried {$try} times to unsuccessfully create a token!");
+        $success = password_verify($pass, $hash);
+        if ($verify == true){
+          return $success;
         }
-        $date = date('Y-m-d H:i:s');
-        $cookie_exp = time() + 30 * 24 * 60 * 60;
-        $db->write('sessions', array('user_id' => $user_id, 'valid' => $date, 'data' => '{}', 'name' => $token));
-        $this->__construct($token);
-        setcookie('librewebtools', $token, $cookie_exp, BASE_URI . '/');
-        header('Location: ' . BASE_URI . '/');
-        exit;
+        if ($success == true){
+          for ($try=0; $try <= 15; $try ++){
+            $token = '';
+            $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            $len = strlen($chars);
+            for ($i = 0; $i<48; $i++){
+              $num = rand(0,$len-1);
+              $token .= substr($chars, $num, 1);
+            }
+            $db->fetch('sessions', array('name'), array('name' => $token));
+            if ($db->error == 0 && count($db->output) == 0){
+              $ready = true;
+              break;
+            }
+            else{
+              echo "Tried token {$token} with error {$db->error}\n";
+            }
+          }
+          if ($ready == false){
+            throw new Exception("Tried {$try} times to unsuccessfully create a token!");
+          }
+          $date = date('Y-m-d H:i:s');
+          $cookie_exp = time() + 30 * 24 * 60 * 60;
+          $db->write('sessions', array('user_id' => $user_id, 'valid' => $date, 'data' => '{}', 'name' => $token));
+          $this->__construct($token);
+          setcookie('librewebtools', $token, $cookie_exp, BASE_URI . '/');
+          header('Location: ' . BASE_URI . '/');
+          exit;
+        }
       }
     }
   }
