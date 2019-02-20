@@ -169,17 +169,11 @@ class Form{
       $this->styles = $this->styles;
     }
     if (isset($this->fields) && is_array($this->fields)){
-      $form->error = 0;
-      $form->message = '';
       $form->fields = [];
       foreach ($this->fields as $field){
         $obj = $field->build();
         $form->fields[] = $obj;
       }
-    }
-    else{
-      $form->error = 90;
-      $form->message = 'No fields exist in this form!';
     }
 
     return $form;
@@ -269,7 +263,7 @@ class Form{
         else{
           $maxlength = '';
         }
-        if (in_array($f->element, $object->input_types)){
+        if (in_array($f->element, $this->input_types)){
           $html .= '  <input class="' . $class . '" type="' . $f->element . '" value="' . 
             $f->value . '" na me="' . $f->name . '" ' . $maxlength . " />\n";
         }
