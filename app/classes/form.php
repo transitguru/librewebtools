@@ -240,7 +240,7 @@ class Form{
           $label .= "</label>\n";
           $class = '';
         }
-        if ($f->required){
+        if (isset($f->required) && $f->required == true){
           $class .= 'required';
         }
         else{
@@ -249,7 +249,7 @@ class Form{
         if (!is_null($f->label)){
           $html .= $label;
         }
-        if ($f->max_chars > 0){
+        if (isset($f->max_chars) && $f->max_chars > 0){
           $maxlength = 'maxlength="' . $f->max_chars . '" ';
         }
         else{
