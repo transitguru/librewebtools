@@ -154,6 +154,8 @@ class Form{
     $form->desc = $this->desc;
     $form->action = $this->action;
     $form->method = $this->method;
+    $form->error = $this->error;
+    $form->message = $this->message;
     if (isset($this->onstar) && is_object($this->onstar)){
       $form->onstar = $this->onstar;
     }
@@ -167,8 +169,8 @@ class Form{
       $this->styles = $this->styles;
     }
     if (isset($this->fields) && is_array($this->fields)){
-      $this->error = 0;
-      $this->message = '';
+      $form->error = 0;
+      $form->message = '';
       $form->fields = [];
       foreach ($this->fields as $field){
         $obj = $field->build();
@@ -176,8 +178,8 @@ class Form{
       }
     }
     else{
-      $this->error = 90;
-      $this->message = 'No fields exist in this form!';
+      $form->error = 90;
+      $form->message = 'No fields exist in this form!';
     }
 
     return $form;
@@ -200,43 +202,44 @@ class Form{
    * @return String $html HTML representation of Form
    */
   public function export_html(){
+    $object = $this->build();
     $html = '';
-    if (!is_null($this->title)){
-      $html .= '<h3>' . $this->title;
-      if ($this->error != 0){
-        $html .= ' <strong>' . $this->message . '</strong>';
+    if (!is_null($object->title)){
+      $html .= '<h3>' . $object->title;
+      if ($object->error != 0){
+        $html .= ' <strong>' . $object->message . '</strong>';
       }
       $html .= "</h3>\n";
     }
-    if (!is_null($this->desc)){
-      $html .= '<p>' . $this->desc . "</p>\n";
+    if (!is_null($object->desc)){
+      $html .= '<p>' . $object->desc . "</p>\n";
     }
-    $html .= '<p>' . $this->message . "</p>\n";
-    $html .= '<form action="' . $this->action . '" method="' . $this->method . '" ';
-    if (count($this->onstar) > 0){
-      foreach ($this->onstar as $key => $value){
+    $html .= '<p>' . $object->message . "</p>\n";
+    $html .= '<form action="' . $object->action . '" method="' . $object->method . '" ';
+    if (count($object->onstar) > 0){
+      foreach ($object->onstar as $key => $value){
         $html .= 'on' . $key . '="' . $value . '" ';
       }
     }
-    if (count($this->datadash) > 0){
-      foreach ($this->datadash as $key => $value){
+    if (count($object->datadash) > 0){
+      foreach ($object->datadash as $key => $value){
         $html .= 'data-' . $key . '="' . $value . '" ';
       }
     }
-    if (count($this->classes) > 0){
-      $class = implode(' ' , $this->classes);
+    if (count($object->classes) > 0){
+      $class = implode(' ' , $object->classes);
       $html .= 'class="' . $class . '" ';
     }
-    if (count($this->styles) > 0){
+    if (count($object->styles) > 0){
       $style = '';
-      foreach ($this->styles as $key => $value){
+      foreach ($object->styles as $key => $value){
         $style .= $key . ':' . $value . ';';
       }
       $html .= 'style="' . $style . '" ';
     }
     $html .= ">\n";
-    if (count($this->fields) > 0){
-      foreach ($this->fields as $f){
+    if (count($object->fields) > 0){
+      foreach ($object->fields as $f){
         if (!is_null($f->label)){
           $label = '  <label for="' . $f->name . '">' . $f->label;
         }
@@ -266,7 +269,7 @@ class Form{
         else{
           $maxlength = '';
         }
-        if (in_array($f->element, $this->input_types)){
+        if (in_array($f->element, $object->input_types)){
           $html .= '  <input class="' . $class . '" type="' . $f->element . '" value="' . 
             $f->value . '" na me="' . $f->name . '" ' . $maxlength . " />\n";
         }
