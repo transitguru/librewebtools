@@ -14,7 +14,7 @@ namespace LWT;
  * @version Release: @package_version@
  */
 class Form{
-  public $title = '';        /**< Human friendly name for form title */
+  public $title = null;      /**< Human friendly name for form title */
   public $name = '';         /**< Name for form element */
   public $desc = '';         /**< Text description for form introducing form */
   public $action = '';       /**< Location where form submits */
@@ -202,7 +202,11 @@ class Form{
   public function export_html(){
     $html = '';
     if (!is_null($this->title)){
-      $html .= '<h3>' . $this->title . "</h3>\n";
+      $html .= '<h3>' . $this->title;
+      if ($this->error != 0){
+        $html .= ' <strong>' . $this->message . '</strong>';
+      }
+      $html .= "</h3>\n";
     }
     if (!is_null($this->desc)){
       $html .= '<p>' . $this->desc . "</p>\n";
@@ -253,28 +257,35 @@ class Form{
         else{
           $class .= '';
         }
+        if (!is_null($f->label)){
+          $html .= $label;
+        }
         if ($f->max_chars > 0){
-          $maxlength = "maxlength=\"{$f->max_chars}\"";
+          $maxlength = 'maxlength="' . $f->max_chars . '" ';
         }
         else{
           $maxlength = '';
         }
         if (in_array($f->element, $this->input_types)){
-          $html .= "$label  <input class=\"{$class}\" type=\"{$f->element}\" value=\"{$f->value}\" name=\"{$f->name}\" {$maxlength} />\n";
+          $html .= '  <input class="' . $class . '" type="' . $f->element . '" value="' . 
+            $f->value . '" na me="' . $f->name . '" ' . $maxlength . " />\n";
         }
         elseif($f->element == 'textarea'){
-          $html .= "$label  <textarea class=\"{$class}\" name=\"{$f->name}\" {$maxlength} >{$f->value}</textarea>\n";
+          $html .= '  <textarea class="' . $class . '" name="' . $f->name . '" ' . 
+            $maxlength . ' >' . $f->value . "</textarea>\n";
         }
         elseif($f->element == 'select' && is_array($f->list) && count($f->list)>0){
-          $html .= "$label  <select class=\"{$class}\" name=\"{$f->name}\">\n";
+          $html .= '  <select class="' . $class . '" name="' . $f->name . "\">\n";
           foreach ($f->list as $items){
-            $html .= "    <option value=\"{$items['value']}\" >{$items['name']}</option>\n";
+            $html .= '    <option value="' . $items['value'] . '" >' . 
+              $items['name'] . "</option>\n";
           }
           $html .= "  </select>\n";
         }
       }
     }
     $html .= "</form>\n";
+
     return $html;
   }
 }

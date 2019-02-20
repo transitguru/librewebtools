@@ -35,8 +35,10 @@ Class Auth Extends \LWT\Subapp{
       $this->form = new \LWT\Form($forms->login);
       if (isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
         $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
+        $this->form->message = 'Invalid username or password';
+        $this->form->error = 1;
       }
-      elseif (fnmatch('application/json*', $this->inputs->content_type)){
+      if (fnmatch('application/json*', $this->inputs->content_type)){
         $json = $this->form->export_json();
         echo $json;
         exit;
