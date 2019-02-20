@@ -17,7 +17,7 @@
           "format":"oneline","required":true},
         {"name":"pass","label":"Password","element":"password",
           "format":"password","required":true},
-        {"name":"send","element":"submit",
+        {"name":"send","element":"submit","label":"",
           "format":"text","value":"Login"}
       ]
     }
