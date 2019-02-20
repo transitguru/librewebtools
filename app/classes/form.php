@@ -257,7 +257,7 @@ class Form{
         }
         if (in_array($f->element, $this->input_types)){
           $html .= '  <input class="' . $class . '" type="' . $f->element . '" value="' . 
-            $f->value . '" na me="' . $f->name . '" ' . $maxlength . " />\n";
+            $f->value . '" name="' . $f->name . '" ' . $maxlength . " />\n";
         }
         elseif($f->element == 'textarea'){
           $html .= '  <textarea class="' . $class . '" name="' . $f->name . '" ' . 
