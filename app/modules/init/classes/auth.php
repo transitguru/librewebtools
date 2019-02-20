@@ -39,6 +39,28 @@ Class Auth Extends \LWT\Subapp{
         $this->form->error = 1;
       }
       if (fnmatch('application/json*', $this->inputs->content_type)){
+        header('Pragma: ');
+        header('Cache-Control: ');
+        header('Content-Type: application/json');
+        $json = $this->form->export_json();
+        echo $json;
+        exit;
+      }
+    }
+    elseif ($this->pathstring == 'profile'){
+      $this->form = new \LWT\Form($forms->profile);
+      if (isset($this->inputs->post->submit)){
+        if ($this->inputs->post->submit == 'Update'){
+          $this->form->message = 'Attempted to update user profile';
+        }
+        elseif ($this->inputs->post->submit == 'Cancel'){
+          $this->form->message = 'Cancelled...';
+        }
+      }
+      if (fnmatch('application/json*', $this->inputs->content_type)){
+        header('Pragma: ');
+        header('Cache-Control: ');
+        header('Content-Type: application/json');
         $json = $this->form->export_json();
         echo $json;
         exit;
@@ -64,7 +86,7 @@ Class Auth Extends \LWT\Subapp{
   }
 
   public function render(){
-    if ($this->pathstring == 'login'){
+    if ($this->pathstring == 'login' || $this->pathstring == 'profile'){
       $html = $this->form->export_html();
       echo $html;
     }

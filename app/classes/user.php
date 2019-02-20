@@ -86,23 +86,6 @@ class User{
   }
 
   /**
-   * Renders User Login Form
-   */
-  public function renderLogin(){
-?>
-    <?php echo $this->message; ?><br />
-        <form id="login-form" method="post" action="">
-          <label for="username">Username:</label> <input type="text" name="username" /><br />
-          <label for="pwd">Password:</label> <input type="password" name="pwd" />
-          <input name="login" type="submit" id="login" value="Log In">
-        </form>
-    <p>
-      <a href="/forgot/">Forgot</a> your password?
-    </p>
-<?php
-  }
-
-  /**
    * Sets user information using login credentials
    *
    * @param string $username Login name for the user

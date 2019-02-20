@@ -20,6 +20,25 @@
         {"name":"send","element":"submit","label":"",
           "format":"text","value":"Login"}
       ]
+    },
+    "profile":{
+      "title":"Profile",
+      "desc":"Update your profile",
+      "name":"form_profile",
+      "fields":[
+        {"name":"login","label":"Login","element":"text",
+          "format":"oneline","required":true,"max_chars":40},
+        {"name":"firstname","label":"First Name","element":"text",
+          "format":"oneline","required":true,"max_chars":100},
+        {"name":"lastname","label":"Last Name","element":"text",
+          "format":"oneline","required":true,"max_chars":100},
+        {"name":"email","label":"Email Address","element":"text",
+          "format":"email","required":true,"max_chars":255},
+        {"name":"submit","element":"submit","label":"",
+          "format":"text","value":"Update"},
+        {"name":"submit","element":"submit",
+          "format":"text","value":"Cancel"}
+      ]
     }
   }
 }
