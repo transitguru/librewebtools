@@ -14,7 +14,7 @@
       "name":"form_login",
       "fields":{
         "user":{"name":"user","label":"Username","element":"text",
-          "format":"oneline","required":true},
+          "format":"nowacky","required":true},
         "pass":{"name":"pass","label":"Password","element":"password",
           "format":"password","required":true},
         "send":{"name":"send","element":"submit","label":"",
@@ -27,7 +27,7 @@
       "name":"form_profile",
       "fields":{
         "login":{"name":"login","label":"Login","element":"text",
-          "format":"oneline","required":true,"max_chars":40},
+          "format":"nowacky","required":true,"max_chars":40},
         "firstname":{"name":"firstname","label":"First Name","element":"text",
           "format":"oneline","required":true,"max_chars":100},
         "lastname":{"name":"lastname","label":"Last Name","element":"text",
