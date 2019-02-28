@@ -151,12 +151,14 @@ class Form{
   public function fill($inputs,$ignore_empty=true){
     if(is_object($this->fields)){
       foreach ($this->fields as $id => $field){
-        $n = $field->name;
-        if(isset($inputs->{$n}) && !is_array($inputs->{$n}) && !is_object($inputs->{$n})){
-          $this->fields->{$id}->value = $inputs->{$n};
-        }
-        elseif(!$ignore_empty){
-          $this->fields->{$id}->value = null;
+        if($field->element != 'submit'){
+          $n = $field->name;
+          if(isset($inputs->{$n}) && !is_array($inputs->{$n}) && !is_object($inputs->{$n})){
+            $this->fields->{$id}->value = $inputs->{$n};
+          }
+          elseif(!$ignore_empty){
+            $this->fields->{$id}->value = null;
+          }
         }
       }
     }
