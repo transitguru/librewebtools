@@ -125,12 +125,12 @@ class Form{
    * Batch tests the values in the form for validity
    */
   public function validate(){
-    if (isset($this->fields) && is_object($this->fields) && count($this->fields)>0){
+    if (isset($this->fields) && is_object($this->fields)){
       $this->error = 0;
       $this->message = '';
-      foreach ($this->field as $i => $field){
-        $this->field->{$i}->validate();
-        if ($this->field->{$i}->error != 0){
+      foreach ($this->fields as $i => $field){
+        $this->fields->{$i}->validate();
+        if ($this->fields->{$i}->error != 0){
           $this->error = 11;
           $this->message = 'There are some errors, see highlighted fields';
         }
@@ -139,6 +139,26 @@ class Form{
     else{
       $this->error = 10;
       $this->message = 'Nothing to do, no fields available for validation!';
+    }
+  }
+
+  /**
+   * Populates the form with user input
+   *
+   * @param Object $inputs Inputs object from user where keys are ids for form
+   * @param bool $ignore_empty Ignore empty fields (if false, set null)
+   */
+  public function fill($inputs,$ignore_empty=true){
+    if(is_object($this->fields)){
+      foreach ($this->fields as $id => $field){
+        $n = $field->name;
+        if(isset($inputs->{$n}) && !is_array($inputs->{$n}) && !is_object($inputs->{$n})){
+          $this->fields->{$id}->value = $inputs->{$n};
+        }
+        elseif(!$ignore_empty){
+          $this->fields->{$id}->value = null;
+        }
+      }
     }
   }
 
@@ -224,7 +244,7 @@ class Form{
       $html .= 'style="' . $style . '" ';
     }
     $html .= ">\n";
-    if (count($object->fields) > 0){
+    if (is_object($object->fields)){
       foreach ($object->fields as $i => $f){
         if (!is_null($f->label)){
           $label = '  <label for="' . $f->name . '">' . $f->label;

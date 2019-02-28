@@ -51,7 +51,8 @@ Class Auth Extends \LWT\Subapp{
       $this->form = new \LWT\Form($forms->profile);
       if (isset($this->inputs->post->submit)){
         if ($this->inputs->post->submit == 'Update'){
-          $this->form->message = 'Attempted to update user profile';
+          $this->form->fill($this->inputs->post);
+          $this->form->validate();
         }
         elseif ($this->inputs->post->submit == 'Cancel'){
           $this->form->message = 'Cancelled...';
