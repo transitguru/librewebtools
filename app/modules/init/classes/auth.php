@@ -14,6 +14,14 @@ namespace LWT\Modules\Init;
  * @version    @package_version@
  */
 Class Auth Extends \LWT\Subapp{
+  /**
+   * list of allowable paths that end up rendering or outputting a form
+   */
+  public $valid_paths = ['login', 'profile', 'password', 'forgot'];
+
+  /**
+   * Runs prior to any HTML output
+   */
   public function ajax(){
     // Load the applicable forms
     $directory = DOC_ROOT . '/app/modules/init/config/';
@@ -86,10 +94,24 @@ Class Auth Extends \LWT\Subapp{
     }
   }
 
+  /**
+   * Runs while inside the template, usually rendering some HTML
+   */
   public function render(){
-    if ($this->pathstring == 'login' || $this->pathstring == 'profile'){
-      $html = $this->form->export_html();
-      echo $html;
+    if (in_array($this->pathstring,$this->valid_paths)){
+      if (is_object($this->form)){
+        $html = $this->form->export_html();
+        echo $html;
+      }
+      else{
+        echo "No form found";
+      }
+    }
+    elseif($this->pathstring == ''){
+      echo '<h3>User Authentication Module</h3><p>Variable dump appears below</p>';
+      echo "\n<pre>\n\n";
+      var_dump($this);
+      echo "\n\n</pre>\n";
     }
     else{
       $this->render_404();
