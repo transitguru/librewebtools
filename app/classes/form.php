@@ -212,17 +212,19 @@ class Form{
   public function export_html(){
     $object = $this->build();
     $html = '';
+    $c = ' class="success"';
     if (!is_null($object->title)){
-      $html .= '<h3>' . $object->title;
-      if ($object->error != 0){
-        $html .= ' <strong>' . $object->message . '</strong>';
-      }
-      $html .= "</h3>\n";
+      $html .= '<h3>' . $object->title . "</h3>\n";
+    }
+    if ($object->error != 0){
+      $c = ' class="error"';
+    }
+    if (!is_null($object->message)){
+      $html .= '<p' . $c . '>' . $object->message . "</p>\n";
     }
     if (!is_null($object->desc)){
       $html .= '<p>' . $object->desc . "</p>\n";
     }
-    $html .= '<p>' . $object->message . "</p>\n";
     $html .= '<form action="' . $object->action . '" method="' . $object->method . '" ';
     if (count($object->onstar) > 0){
       foreach ($object->onstar as $key => $value){
