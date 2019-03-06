@@ -13,47 +13,52 @@ namespace LWT;
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  *
- * Below is an example on what to use for each type of database
- *
- * @code
- *   public $db = array(
- *     'host' => 'localhost',
- *     'type' => 'mysql',
- *     'name' => 'databasename',
- *     'user' => 'username',
- *     'pass' => 'password',
- *     'port' => 3306,
- *   );
- *   public $db = array(
- *     'host' => 'localhost',
- *     'type' => 'pgsql',
- *     'name' => 'databasename',
- *     'user' => 'username',
- *     'pass' => 'password',
- *     'port' => 5432,
- *   );
- *   public $db = array(
- *     'host' => null,
- *     'type' => 'sqlite',
- *     'name' => DOC_ROOT . '/path/to/sqlitefile.db',
- *     'user' => null,
- *     'pass' => null,
- *     'port' => null,
- *   );
- * @endcode
- *
  * For null or non-applicable values, you may enter null or safely omit
- * them from the array.
- *
+ * them from the object.
  */
 class Settings{
-  /** DB Settings array */
-  public $db = array(
-    'host' => 'localhost',        /**< Host for Database connection (mysql or pgsql) */
-    'type' => 'mysql',            /**< Type of database (sqlite3, mysql, or pgsql) */ 
-    'name' => 'librewebtools',    /**< Name for application's database (mysql, pgsql) or filename (sqlite3) */
-    'user' => 'librewebtools',    /**< Username for application's database (please don't use root!) */
-    'pass' => 'somesillystring',  /**< Password for the application's user (Please change this!!!) */
-    'port' => null,               /**< Port for the application's database (null would use defaults) */
-  );
+  public $db = null;        /*< DB Settings object for production environment */
+  public $sandbox = null;   /*< DB Settings object to define testing databases */
+
+  /**
+   * Creates the database settings object
+   */
+  public function __construct(){
+    $this->db = (object)[
+      'host' => 'localhost',        /**< Host for Database connection (mysql or pgsql) */
+      'type' => 'mysql',            /**< Type of database (sqlite3, mysql, or pgsql) */ 
+      'name' => 'librewebtools',    /**< Name for application's database or filename (sqlite3) */
+      'user' => 'librewebtools',    /**< Username for application (don't use root!) */
+      'pass' => 'somesillystring',  /**< Password for the application (change this!!!) */
+      'port' => null,               /**< Port for the application (null uses defaults) */
+    ];
+
+    $this->sandbox = (object)[
+      'mysql' => (object)[
+        'host' => 'localhost',
+        'type' => 'mysql',
+        'name' => 'sandboxdb',
+        'user' => 'sandboxuser',
+        'pass' => 'sandboxpass',
+        'port' => 3306,
+      ],
+      'pgsql' => (object)[
+        'host' => 'localhost',
+        'type' => 'pgsql',
+        'name' => 'sandboxdb',
+        'user' => 'sandboxuser',
+        'pass' => 'sandboxpass',
+        'port' => 5432,
+      ],
+      'sqlite' => (object)[
+        'host' => null,
+        'type' => 'sqlite',
+        'name' => DOC_ROOT . '/path/to/db_file.db',
+        'user' => null,
+        'pass' => null,
+        'port' => null,
+      ],
+    ];
+  }
 }
+
