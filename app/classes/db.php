@@ -25,7 +25,7 @@ class Db{
   /** Commands that are recognized by this DB connector */
   protected $commands = ['select','insert','delete', 'update'];
   /** Types of comparisons that are allowed */
-  protected $comparisons = ['<>', '<', '<=', '>=', '=', '==', '%', '%%'];
+  protected $comparisons = ['<>', '<', '<=', '>=', '=', '%'];
   protected $db = null;       /**< DB information for this object */
   protected $pdo = null;      /**< PDO object to use for querying */
 
@@ -152,19 +152,22 @@ class Db{
    *       'col_3' => 'Some Text',
    *     ],
    *     'where' => (object)[     // Where clause for select, delete, update
-   *       'col_1' => [90, '<'],  // <>, <, <=, >=, =, ==, %, %% (== and && case insensitive)
-   *       'col_2' => ['%something', '%'], // % and %% means LIKE
-   *       'col_3' => ['some_value_equal'], // if [1] not defined, means '='
+   *       'type' => 'and',
+   *       'items' => [
+   *         (object) ['type' => 'col', 'id' => 'col1', 'value' => 90, 'eq' => '<'],
+   *         (object) ['type' => 'col', 'id' => 'col2', 'value' => 'hello', 'eq' => '%', 'cs' => false],
+   *         (object) ['type' => 'or', 'items' => [] ],
+   *       ],
    *     ],
    *     'group' => [             // group by clause for select
    *       'col_1',
    *       'col_2',
    *       'col_3',
    *     ],
-   *     'sort' => (object)[      // order by clause for select
-   *       'col_1' => 'as',       // ascending, case sensitive
-   *       'col_2' => 'di',       // descending, case insensitive
-   *       'col_3' => 'd',        // assumes case sensitive and/or numeric
+   *     'sort' => [      // order by clause for select
+   *       (object)['id' => 'col_1', 'dir' => 'a', 'cs' => true], //ascending, case sensitive
+   *       (object)['id' => 'col_2', 'dir' => 'd', 'cs' => false], //desc, not case sensitive
+   *       (object)['id' => 'col_3', 'dir' => 'd'],              // case sensitive
    *     ],
    *   ];
    * @endcode
@@ -252,41 +255,13 @@ class Db{
 
     // where (select, update, delete)
     if (is_object($query->where) && in_array($cmd, ['select','update','delete'])){
-      $queries = [];
-      foreach($query->where as $field => $value){
-        $f = $this->convert_to_sql($field,true);
-        $v = $this->convert_to_sql($value[0]);
-        $eq = '=';
-        $cs = true;
-        if (isset($value[1])){
-          if($value[1] == '=='){
-            $eq = '=';
-            $cs = false;
-          }
-          elseif($value[1] == '%'){
-            $eq = 'LIKE';
-          }
-          elseif ($value[1] == '%%'){
-            $eq = 'LIKE';
-            $cs = false;
-          }
-          elseif(in_array($value[1],$this->comparisons){
-            $eq = $value[1];
-          }
-        }
-        if ($f === false || $v === false){
-          $this->error = 9999;
-          $this->message = 'Bad input settings';
-          return;
-        }
-        if ($cs == false){
-          $f = 'lower(' . $f . ')';
-        }
-        $queries[]= $f . ' ' . $eq . ' ' . $v;
+      $string = $this->process_where($query->where);
+      if ($string == false){
+        $this->error = 9999;
+        $this->message = 'Bad input settings';
+        return;
       }
-      // TODO Provide a way to do AND and OR as well as grouping?
-      $query_string = implode(' AND ', $queries);
-      $sql .= 'WHERE ' . $query_string . ' ';
+      $sql .= ' WHERE ' . $string;
     }
 
     // group (select)
@@ -306,22 +281,25 @@ class Db{
     }
 
     // sort (select)
-    if (is_object($query->sort) && $cmd == 'select'){
+    if (is_array($query->sort) && $cmd == 'select'){
       $sorts = [];
-      foreach ($query->sort as $field => $info){
-        $f = $this->convert_to_sql($field, true);
+      foreach ($query->sort as $field){
+        if (!isset($field->id)){
+          $this->error = 9999;
+          $this->message = 'Bad input settings';
+          return;
+        }
+        $f = $this->convert_to_sql($field->id, true);
         if ($f === false){
           $this->error = 9999;
           $this->message = 'Bad input settings';
           return;
         }
-        $d = '';
-        $dir = mb_substr($info, 0, 1);
-        $cs = mb_substr($info, 1, 1);
-        if ($dir == 'd'){
+        $d = 'ASC';
+        if (isset($field->dir) && $field->dir == 'd'){
           $d = 'DESC';
         }
-        if ($cs == 'i'){
+        if (isset($field->cs) && $field->cs == false){
           $f = 'lower(' . $f . ')';
         }
         $sorts[]= $f . ' ' . $d;
@@ -372,6 +350,65 @@ class Db{
       }
     }
     return $output;
+  }
+
+  /**
+   * Processes WHERE clause group
+   *
+   * @param object $where type and array of group of WHERE statements and/or groups
+   *
+   * @return string $sql SQL statement string of where clause
+   */
+  private function process_where($where){
+    if($where->type == 'and' || $where->type == 'or'){
+      $glue = ' ' . mb_strtoupper($where->type) . ' ';
+    }
+    else{
+      $glue = ' AND ';
+    }
+    if (isset($where->items) && is_array($where->items)){
+      $queries = [];
+      foreach($where->items as $field){
+        $sql = '';
+        if(isset($field->type) && $field->type == 'col'){
+          if(!isset($field->col) || !property_exists($field, 'value')){
+            return false;
+          }
+          $f = $this->convert_to_sql($field->col,true);
+          $v = $this->convert_to_sql($field->value);
+          $eq = '=';
+          $cs = true;
+          if (isset($field->eq)){
+            if($field->eq == '%'){
+              $eq = 'LIKE';
+            }
+            elseif(in_array($field->eq,$this->comparisons)){
+              $eq = $field->eq;
+            }
+          }
+          if (isset($field->cs) && $field->cs == false){
+            $cs = false;
+          }
+          if ($f === false || $v === false){
+            return false;
+          }
+          if ($cs == false){
+            $f = 'lower(' . $f . ')';
+            $v = mb_strtolower($v);
+          }
+          $queries[]= $f . ' ' . $eq . ' ' . $v;
+        }
+        else{
+          $string = $this->process_where($field);
+          if ($string == false){
+            return false;
+          }
+          $queries[]= '( ' . $string . ' )';
+        }
+        $sql .= implode($glue, $queries);
+      }
+      return $sql;
+    }
   }
 
   /**
