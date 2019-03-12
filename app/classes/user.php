@@ -35,27 +35,59 @@ class User{
     if ($id>0){
       // Lookup user by ID
       $db = new Db();
-      $db->fetch('users', null, array('id' => $id));
+      $q = (object)[
+        'command' => 'select',
+        'table' => 'users',
+        'fields' => [],
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $id, 'id' => 'id']
+          ]
+        ]
+      ];
+      $db->query($q);
       if ($db->affected_rows == 1){
-        $this->id = $db->output[0]['id'];
-        $this->login = $db->output[0]['login'];
-        $this->firstname = $db->output[0]['firstname'];
-        $this->lastname = $db->output[0]['lastname'];
-        $this->created = $db->output[0]['created'];
-        $this->email = $db->output[0]['email'];
-        $this->desc = $db->output[0]['desc'];
-        $db->fetch('user_roles', null, array('user_id' => $id), null, null, 'role_id');
-        $this->roles = array();
+        $this->id = (int) $db->output[0]->id;
+        $this->login = $db->output[0]->login;
+        $this->firstname = $db->output[0]->firstname;
+        $this->lastname = $db->output[0]->lastname;
+        $this->created = $db->output[0]->created;
+        $this->email = $db->output[0]->email;
+        $this->desc = $db->output[0]->desc;
+        $q = (object)[
+          'command' => 'select',
+          'table' => 'user_roles',
+          'fields' => [],
+          'where' => (object)[
+            'type' => 'and', 'items' => [
+              (object)['type' => '=', 'value' => $id, 'id' => 'user_id']
+            ]
+          ]
+        ];
+        $db->query($q);
+        $this->roles = [];
         if ($db->affected_rows > 0){
-          foreach ($db->output as $key => $value){
-            $this->roles[$key] = $value['role_id'];
+          foreach ($db->output as $field){
+            $rid = (int) $field->role_id;
+            $this->roles[$rid] = $rid;
           }
         }
-        $db->fetch('user_groups', null, array('user_id' => $id), null, null, 'group_id');
-        $this->groups = array();
+        $q = (object)[
+          'command' => 'select',
+          'table' => 'user_groups',
+          'fields' => [],
+          'where' => (object)[
+            'type' => 'and', 'items' => [
+              (object)['type' => '=', 'value' => $id, 'id' => 'user_id']
+            ]
+          ]
+        ];
+        $db->query($q);
+        $this->groups = [];
         if ($db->affected_rows > 0){
-          foreach ($db->output as $key => $value){
-            $this->groups[$key] = $value['group_id'];
+          foreach ($db->output as $field){
+            $gid = (int) $field->group_id;
+            $this->groups[$gid] = $gid;
           }
         }
       }
@@ -81,8 +113,8 @@ class User{
     $this->email = '';
     $this->created = '';
     $this->desc = '';
-    $this->groups = array();
-    $this->roles = array();
+    $this->groups = [];
+    $this->roles = [];
   }
 
   /**
@@ -98,15 +130,36 @@ class User{
     $db = new Db();
 
     //lookup the user by ID
-    $db->fetch('users', array('id'), array('login' => $user));
+    $q = (object)[
+      'command' => 'select',
+      'table' => 'users',
+      'fields' => ['id'],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $user, 'id' => 'login']
+        ]
+      ]
+    ];
+    $db->query($q);
     if ($db->affected_rows > 0){
-      $id = $db->output[0]['id'];
-      $db->fetch('passwords', NULL, array('user_id' => $id), NULL, array('valid_date'));
+      $id = (int) $db->output[0]->id;
+      $q = (object)[
+        'command' => 'select',
+        'table' => 'passwords',
+        'fields' => [],
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $id, 'id' => 'user_id']
+          ]
+        ],
+        'sort' => [ (object)['id'=>'valid_date', 'dir' => 'a'] ]
+      ];
+      $db->query($q);
       //Check for password
       if ($db->affected_rows>0){
         foreach ($db->output as $pwd){
-          $hashed = $pwd['hashed'];
-          $valid_date = $pwd['valid_date'];
+          $hashed = $pwd->hashed;
+          $valid_date = $pwd->valid_date;
           $passwords[$valid_date] = $hashed;
         }
         if (isset($hashed)){
@@ -137,8 +190,17 @@ class User{
     }
     $hashed = password_hash($pass, PASSWORD_DEFAULT);
     $current_date = date("Y-m-d H:i:s");
+    $q = (object)[
+      'command' => 'insert',
+      'table' => 'passwords',
+      'inputs' => (object)[
+        'user_id' => $this->id,
+        'valid_date' => $current_date,
+        'hashed' => $hashed,
+      ]
+    ];
     $db = new Db();
-    $db->write('passwords', array('user_id' => $this->id, 'valid_date' => $current_date, 'hashed' => $hashed));
+    $db->query($q);
   }
 
   /**
@@ -149,18 +211,39 @@ class User{
    */
   public function resetpassword($email){
     $db = new Db();
-    $db->fetch('users', NULL, array('email' => $email));
+    $q = (object)[
+      'command' => 'select',
+      'table' => 'users',
+      'fields' => [],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $email, 'id' => 'email']
+        ]
+      ],
+    ];
+    $db->query($q);
     if ($db->affected_rows > 0){
-      $id = $db->output[0]['id'];
-      $login = $db->output[0]['login'];
-      $db->fetch('passwords', array('user_id', 'valid_date'), array('user_id' => $id), NULL, array('valid_date'));
+      $id = (int) $db->output[0]->id;
+      $login = $db->output[0]->login;
+      $q = (object)[
+        'command' => 'select',
+        'table' => 'passwords',
+        'fields' => [],
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $id, 'id' => 'user_id']
+          ]
+        ],
+        'sort' => [ (object)['id'=>'valid_date', 'dir' => 'a'] ]
+      ];
+      $db->query($q);
       if ($db->affected_rows > 0){
         foreach ($db->output as $data){
-          $user_id = $data['user_id'];
+          $user_id = (int) $data['user_id'];
           $valid_date = $data['valid_date'];
         }
       }
-      $loop = TRUE;
+      $loop = true;
       while ($loop){
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
         $len = strlen($chars);
@@ -169,15 +252,38 @@ class User{
           $num = rand(0,$len-1);
           $reset_code .= substr($chars, $num, 1);
         }
-        $db->fetch('passwords', array('reset_code'), array('reset_code' => $reset_code));
+        $q = (object)[
+          'command' => 'select',
+          'table' => 'passwords',
+          'fields' => ['reset_code'],
+          'where' => (object)[
+            'type' => 'and', 'items' => [
+              (object)['type' => '=', 'value' => $reset_code, 'id' => 'reset_code']
+            ]
+          ],
+        ];
+        $db->query($q);
         if ($db->affected_rows == 0){
           $loop = FALSE;
         }
       }
       $unix = time() + 24 * 60 * 60;
       $reset_date = date('Y-m-d H:i:s',$unix);
-      $sql = "UPDATE `passwords` SET `reset_date` = '{$reset_date}' , `reset_code`='{$reset_code}' WHERE `user_id` = {$user_id} AND `valid_date` = '{$valid_date}'";
-      $db->write_raw($sql);
+      $q = (object)[
+        'command' => 'update',
+        'table' => 'passwords',
+        'inputs' => (object)[
+          'reset_code' => $reset_code,
+          'reset_date' => $reset_date,
+        ],
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $user_id, 'id' => 'user_id'],
+            (object)['type' => '=', 'value' => $valid_date, 'id' => 'valid_date'],
+          ]
+        ],
+      ];
+      $db->query($q);
       if ($db->error > 0){
         echo $db->error;
         echo "Fail!\n";
@@ -241,7 +347,17 @@ class User{
         // Check for unique login
         if (!$this->error && $this->login != $fields['login']->value){
           $test = new Db();
-          $test->fetch('users',NULL,array('login' => $fields['login']->value));
+          $qt = (object)[
+            'command' => 'select',
+            'table' => 'users',
+            'fields' => [],
+            'where' => (object)[
+              'type' => 'and', 'items' => [
+                (object)['type' => '=', 'value' => $fields['login']->value, 'id' => 'login']
+              ]
+            ]
+          ];
+          $test->query($qt);
           if ($test->affected_rows > 0){
             $fields['login']->message = 'Already Taken: ';
             $this->error = 9999;
@@ -403,24 +519,36 @@ class User{
    */
   public function write(){
     $db = new Db();
-    $inputs['login'] = $this->login;
-    $inputs['firstname'] = $this->firstname;
-    $inputs['lastname'] = $this->lastname;
-    $inputs['email'] = $this->email;
-    $inputs['desc'] = $this->desc;
+    $q = (object)[
+      'table' => 'users',
+      'inputs' => (object)[
+        'login' => $this->login,
+        'firstname' => $this->firstname,
+        'lastname' => $this->lastname,
+        'email' => $this->email,
+        'desc' => $this->desc,
+      ]
+    ];
     if ($this->id > 0){
-      $db->write('users', $inputs, array('id' => $this->id));
+      $q->command = 'update';
+      $q->where = (object)[
+        'type' => 'and', 'items' [
+          (object)['type' => '=', 'value' => $this->id, 'id' => 'id']
+        ]
+      ];
+      $db->query($q);
       $this->error = $db->error;
       $this->message = $db->message;
     }
     elseif ($this->id < 0){
-      $inputs['created'] = date('Y-m-d H:i:s');
+      $q->command = 'insert';
+      $q->inputs->created = date('Y-m-d H:i:s');
       $this->created = $inputs['created'];
-      $db->write('users', $inputs);
+      $db->query($q);
       $this->error = $db->error;
       $this->message = $db->message;
       if (!$db->error){
-        $this->id = $db->insert_id;
+        $this->id = (int) $db->insert_id;
       }
     }
     else{
@@ -429,15 +557,35 @@ class User{
     }
     if (!$this->error){
       // Empty out groups and roles database tables
-      $db->write_raw("DELETE FROM `user_groups` WHERE `user_id` = {$this->id}");
-      $db->write_raw("DELETE FROM `user_roles` WHERE `user_id` = {$this->id}");
+      $q = (object)[
+        'command' => 'delete',
+        'table' => 'user_groups',
+        'where' => (object) [ '
+          type' => 'and', 'items' => [
+            (object) ['type' => '=', 'value' => $this->id, 'id' => 'user_id']
+          ]
+        ]
+      ];
+      $db->query($q);
+      $q->table = 'user_roles';
+      $db->query($q);
 
       // Write the new roles and groups
       foreach ($this->groups as $group){
-        $db->write('user_groups', array('group_id' => $group, 'user_id' => $this->id));
+        $q = (object)[
+          'command' => 'insert',
+          'table' => 'user_groups',
+          'inputs' => (object)['group_id' => $group, 'user_id' => $this->id]
+        ];
+        $db->query($q);
       }
       foreach ($this->roles as $role){
-        $db->write('user_roles', array('role_id' => $role, 'user_id' => $this->id));
+        $q = (object)[
+          'command' => 'insert',
+          'table' => 'user_roles',
+          'inputs' => (object)['group_id' => $role, 'user_id' => $this->id]
+        ];
+        $db->query($q);
       }
     }
   }
@@ -448,7 +596,16 @@ class User{
   public function delete(){
     if ($this->id > 0){
       $db = new Db();
-      $db->write_raw("DELETE FROM `users` WHERE `id`={$this->id}");
+      $q = (object)[
+        'command' => 'delete',
+        'table' => 'users',
+        'where' => (object) [
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $this->id, 'id' => 'id']
+          ]
+        ]
+      ];
+      $db->query($q);
       if(!$db->error){
         $this->clear();
       }

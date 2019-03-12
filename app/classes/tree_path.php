@@ -61,20 +61,37 @@ class Path extends Tree{
     $this->content = '';
     foreach ($path as $i => $url_code){
       if($this->app == null && ($i == 0 || ($i > 0 && $url_code !== ''))){
+        $q = (object)[
+          'command' => 'select',
+          'table' => 'paths',
+          'fields' => [],
+        ];
         if ($i == 0){
-          $db->fetch('paths',NULL, array('parent_id' => $this->path_id, 'url_code' => '/'));
+          $q->where = (object)[
+            'type' => 'and', 'items' => [
+              (object)['type' => '=', 'value' => $this->path_id, 'id' => 'parent_id'],
+              (object)['type' => '=', 'value' => '/', 'id' => 'url_code'],
+            ]
+          ];
+          $db->query($q);
         }
         else{
-          $db->fetch('paths',NULL, array('parent_id' => $this->path_id, 'url_code' => $url_code));
+          $q->where = (object)[
+            'type' => 'and', 'items' => [
+              (object)['type' => '=', 'value' => $this->path_id, 'id' => 'parent_id'],
+              (object)['type' => '=', 'value' => $url_code, 'id' => 'url_code'],
+            ]
+          ];
+          $db->query($q);
         }
         if ($db->affected_rows > 0){
-          $this->path_id = $db->output[0]['id'];
-          $this->app = $db->output[0]['app'];
-          $this->created = $db->output[0]['created'];
-          $this->activated = $db->output[0]['activated'];
-          $this->deactivated = $db->output[0]['deactivated'];
-          $this->title = $db->output[0]['title'];
-          $this->module_id = $db->output[0]['module_id'];
+          $this->path_id = (int) $db->output[0]->id;
+          $this->app = $db->output[0]->app;
+          $this->created = $db->output[0]->created;
+          $this->activated = $db->output[0]->activated;
+          $this->deactivated = $db->output[0]->deactivated;
+          $this->title = $db->output[0]->title;
+          $this->module_id = (int) $db->output[0]->module_id;
           $this->root .= $url_code . '/';
         }
         else{
@@ -110,7 +127,7 @@ class Path extends Tree{
       // Retrieve any path content, if it exists
       $db->fetch_raw('SELECT * FROM "path_content" WHERE "path_id" = ' . $this->path_id . ' ORDER BY "created" DESC LIMIT 1');
       if ($db->affected_rows > 0){
-        $this->content = $db->output[0]['content'];
+        $this->content = $db->output[0]->content;
       }
     }
     else{
@@ -153,22 +170,42 @@ class Path extends Tree{
 
     // Get the allowable groups for the path
     $db = new Db();
-    $db->fetch('path_groups', NULL, array('path_id' => $this->path_id));
+    $q = (object)[
+      'command' => 'select',
+      'table' => 'path_groups',
+      'fields' => [],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $this->path_id, 'id' => 'path_id']
+        ]
+      ]
+    ];
+    $db->query($q);
     if ($db->affected_rows > 0){
       foreach ($db->output as $record){
-        if (in_array($record['group_id'],$all_groups)){
+        if (in_array($record->group_id,$all_groups)){
           $access = true;
         }
       }
     }
 
     // Check for Role overrides (if unset, means everyone can access!)
-    $db->fetch('path_roles', NULL, array('path_id' => $this->path_id));
+    $q = (object)[
+      'command' => 'select',
+      'table' => 'path_roles',
+      'fields' => [],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $this->path_id, 'id' => 'path_id']
+        ]
+      ]
+    ];
+    $db->query($q);
     if ($db->affected_rows > 0){
       //Reset access to false
       $access = false;
       foreach ($db->output as $record){
-        if (in_array($record['role_id'],$user->roles)){
+        if (in_array($record->role_id,$user->roles)){
           $access = true;
         }
       }

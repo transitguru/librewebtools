@@ -29,7 +29,17 @@ class Group extends Tree{
     if ($id>=0){
       $this->table = 'groups';
       $db = new Db();
-      $db->fetch($this->table, null, array('id' => $id));
+      $q = (object)[
+        'command' => 'select',
+        'table' => $this->table,
+        'fields' => [],
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $id, 'id' => 'id']
+          ]
+        ]
+      ];
+      $db->query($q);
       if ($db->affected_rows == 1){
         $this->id = $db->output[0]['id'];
         $this->parent_id = $db->output[0]['parent_id'];
@@ -76,22 +86,34 @@ class Group extends Tree{
    */
   public function write(){
     $db = new Db();
-    $inputs['name'] = $this->name;
-    $inputs['parent_id'] = $this->parent_id;
-    $inputs['sortorder'] = $this->sortorder;
-    $inputs['desc'] = $this->desc;
+    $q = (object)[
+      'table' => $this->table,
+      'inputs' => (object)[
+        'name' => $this->name,
+        'parent_id' => $this->parent_id,
+        'sortorder' => $this->sortorder,
+        'desc' => $this->desc,
+      ],
+    ];
     if ($this->id >= 0){
-      $db->write($this->table, $inputs, array('id' => $this->id));
+      $q->command = 'update';
+      $q->where = (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $this->id, 'id' => 'id']
+        ]
+      ];
+      $db->query($q);
       $this->error = $db->error;
       $this->message = $db->message;
     }
     else{
-      $inputs['created'] = date('Y-m-d H:i:s');
-      $db->write($this->table, $inputs);
+      $q->command = 'insert';
+      $q->inputs->created = date('Y-m-d H:i:s');
+      $db->query($q);
       $this->error = $db->error;
       $this->message = $db->message;
       if (!$db->error){
-        $this->id = $db->insert_id;
+        $this->id = (int) $db->insert_id;
       }
     }
   }
@@ -102,7 +124,16 @@ class Group extends Tree{
   public function delete(){
     if ($this->id >= 0){
       $db = new Db();
-      $db->write_raw("DELETE FROM `{$this->table}` WHERE `id`={$this->id}");
+      $q = (object)[
+        'command' => 'delete',
+        'table' => $this->table,
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $this->id, 'id' => 'id']
+          ]
+        ]
+      ];
+      $db->query($q);
       if (!$db->error){
         $this->clear();
       }
@@ -111,3 +142,4 @@ class Group extends Tree{
     }
   }
 }
+

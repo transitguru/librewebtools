@@ -32,24 +32,34 @@ class File{
     if ($id>0){
       // Lookup file by ID
       $db = new Db();
-      $db->fetch('files', null, array('id' => $id));
+      $q = (object)[
+        'command' => 'select',
+        'table' => 'files',
+        'fields' => [],
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $id, 'id' => 'id']
+          ]
+        ]
+      ];
+      $db->query($q);
       if ($db->affected_rows == 1){
-        $this->id = $db->output[0]['id'];
-        $this->user_id = $db->output[0]['user_id'];
-        $this->basename = $db->output[0]['basename'];
-        $this->path = $db->output[0]['path'];
-        $this->size = $db->output[0]['size'];
-        $this->mimetype = $db->output[0]['mimetype'];
-        $this->uploaded = $db->output[0]['uploaded'];
-        $this->title = $db->output[0]['title'];
-        $this->caption = $db->output[0]['caption'];
+        $this->id = (int) $db->output[0]->id;
+        $this->user_id = (int) $db->output[0]->user_id;
+        $this->basename = $db->output[0]->basename;
+        $this->path = $db->output[0]->path;
+        $this->size = (int) $db->output[0]->size;
+        $this->mimetype = $db->output[0]->mimetype;
+        $this->uploaded = $db->output[0]->uploaded;
+        $this->title = $db->output[0]->title;
+        $this->caption = $db->output[0]->caption;
         $this->error = 0;
         $this->message = '';
       }
       else{
         $this->clear();
         $this->error = 1;
-        $this->message = 'Role not found';
+        $this->message = 'File not found';
       }
     }
     else{
@@ -57,7 +67,6 @@ class File{
       $this->clear();
       $this->id = $id;
     }
-
   }
 
   /**
@@ -84,25 +93,37 @@ class File{
    */
   public function write(){
     $db = new Db();
-    $inputs['user_id'] = $this->user_id;
-    $inputs['basename'] = $this->basename;
-    $inputs['path'] = $this->path;
-    $inputs['size'] = $this->size;
-    $inputs['mimetype'] = $this->mimetype;
-    $inputs['title'] = $this->title;
-    $inputs['caption'] = $this->caption;
+    $q = (object)[
+      'table' => 'files',
+      'inputs' => (object)[
+        'user_id' => $this->user_id,
+        'basename' => $this->basename,
+        'path' => $this->path,
+        'size' => $this->size,
+        'mimetype' => $this->mimetype,
+        'title' => $this->title,
+        'caption' => $this->caption,
+      ]
+    ];
     if ($this->id >= 0){
-      $db->write('files', $inputs, array('id' => $this->id));
+      $q->command = 'update';
+      $q->where = (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $this->id, 'id' => 'id']
+        ]
+      ];
+      $db->query($q);
       $this->error = $db->error;
       $this->message = $db->message;
     }
     else{
-      $inputs['uploaded'] = date('Y-m-d H:i:s');
-      $db->write('files', $inputs);
+      $q->command = 'insert';
+      $q->inputs->uploaded = date('Y-m-d H:i:s');
+      $db->query($q);
       $this->error = $db->error;
       $this->message = $db->message;
       if (!$db->error){
-        $this->id = $db->insert_id;
+        $this->id = (int) $db->insert_id;
       }
     }
   }
@@ -113,7 +134,16 @@ class File{
   public function delete(){
     if ($this->id >= 0){
       $db = new Db();
-      $db->write_raw("DELETE FROM `files` WHERE `id`={$this->id}");
+      $q = (object)[
+        'command' => 'delete',
+        'table' => 'files',
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $this->id, 'id' => 'id']
+          ]
+        ]
+      ];
+      $db->query($q);
       if (!$db->error){
         $this->clear();
       }

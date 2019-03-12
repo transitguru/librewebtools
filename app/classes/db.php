@@ -26,6 +26,8 @@ class Db{
   protected $commands = ['select','insert','delete', 'update'];
   /** Types of comparisons that are allowed */
   protected $comparisons = ['<>', '<', '<=', '>=', '=', '%'];
+  /** Types of groups that are seen in a WHERE clause */
+  protected $group_types = ['and', 'or'];
   protected $db = null;       /**< DB information for this object */
   protected $pdo = null;      /**< PDO object to use for querying */
 
@@ -49,11 +51,9 @@ class Db{
         'pass' => null,
         'port' => null,
       ];
+      $this->db->type = $src->type;
       if (isset($src->name)){
         $this->db->name = $src->name;
-      }
-      if (isset($src->type)){
-        $this->db->type = $src->type;
       }
       if (isset($src->host)){
         $this->db->host = $src->host;
@@ -89,26 +89,23 @@ class Db{
       }
       $this->error = 0;
 
+      $username = null;
+      $password = null;
+      $options = null;
+
       // sqlite setup
       if ($this->db->type == 'sqlite'){
         $dsn = "sqlite:{$this->db->name}";
-        $username = null;
-        $password = null;
-        $options = null;
       }
       // MySQL/MariaDB setup
       elseif ($this->db->type == 'mysql'){
         $dsn = "mysql:{$host}{$port};dbname={$this->db->name}";
         $username = $this->db->user;
         $password = $this->db->pass;
-        $options = null;
       }
       // PostgreSQL setup
       elseif ($this->db->type == 'pgsql'){
         $dsn = "pgsql:{$host}{$port};dbname={$this->db->name};user={$this->db->user};password={$this->db->pass}";
-        $username = null;
-        $password = null;
-        $options = null;
       }
       else{
         $this->error = 9990;
@@ -152,10 +149,10 @@ class Db{
    *       'col_3' => 'Some Text',
    *     ],
    *     'where' => (object)[     // Where clause for select, delete, update
-   *       'type' => 'and',
+   *       'type' => 'and',       // Use lowercase for AND, OR, etc
    *       'items' => [
-   *         (object) ['type' => 'col', 'id' => 'col1', 'value' => 90, 'eq' => '<'],
-   *         (object) ['type' => 'col', 'id' => 'col2', 'value' => 'hello', 'eq' => '%', 'cs' => false],
+   *         (object) ['id' => 'col1', 'value' => 90, 'type' => '<'],
+   *         (object) ['id' => 'col2', 'value' => 'hello', 'type' => '%', 'cs' => false],
    *         (object) ['type' => 'or', 'items' => [] ],
    *       ],
    *     ],
@@ -201,7 +198,7 @@ class Db{
     if ($cmd == 'select'){
       $sql = 'SELECT ';
       $selects = [];
-      if(is_array($query->fields) && count($query->fields)>0){
+      if(isset($query->fields) && is_array($query->fields) && count($query->fields)>0){
         foreach($query->fields as $field){
           $f = $this->convert_to_sql($field, true);
           if ($f === false){
@@ -220,7 +217,7 @@ class Db{
     }
 
     // inputs (update, insert)
-    if (is_object($query->inputs) && in_array($cmd, ['update','delete'])){
+    if (isset($query->inputs) && is_object($query->inputs) && in_array($cmd, ['update','delete'])){
       $values = [];
       $fields = [];
       $queries = [];
@@ -254,7 +251,7 @@ class Db{
     }
 
     // where (select, update, delete)
-    if (is_object($query->where) && in_array($cmd, ['select','update','delete'])){
+    if (isset($query->where) && is_object($query->where) && in_array($cmd, ['select','update','delete'])){
       $string = $this->process_where($query->where);
       if ($string == false){
         $this->error = 9999;
@@ -265,7 +262,7 @@ class Db{
     }
 
     // group (select)
-    if (is_array($query->group) && $cmd == 'select'){
+    if (isset($query->group) && is_array($query->group) && $cmd == 'select'){
       $groups = [];
       foreach ($query->group as $group){
         $g = $this->convert_to_sql($group, true);
@@ -281,7 +278,7 @@ class Db{
     }
 
     // sort (select)
-    if (is_array($query->sort) && $cmd == 'select'){
+    if (isset($query->sort) && is_array($query->sort) && $cmd == 'select'){
       $sorts = [];
       foreach ($query->sort as $field){
         if (!isset($field->id)){
@@ -360,30 +357,30 @@ class Db{
    * @return string $sql SQL statement string of where clause
    */
   private function process_where($where){
-    if($where->type == 'and' || $where->type == 'or'){
+    if (isset($where->type) && in_array($where->type, $this->group_types)){
       $glue = ' ' . mb_strtoupper($where->type) . ' ';
     }
-    else{
+    elseif (isset($where->items)){
       $glue = ' AND ';
     }
     if (isset($where->items) && is_array($where->items)){
       $queries = [];
-      foreach($where->items as $field){
+      foreach ($where->items as $field){
         $sql = '';
-        if(isset($field->type) && $field->type == 'col'){
-          if(!isset($field->col) || !property_exists($field, 'value')){
+        if (property_exists($field, 'value')){
+          if(!isset($field->id)){
             return false;
           }
-          $f = $this->convert_to_sql($field->col,true);
+          $f = $this->convert_to_sql($field->id,true);
           $v = $this->convert_to_sql($field->value);
           $eq = '=';
           $cs = true;
-          if (isset($field->eq)){
-            if($field->eq == '%'){
+          if (isset($field->type)){
+            if($field->type == '%'){
               $eq = 'LIKE';
             }
-            elseif(in_array($field->eq,$this->comparisons)){
-              $eq = $field->eq;
+            elseif(in_array($field->type,$this->comparisons)){
+              $eq = $field->type;
             }
           }
           if (isset($field->cs) && $field->cs == false){
@@ -409,181 +406,6 @@ class Db{
       }
       return $sql;
     }
-  }
-
-  /**
-   * Simple database Write (uses raw write to do actual db write)
-   *
-   * @param string $table Table name
-   * @param array $inputs Associative array of Inputs
-   * @param array $where Associative array of WHERE clause
-   */
-  public function write($table, $inputs, $where = NULL){
-    $fields = array();
-    $values = array();
-    foreach ($inputs as $field => $value){
-      if (fnmatch('*"*', $field)){
-        $this->error = 9999;
-        $this->message = 'Bad input settings';
-        return;
-      }
-      $type = gettype($value);
-      if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
-        $values[$field] = $value;
-        $fields[] = $field;
-      }
-      elseif ($type == 'string' && $value !== ''){
-        $values[$field] = "'" . str_replace("'", "\\'",str_replace("\\", "\\\\", $value)) . "'";
-        $fields[] = $field;
-      }
-      elseif ($type == 'null' || $value == NULL || $value === ''){
-        $values[$field] = 'NULL';
-        $fields[] = $field;
-      }
-      else{
-        $this->error = 9999;
-        $this->message = 'Bad input settings';
-        return;
-      }
-    }
-    if (is_null($where)){
-      $field_string = implode( '" , "',$fields);
-      $value_string = implode(',', $values);
-      $sql = "INSERT INTO \"{$table}\" (\"{$field_string}\") VALUES ({$value_string})";
-    }
-    else{
-      $queries = array();
-      foreach ($values as $field => $value){
-        $queries[] = "\"{$field}\"=$value";
-      }
-      $wheres = array();
-      foreach ($where as $field => $value){
-        if (fnmatch('*"*', $field)){
-          $this->error = 9999;
-          $this->message = 'Bad input settings';
-          return;
-        }
-        $type = gettype($value);
-        if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
-        }
-        elseif ($type == 'string' && $value !== ''){
-          $value = "'" . str_replace("'", "\\'",str_replace("\\", "\\\\", $value)) . "'";
-        }
-        elseif ($type == 'null' || $value == NULL || $value === ''){
-          $value = 'NULL';
-        }
-        else{
-          $this->error = 9999;
-          $this->message = 'Bad input settings';
-          return;
-        }
-        $wheres[] = "\"{$field}\"={$value}";
-      }
-      $sql = "UPDATE \"{$table}\" SET " . implode(" , ",$queries) . " WHERE " . implode(" AND ", $wheres);
-    }
-    $this->write_raw($sql);
-  }
-
-  /**
-   * Database Delete (uses raw write to do actual db write)
-   *
-   * @param string $table Table name
-   * @param array $where Associative array of WHERE clause
-   */
-  public function delete($table, $where = NULL){
-    if (is_null($where)){
-      $sql = "DELETE FROM \"{$table}\"";
-    }
-    else{
-      $wheres = array();
-      foreach ($where as $field => $value){
-        if (fnmatch('*"*', $field)){
-          $this->error = 9999;
-          $this->message = 'Bad input settings';
-          return;
-        }
-        $type = gettype($value);
-        if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
-        }
-        elseif ($type == 'string' && $value !== ''){
-          $value = "'" . str_replace("'", "\\'",str_replace("\\", "\\\\", $value)) . "'";
-        }
-        elseif ($type == 'null' || $value == NULL || $value === ''){
-          $value = 'NULL';
-        }
-        else{
-          $this->error = 9999;
-          $this->message = 'Bad input settings';
-          return;
-        }
-        $wheres[] = "\"{$field}\"={$value}";
-      }
-      $sql = "DELETE FROM \"{$table}\" WHERE " . implode(" AND ", $wheres);
-    }
-    $this->write_raw($sql);
-  }
-
-  /**
-   * Fetches array of table data (uses the raw fetch to do the actual db fetch)
-   *
-   * @param string $table Table where info is coming from
-   * @param array $fields Fields that are needed from database (if null, all)
-   * @param array $where Optional associative array of WHERE ids/values to filter info
-   * @param array $groupby Optional GROUP BY variables
-   * @param array $sortby Optional SORT BY variables
-   * @param string $id Optional field to use as index instead of numeric index
-   */
-  public function fetch($table, $fields=NULL,  $where=NULL, $groupby=NULL, $sortby=NULL, $id=NULL){
-    if (!is_array($fields)){
-      $field_string = '*';
-    }
-    else{
-      $field_string = '"' . implode( '" , "',$fields) . '"';
-    }
-    if (!is_array($where)){
-      $where_string = '';
-    }
-    else{
-      $where_elements = array();
-      foreach ($where as $key => $value){
-        $type = gettype($value);
-        if ($type == 'boolean' || $type == 'integer' || $type == 'double'){
-          $value = $value;
-        }
-        elseif ($type == 'string'){
-          $value = "'" . str_replace("'", "\\'",str_replace("\\", "\\\\", $value)) . "'";
-        }
-        elseif ($type == 'null' || $value == NULL){
-          $value = NULL;
-        }
-        else{
-          $this->error = 9999;
-          $this->message = 'Bad input settings';
-          return;
-        }
-        if (is_null($value)){
-          $where_elements[] = "\"{$key}\" IS NULL";
-        }
-        else{
-          $where_elements[] = "\"{$key}\"={$value}";
-        }
-      }
-      $where_string = "WHERE " . implode(' AND ', $where_elements);
-    }
-    if (!is_array($groupby)){
-      $groupby_string = '';
-    }
-    else{
-      $groupby_string = 'GROUP BY "' .implode('" , "' , $groupby). '"';
-    }
-    if (!is_array($sortby)){
-      $sortby_string = '';
-    }
-    else{
-      $sortby_string = 'ORDER BY "' . implode('" , "', $sortby) . '"';
-    }
-    $sql = "SELECT {$field_string} FROM \"{$table}\" {$where_string} {$groupby_string} {$sortby_string}";
-    $this->fetch_raw($sql, $id);
   }
 
   /**

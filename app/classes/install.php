@@ -33,11 +33,30 @@ class Installer{
 
     // Check for existence of admin user password or homepage
     if (!$this->install){
-      $db->fetch('passwords', NULL, array('user_id' => 1));
+      $q = (object)[
+        'command' => 'select',
+        'table' => 'passwords',
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => 1, 'id' => 'user_id']
+          ]
+        ]
+      ];
+      $db->query($q);
       if ($db->affected_rows == 0){
         $this->install = true;
       }
-      $db->fetch('paths', NULL, array('id' => 0));
+
+      $q = (object)[
+        'command' => 'select',
+        'table' => 'paths',
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => 0, 'id' => 'id']
+          ]
+        ]
+      ];
+      $db->query($q);
       if ($db->affected_rows == 0){
         $this->install = true;
       }
@@ -237,8 +256,8 @@ class Installer{
           $user->firstname = $inputs->firstname;
           $user->lastname = $inputs->lastname;
           $user->email = $post->db->admin_email;
-          $user->roles = array(1 => [1]);
-          $user->groups = array(0 => [0]);
+          $user->roles = [1 => [1]];
+          $user->groups = [0 => [0]];
           $user->write();
           $this->console .= "{$user->error} \n";
           if ($user->error){
@@ -250,7 +269,12 @@ class Installer{
           if (isset($inputs->created)){
             $inputs->created = $date;
           }
-          $db->write($table, $inputs);
+          $q = (object)[
+            'command' => 'insert',
+            'table' => $table,
+            'inputs' => $inputs
+          ];
+          $db->query($q);
           if ($db->error != 0){
             $this->console .= "Error populating table \"{$table}\" ({$db->message})\n";
             return $db->error;

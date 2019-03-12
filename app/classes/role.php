@@ -31,13 +31,23 @@ class Role{
     if ($id>=0){
       // Lookup role by ID
       $db = new Db();
-      $db->fetch('roles', null, array('id' => $id));
+      $q = (object)[
+        'command' => 'select',
+        'table' => 'roles',
+        'fields' => [],
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $id, 'id' => 'id']
+          ]
+        ]
+      ];
+      $db->query($q);
       if ($db->affected_rows == 1){
-        $this->id = $db->output[0]['id'];
-        $this->name = $db->output[0]['name'];
-        $this->sortorder = $db->output[0]['sortorder'];
-        $this->created = $db->output[0]['created'];
-        $this->desc = $db->output[0]['desc'];
+        $this->id = (int) $db->output[0]->id;
+        $this->name = $db->output[0]->name;
+        $this->sortorder = (int) $db->output[0]->sortorder;
+        $this->created = $db->output[0]->created;
+        $this->desc = $db->output[0]->desc;
         $this->error = 0;
         $this->message = '';
       }
@@ -74,17 +84,29 @@ class Role{
    */
   public function write(){
     $db = new Db();
-    $inputs['name'] = $this->name;
-    $inputs['sortorder'] = $this->sortorder;
-    $inputs['desc'] = $this->desc;
+    $q = (object)[
+      'table' => 'roles',
+      'inputs' => (object)[
+        'name' => $this->name,
+        'sortorder' => $this->sortorder,
+        'desc' => $this->desc,
+      ]
+    ];
     if ($this->id >= 0){
-      $db->write('roles', $inputs, array('id' => $this->id));
+      $q->command = 'update';
+      $q->where = (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $this->id, 'id' => 'id']
+        ]
+      ];
+      $db->query($q);
       $this->error = $db->error;
       $this->message = $db->message;
     }
     else{
-      $inputs['created'] = date('Y-m-d H:i:s');
-      $db->write('roles', $inputs);
+      $q->command = 'insert';
+      $q->inputs->created = date('Y-m-d H:i:s');
+      $db->query($q);
       $this->error = $db->error;
       $this->message = $db->message;
       if (!$db->error){
@@ -99,7 +121,16 @@ class Role{
   public function delete(){
     if ($this->id >= 0){
       $db = new Db();
-      $db->write_raw("DELETE FROM `roles` WHERE `id`={$this->id}");
+      $q = (object)[
+        'command' => 'delete',
+        'table' => 'roles',
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $this->id, 'id' => 'id']
+          ]
+        ]
+      ];
+      $db->query($q);
       if (!$db->error){
         $this->clear();
       }
@@ -107,5 +138,5 @@ class Role{
       $this->message = $db->message;
     }
   }
-
 }
+

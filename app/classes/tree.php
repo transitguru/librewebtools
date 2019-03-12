@@ -60,13 +60,23 @@ class Tree{
     $loop = true;
     $db = new Db();
     while($loop){
-      $db->fetch($this->table, NULL, array('id' => $search));
-      if ($db->output[0]['parent_id'] == 0){
+      $q = (object)[
+        'command' => 'select',
+        'table' => $this->table,
+        'fields' => [],
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $search, 'id' => 'id']
+          ]
+        ]
+      ];
+      $db->query($q);
+      if ($db->output[0]->parent_id == 0){
         $loop = false;
         $ids[0] = 0;
       }
       else{
-        $ids[$search] = $search = $db->output[0]['parent_id'];
+        $ids[$search] = $search = $db->output[0]->parent_id;
       }
     }
     return $ids;
@@ -82,10 +92,20 @@ class Tree{
   public function children($parent, $ids){
     $ids[$parent] = $parent;
     $db = new Db();
-    $db->fetch($this->table, NULL, array('parent_id' => $parent));
+    $q = (object)[
+      'command' => 'select',
+      'table' => $this->table,
+      'fields' => [],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $parent, 'id' => 'parent_id']
+        ]
+      ]
+    ];
+    $db->query($q);
     if ($db->affected_rows > 0){
       foreach ($db->output as $child){
-        $ids = $this->children($child['id'],$ids);
+        $ids = $this->children($child->id,$ids);
       }
     }
     return $ids;

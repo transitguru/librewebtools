@@ -30,18 +30,38 @@ class Session{
     $db = new Db();
     if ($token != '' && $token != '0'){
       $this->id = $token;
-      $db->fetch('sessions', null, array('name' => $token));
+      $q = (object)[
+        'command' => 'select',
+        'table' => 'sessions',
+        'fields' => [],
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $this->id, 'id' => 'name']
+          ]
+        ]
+      ];
+      $db->query($q);
       if($db->error == 0 && count($db->output)>0){
         $time = time() - $this->expire;
         $date = date('Y-m-d H:i:s', $time);
-        $valid = $db->output[0]['valid'];
+        $valid = $db->output[0]->valid;
         if($date > $valid){
-          $db->delete('sessions', ['name' => $this->id]);
+          $q->command = 'delete';
+          $db->query($q);
         }
         else{
-          $this->data = json_decode($db->output[0]['data']);
-          $this->user_id = $db->output[0]['user_id'];
-          $db->fetch('users', null, array('id' => $this->user_id));
+          $this->data = json_decode($db->output[0]->data);
+          $this->user_id = (int) $db->output[0]->user_id;
+          $q = (object)[
+            'command' => 'select',
+            'table' => 'users',
+            'where' => (object)[
+              'type' => 'and', 'items' => [
+                (object)['type' => '=', 'value' => $this->user_id, 'id' => 'id']
+              ]
+            ]
+          ];
+          $db->query($q);
           if($db->error == 0 && count($db->output)>0){
             $success = true;
           }
@@ -51,7 +71,17 @@ class Session{
     if($success){
       // Reset Expiration to later time
       $date = date('Y-m-d H:i:s');
-      $db->write('sessions', array('valid' => $date),array('name' => $this->id));
+      $q = (object)[
+        'command' => 'update',
+        'table' => 'sessions',
+        'inputs' => (object)['valid' => $date],
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $this->id, 'id' => 'name']
+          ]
+        ]
+      ];
+      $db->query($q);
     }
     else{
       // Zero everything out to show unauthenticated user
@@ -64,11 +94,21 @@ class Session{
    * Writes session data to the database
    */
   public function write(){
-    if ($this->user['id'] != 0){
+    if ($this->user->id != 0){
       $db = new Db();
       $json = json_encode($this->data, JSON_UNESCAPED_SLASHES);
       $date = date('Y-m-d H:i:s');
-      $db->write('sessions', array('valid'=>$date, 'data'=> $json), array('name' => $this->id));
+      $q = (object)[
+        'command' => 'update',
+        'table' => 'sessions',
+        'inputs' => (object)['valid' => $date, 'data' => $json],
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $this->id, 'id' => 'name']
+          ]
+        ]
+      ];
+      $db->query($q);
     }
   }
 
@@ -88,13 +128,36 @@ class Session{
     $user = trim(strtolower($username));
     $pass = trim($password);
 
-    $db->fetch('users', null, array('login' => $user));
+    $q = (object)[
+      'command' => 'select',
+      'table' => 'users',
+      'fields' => [],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $user, 'id' => 'login']
+        ]
+      ]
+    ];
+    $db->query($q);
     if(is_array($db->output) && count($db->output)>0){
-      $user_id = $db->output[0]['id'];
-      $db->fetch('passwords', null, array('user_id' => $user_id), null, array('valid_date'));
+      $user_id = (int) $db->output[0]->id;
+      $q = (object)[
+        'command' => 'select',
+        'table' => 'passwords',
+        'fields' => [],
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $user_id, 'id' => 'user_id']
+          ]
+        ],
+        'sort' => [
+          (object)['dir' => 'a', 'id' => 'valid_date']
+        ]
+      ];
+      $db->query($q);
       if(is_array($db->output) && count($db->output)>0){
         foreach ($db->output as $pwd){
-          $hash = $pwd['hashed'];
+          $hash = $pwd->hashed;
         }
         $success = password_verify($pass, $hash);
         if ($verify == true){
@@ -109,7 +172,17 @@ class Session{
               $num = rand(0,$len-1);
               $token .= substr($chars, $num, 1);
             }
-            $db->fetch('sessions', array('name'), array('name' => $token));
+            $q = (object)[
+              'command' => 'select',
+              'table' => 'sessions',
+              'fields' => ['name'],
+              'where' => (object)[
+                'type' => 'and', 'items' => [
+                  (object)['type' => '=', 'value' => $token, 'id' => 'name']
+                ]
+              ]
+            ];
+            $db->query($q);
             if ($db->error == 0 && count($db->output) == 0){
               $ready = true;
               break;
@@ -123,7 +196,17 @@ class Session{
           }
           $date = date('Y-m-d H:i:s');
           $cookie_exp = time() + 30 * 24 * 60 * 60;
-          $db->write('sessions', array('user_id' => $user_id, 'valid' => $date, 'data' => '{}', 'name' => $token));
+          $q = (object)[
+            'command' => 'insert',
+            'table' => 'sessions',
+            'inputs' => (object)[
+              'user_id' => $user_id,
+              'valid' => $date,
+              'data' => '{}',
+              'name' => $token,
+            ]
+          ];
+          $db->query($q);
           $this->__construct($token);
           setcookie('librewebtools', $token, $cookie_exp, BASE_URI . '/');
           header('Location: ' . BASE_URI . '/');
@@ -138,7 +221,16 @@ class Session{
    */
   public function logout(){
     $db = new Db();
-    $db->delete('sessions', ['name' => $this->id]);
+    $q = (object)[
+      'command' => 'delete',
+      'table' => 'sessions',
+      'where' => (object)[
+        'type' => 'and', 'items'[
+          (object)['type' => '=', 'value' => $this->id, 'id' => 'name']
+        ]
+      ]
+    ];
+    $db->query($q);
     setcookie('librewebtools', '', 0, BASE_URI . '/');
     $this->__construct('');
     header('Location: ' . BASE_URI . '/');

@@ -24,6 +24,7 @@ class Module{
   public $stylesheets = array(); /**< Array of stylesheets loaded from modules and themes */
   public $user_input = array(); /**< Object of user input (URI, POST, FILES, GET) */
   public $session = array(); /**< Object of user session */
+
   /**
    * Construct the theme
    * @param int $id ID for the theme
@@ -31,16 +32,26 @@ class Module{
   public function __construct($id = null, $user_input = array(), $session = array()){
     if (!is_null($id) && $id > 0){
       $db = new Db();
+      $q = (object)[
+        'command' => 'select',
+        'table' => 'modules',
+        'fields' => [],
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)['type' => '=', 'value' => $id, 'id' => 'id']
+          ]
+        ]
+      ];
       $this->user_input = $user_input;
       $this->session = $session;
-      $db->fetch('modules', null, array('id' => $id));
+      $db->query($q);
       if ($db->affected_rows > 0){
-        $this->id = $id;
-        $this->core = $db->output[0]['core'];
-        $this->code = $db->output[0]['code'];
-        $this->enabled = $db->output[0]['enabled'];
-        $this->name = $db->output[0]['name'];
-        $this->required = $db->output[0]['required'];
+        $this->id = (int) $id;
+        $this->core = (int) $db->output[0]->core;
+        $this->code = $db->output[0]->code;
+        $this->enabled = (int) $db->output[0]->enabled;
+        $this->name = $db->output[0]->name;
+        $this->required = (int) $db->output[0]->required;
       }
       else{
         $this->id = null;
@@ -109,10 +120,19 @@ class Module{
       $dir = 'custom';
     }
     $db = new Db();
-    $db->fetch('modules', null, array('core' => $core), null, array('code'));
+    $q = (object)[
+      'command' => 'select',
+      'table' => 'modules',
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $core, 'id' => 'core']
+        ]
+      ]
+    ];
+    $db->query($q);
     if ($db->affected_rows > 0 ){
       foreach ($db->output as $module){
-        $code = $module['code'];
+        $code = $module->code;
         $PATH = DOC_ROOT . '/app/' . $dir . '/' . $code;
         $include = $PATH . '/bootstrap.php';
         if (is_dir($PATH)){
@@ -138,21 +158,43 @@ class Module{
    */
   public function loadScripts(){
     $db = new Db();
-    $db->fetch('paths', array('url_code', 'parent_id'), array('app' => '\\LWT\\Modules\\Init\\Script'));
+    $q = (object)[
+      'command' => 'select',
+      'table' => 'paths',
+      'fields' => ['url_code', 'parent_id'],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => '\\LWT\\Modules\\Init\\Script', 'id' => 'app']
+        ]
+      ]
+    ];
+    $db->query($q);
     if ($db->affected_rows > 0){
-      $path = $db->output[0]['url_code'];
-      while ($db->output[0]['parent_id'] != 0){
-        $db->fetch('paths', array('url_code', 'parent_id'), array('id' => $db->output[0]['parent_id']));
-        $path = $db->output[0]['url_code'] . '/' . $path;
+      $path = $db->output[0]->url_code;
+      while ($db->output[0]->parent_id != 0){
+        $q = (object)[
+          'command' => 'select',
+          'table' => 'paths',
+          'fields' => ['url_code', 'parent_id'],
+          'where' => (object)[
+            'type' => 'and', 'items' => [
+              (object)['type' => '=', 'value' => $db->output[0]->parent_id, 'id' => 'id']
+            ]
+          ]
+        ];
+        $db->query($q);
+        $path = $db->output[0]->url_code . '/' . $path;
       }
       if (count($this->javascripts)>0){
         foreach ($this->javascripts as $script){
-          echo '    <script type="application/javascript" src="' . BASE_URI . '/' . $path . '/' . $script . '"></script>' . "\n";
+          echo '    <script type="application/javascript" src="' . BASE_URI;
+          echo '/' . $path . '/' . $script . '"></script>' . "\n";
         }
       }
       if (count($this->stylesheets)>0){
         foreach ($this->stylesheets as $sheet){
-          echo '    <link rel="stylesheet" type="text/css" href="' . BASE_URI . '/' . $path . '/' . $sheet . '" />' . "\n";
+          echo '    <link rel="stylesheet" type="text/css" href="' . BASE_URI;
+          echo '/' . $path . '/' . $sheet . '" />' . "\n";
         }
       }
     }
@@ -160,27 +202,37 @@ class Module{
 
   /**
    * Writes the data to the database
-   *
    */
   public function write(){
     $db = new Db();
-    $inputs['core'] = $this->core;
-    $inputs['code'] = $this->code;
-    $inputs['name'] = $this->name;
-    $inputs['type'] = $this->type;
-    $inputs['enabled'] = $this->enabled;
-    $inputs['required'] = $this->required;
+    $q = (object)[
+      'inputs' => (object)[
+        'core' => $this->core,
+        'code' => $this->code,
+        'name' => $this->name,
+        'type' => $this->type,
+        'enabled' => $this->enabled,
+        'required' => $this->required,
+      ]
+    ];
     if ($this->id >= 0){
-      $db->write('modules', $inputs, array('id' => $this->id));
+      $q->command = 'update';
+      $q->where = (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $this->id, 'id' => 'id']
+        ]
+      ];
+      $db->query($q);
       $this->error = $db->error;
       $this->message = $db->message;
     }
     else{
-      $db->write('modules', $inputs);
+      $q->command = 'insert';
+      $db->query($q);
       $this->error = $db->error;
       $this->message = $db->message;
       if (!$db->error){
-        $this->id = $db->insert_id;
+        $this->id = (int) $db->insert_id;
       }
     }
   }
@@ -191,7 +243,16 @@ class Module{
   public function delete(){
     if ($this->id >= 0){
       $db = new Db();
-      $db->delete('modules', ['id' => $this->id]);
+      $q = (object)[
+        'command' => 'delete',
+        'table' => 'modules',
+        'where' => (object)[
+          'type' => 'and', 'items' => [
+            (object)[ 'type' => '=', 'value' => $this->id, 'id' => 'id']
+          ]
+        ]
+      ];
+      $db->query($q);
       if (!$db->error){
         $this->clear();
       }
