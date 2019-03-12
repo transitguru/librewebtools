@@ -339,7 +339,7 @@ class Db{
       }
       elseif($type == 'string'){
         $clean = str_replace("\\", "\\\\", $value);
-        $clean = str_replace("'", "\\'",str_replace);
+        $clean = str_replace("'", "\\'",$clean);
         $output = "'" . $clean . "'";
       }
       elseif($type == 'null' || $value == null){
