@@ -41,12 +41,12 @@ class Group extends Tree{
       ];
       $db->query($q);
       if ($db->affected_rows == 1){
-        $this->id = $db->output[0]['id'];
-        $this->parent_id = $db->output[0]['parent_id'];
-        $this->name = $db->output[0]['name'];
-        $this->sortorder = $db->output[0]['sortorder'];
-        $this->created = $db->output[0]['created'];
-        $this->desc = $db->output[0]['desc'];
+        $this->id = $db->output[0]->id;
+        $this->parent_id = $db->output[0]->parent_id;
+        $this->name = $db->output[0]->name;
+        $this->sortorder = $db->output[0]->sortorder;
+        $this->created = $db->output[0]->created;
+        $this->desc = $db->output[0]->desc;
         $this->error = 0;
         $this->message = '';
       }
