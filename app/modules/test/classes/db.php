@@ -55,6 +55,22 @@ class Db extends Tester{
     $q->fields = [(object) ['id' => 'id'],(object)['id' => 'name']];
     $sql = $db->build_sql($q);
     echo "$sql\n";
+
+    $q = (object)[
+      'command' => 'insert',
+      'table' => 'test',
+      'inputs' => (object)['id' => 99, 'name' => 'Hello There']
+    ];
+    $sql = $db->build_sql($q);
+    echo "$sql\n";
+    $q->command = 'update';
+    $q->where = (object)[
+      'type' => 'and', 'items' => [
+        (object) ['type' => '=', 'id' => 'id', 'value' => 9]
+      ]
+    ];
+    $sql = $db->build_sql($q);
+    echo "$sql\n";
     exit;
   }
 }

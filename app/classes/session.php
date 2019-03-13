@@ -225,7 +225,7 @@ class Session{
       'command' => 'delete',
       'table' => 'sessions',
       'where' => (object)[
-        'type' => 'and', 'items'[
+        'type' => 'and', 'items' => [
           (object)['type' => '=', 'value' => $this->id, 'id' => 'name']
         ]
       ]

@@ -195,16 +195,14 @@ class Db{
     if (!is_object($query) || !isset($query->table)){
       $this->error = 1;
       $this->message = 'Malformed query';
-      return;
+      return false;
     }
 
     // Set command
     $sql = '';
+    $cmd = 'select';
     if(isset($query->command) && in_array($query->command, $this->commands)){
       $cmd = $query->command;
-    }
-    else{
-      $cmd = 'select';
     }
 
     // Set table
@@ -212,7 +210,7 @@ class Db{
     if (!$table){
       $this->error = 9999;
       $this->message = 'Bad input settings';
-      return;
+      return false;
     }
 
     // fields (select)
@@ -230,7 +228,7 @@ class Db{
           if ($f === false){
             $this->error = 9999;
             $this->message = 'Bad input settings';
-            return;
+            return false;
           }
           $selects[]= $f;
         }
@@ -243,7 +241,7 @@ class Db{
     }
 
     // inputs (update, insert)
-    if (isset($query->inputs) && is_object($query->inputs) && in_array($cmd, ['update','delete'])){
+    if (isset($query->inputs) && is_object($query->inputs) && in_array($cmd, ['update','insert'])){
       $values = [];
       $fields = [];
       $queries = [];
@@ -253,7 +251,7 @@ class Db{
         if ($f === false || $v === false){
           $this->error = 9999;
           $this->message = 'Bad input settings';
-          return;
+          return false;
         }
         $values[]= $v;
         $fields[]= $f;
@@ -282,7 +280,7 @@ class Db{
       if ($string == false){
         $this->error = 9999;
         $this->message = 'Bad input settings';
-        return;
+        return false;
       }
       $sql .= ' WHERE ' . $string;
     }
@@ -296,7 +294,7 @@ class Db{
           if ($g === false){
             $this->error = 9999;
             $this->message = 'Bad input settings';
-            return;
+            return false;
           }
           if (isset($group->cs) && $group->cs == false){
             $g = 'LOWER(' . $g . ')';
@@ -317,13 +315,13 @@ class Db{
         if (!isset($field->id)){
           $this->error = 9999;
           $this->message = 'Bad input settings';
-          return;
+          return false;
         }
         $f = $this->convert_to_sql($field->id, true);
         if ($f === false){
           $this->error = 9999;
           $this->message = 'Bad input settings';
-          return;
+          return false;
         }
         $d = 'ASC';
         if (isset($field->dir) && $field->dir == 'd'){
