@@ -323,16 +323,16 @@ class Db{
   private function convert_to_sql($value, $token = false){
     $output = false;
 
-    if (!fnmatch('*"*', $value) && $token){
+    if (!fnmatch('*"*', $value) && $token == true){
       $output = '"' . $value . '"';
     }
     elseif(!$token){
       $type = gettype($value);
       if($value === true){
-        $output = 'true';
+        $output = 'TRUE';
       }
       elseif($value === false){
-        $output = 'false';
+        $output = 'FALSE';
       }
       elseif($type == 'integer' || $type == 'double'){
         $output = $value;
@@ -343,7 +343,7 @@ class Db{
         $output = "'" . $clean . "'";
       }
       elseif($type == 'null' || $value == null){
-        $output = 'null';
+        $output = 'NULL';
       }
     }
     return $output;
@@ -365,8 +365,8 @@ class Db{
     }
     if (isset($where->items) && is_array($where->items)){
       $queries = [];
+      $sql = '';
       foreach ($where->items as $field){
-        $sql = '';
         if (property_exists($field, 'value')){
           if(!isset($field->id)){
             return false;
