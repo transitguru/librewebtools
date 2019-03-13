@@ -360,7 +360,7 @@ class Db{
     if (isset($where->type) && in_array($where->type, $this->group_types)){
       $glue = ' ' . mb_strtoupper($where->type) . ' ';
     }
-    elseif (isset($where->items)){
+    else{
       $glue = ' AND ';
     }
     if (isset($where->items) && is_array($where->items)){
@@ -374,7 +374,6 @@ class Db{
           $f = $this->convert_to_sql($field->id,true);
           $v = $this->convert_to_sql($field->value);
           $eq = '=';
-          $cs = true;
           if (isset($field->type)){
             if($field->type == '%'){
               $eq = 'LIKE';
@@ -384,20 +383,17 @@ class Db{
             }
           }
           if (isset($field->cs) && $field->cs == false){
-            $cs = false;
+            $f = 'lower(' . $f . ')';
+            $v = mb_strtolower($v);
           }
           if ($f === false || $v === false){
             return false;
-          }
-          if ($cs == false){
-            $f = 'lower(' . $f . ')';
-            $v = mb_strtolower($v);
           }
           $queries[]= $f . ' ' . $eq . ' ' . $v;
         }
         else{
           $string = $this->process_where($field);
-          if ($string == false){
+          if ($string === false){
             return false;
           }
           $queries[]= '( ' . $string . ' )';
@@ -405,6 +401,9 @@ class Db{
         $sql .= implode($glue, $queries);
       }
       return $sql;
+    }
+    else{
+      return false;
     }
   }
 

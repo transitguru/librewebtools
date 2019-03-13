@@ -110,7 +110,7 @@ class Path extends Tree{
       $roles = $user->roles;
     }
     else{
-      $roles = array(0);
+      $roles = [0];
     }
     $this->access = $this->permissions($user);
     if ($this->access){
@@ -156,7 +156,7 @@ class Path extends Tree{
     $access = false;
 
     //Load the user's grouptree
-    $all_groups = array();
+    $all_groups = [];
     if (count($user->groups) > 0){
       foreach ($user->groups as $group_id){
         $group = new Group($group_id);
