@@ -22,7 +22,7 @@ class Db extends Tester{
       'fields' => [],
       'where' => (object)[
         'type' => 'and', 'items' => [
-          (object) ['type' => '%', 'value' => 'Mi', 'id' => 'name', 'cs' => false],
+          (object) ['type' => '%', 'value' => 'Mi%', 'id' => 'name', 'cs' => false],
           (object) [
             'type' => 'or', 'items' => [
               (object) ['type' => '>', 'value' => 14, 'id' => 'id'],
@@ -35,6 +35,8 @@ class Db extends Tester{
     ];
     $sql = $db->build_sql($q);
     echo "$sql\n";
+    $db->fetch_raw($sql);
+    var_dump($db);
     $q->sort = [
       (object) ['id' => 'name', 'cs' => false],
       (object) ['id' => 'id', 'dir' => 'd' ]

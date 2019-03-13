@@ -404,7 +404,7 @@ class Db{
             if($field->type == '%'){
               $eq = 'LIKE';
             }
-            elseif($v == 'NULL'){
+            elseif($v === 'NULL'){
               $eq = 'IS';
               if ($field->type == '<>'){
                 $eq .= ' NOT';
@@ -483,7 +483,6 @@ class Db{
         $msg = $error_info[1] . ': ' . $error_info[2];
         $this->message = "Error: {$this->error} ({$msg})";
         $this->affected_rows = 0;
-
       }
       else{
         $this->error = 0;
