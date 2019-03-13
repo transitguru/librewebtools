@@ -25,7 +25,7 @@ class Db{
   /** Commands that are recognized by this DB connector */
   protected $commands = ['select','insert','delete', 'update'];
   /** Types of comparisons that are allowed */
-  protected $comparisons = ['<>', '<', '<=', '>=', '=', '%'];
+  protected $comparisons = ['<>', '<', '>', '<=', '>=', '=', '%'];
   /** Types of groups that are seen in a WHERE clause */
   protected $group_types = ['and', 'or'];
   protected $db = null;       /**< DB information for this object */
@@ -130,6 +130,25 @@ class Db{
   }
 
   /**
+   * Runs query using an object (see build_sql for specifications)
+   *
+   * @param object $query SQL query in an object as described in build_sql()
+   */
+  public function query($query){
+    $cmd = 'select';
+    if(isset($query->command) && in_array($query->command, $this->commands)){
+      $cmd = $query->command;
+    }
+    $sql = $this->build_sql($query);
+    if ($cmd == 'select'){
+      $this->fetch_raw($sql);
+    }
+    else{
+      $this->write_raw($sql);
+    }
+  }
+
+  /**
    * Database query builder using an object that defines the query
    *
    * @param object $query Object defining the query as shown below
@@ -139,9 +158,9 @@ class Db{
    *     'command' => 'select',   // select, delete, insert, update
    *     'table' => 'sometable',  // Table being worked on
    *     'fields' => [            // Fields to select (empty, null, or missing means *)
-   *       'col_1',
-   *       'col_2',
-   *       'col_3',
+   *       (object) ['id' => 'col_1'],  // TODO: future SUM, COUNT, LOWER, etc.
+   *       (object) ['id' => 'col_2'],
+   *       (object) ['id' => 'col_3'],
    *     ],
    *     'inputs' => (object)[    // Fields that would be set for insert or update
    *       'col_1' => 45,
@@ -157,9 +176,9 @@ class Db{
    *       ],
    *     ],
    *     'group' => [             // group by clause for select
-   *       'col_1',
-   *       'col_2',
-   *       'col_3',
+   *       (object)['id' => 'col_1'],
+   *       (object)['id' => 'col_2', 'cs' => false],  // using case insensitive
+   *       (object)['id' => 'col_3'],
    *     ],
    *     'sort' => [      // order by clause for select
    *       (object)['id' => 'col_1', 'dir' => 'a', 'cs' => true], //ascending, case sensitive
@@ -168,8 +187,10 @@ class Db{
    *     ],
    *   ];
    * @endcode
+   *
+   * @return string $sql SQL statement to use for writing a query
    */
-  public function query($query){
+  public function build_sql($query){
     // Make sure we can actually do something
     if (!is_object($query) || !isset($query->table)){
       $this->error = 1;
@@ -200,7 +221,12 @@ class Db{
       $selects = [];
       if(isset($query->fields) && is_array($query->fields) && count($query->fields)>0){
         foreach($query->fields as $field){
-          $f = $this->convert_to_sql($field, true);
+          if (isset($field->id)){
+            $f = $this->convert_to_sql($field->id, true);
+          }
+          else{
+            $f = $this->convert_to_sql($field, true);
+          }
           if ($f === false){
             $this->error = 9999;
             $this->message = 'Bad input settings';
@@ -265,16 +291,23 @@ class Db{
     if (isset($query->group) && is_array($query->group) && $cmd == 'select'){
       $groups = [];
       foreach ($query->group as $group){
-        $g = $this->convert_to_sql($group, true);
-        if ($g === false){
-          $this->error = 9999;
-          $this->message = 'Bad input settings';
-          return;
+        if (isset($group->id)){
+          $g = $this->convert_to_sql($group->id, true);
+          if ($g === false){
+            $this->error = 9999;
+            $this->message = 'Bad input settings';
+            return;
+          }
+          if (isset($group->cs) && $group->cs == false){
+            $g = 'LOWER(' . $g . ')';
+          }
+          $groups[]= $g;
         }
-        $groups[]= $g;
       }
-      $query_string = implode(' , ', $qroups);
-      $sql .= 'GROUP BY ' . $query_string . ' ';
+      if (count($groups)>0){
+        $query_string = implode(' , ', $groups);
+        $sql .= ' GROUP BY ' . $query_string . ' ';
+      }
     }
 
     // sort (select)
@@ -297,19 +330,14 @@ class Db{
           $d = 'DESC';
         }
         if (isset($field->cs) && $field->cs == false){
-          $f = 'lower(' . $f . ')';
+          $f = 'LOWER(' . $f . ')';
         }
         $sorts[]= $f . ' ' . $d;
       }
       $sort_string = implode(' , ' , $sorts);
-      $sql .= 'ORDER BY ' . $sort_string . ' ';
+      $sql .= ' ORDER BY ' . $sort_string . ' ';
     }
-    if ($cmd == 'select'){
-      $this->fetch_raw($sql);
-    }
-    else{
-      $this->write_raw($sql);
-    }
+    return $sql;
   }
 
   /**
@@ -357,11 +385,9 @@ class Db{
    * @return string $sql SQL statement string of where clause
    */
   private function process_where($where){
+    $glue = ' AND ';
     if (isset($where->type) && in_array($where->type, $this->group_types)){
       $glue = ' ' . mb_strtoupper($where->type) . ' ';
-    }
-    else{
-      $glue = ' AND ';
     }
     if (isset($where->items) && is_array($where->items)){
       $queries = [];
@@ -378,12 +404,18 @@ class Db{
             if($field->type == '%'){
               $eq = 'LIKE';
             }
+            elseif($v == 'NULL'){
+              $eq = 'IS';
+              if ($field->type == '<>'){
+                $eq .= ' NOT';
+              }
+            }
             elseif(in_array($field->type,$this->comparisons)){
               $eq = $field->type;
             }
           }
           if (isset($field->cs) && $field->cs == false){
-            $f = 'lower(' . $f . ')';
+            $f = 'LOWER(' . $f . ')';
             $v = mb_strtolower($v);
           }
           if ($f === false || $v === false){
@@ -398,8 +430,8 @@ class Db{
           }
           $queries[]= '( ' . $string . ' )';
         }
-        $sql .= implode($glue, $queries);
       }
+      $sql = implode($glue, $queries);
       return $sql;
     }
     else{
@@ -435,7 +467,7 @@ class Db{
    * @param string $sql raw query to send to the database
    * @param string $id Optional field to use as index instead of numeric index
    */
-  public function fetch_raw($sql, $id=NULL){
+  public function fetch_raw($sql, $id=null){
     if (!is_null($this->pdo)){
       $query = $this->pdo->query($sql);
       $this->output = array();
