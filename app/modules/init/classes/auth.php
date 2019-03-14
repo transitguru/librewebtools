@@ -57,6 +57,12 @@ Class Auth Extends \LWT\Subapp{
     }
     elseif ($this->pathstring == 'profile'){
       $this->form = new \LWT\Form($forms->profile);
+      $user_obj = new \LWT\User($this->session->user_id);
+      $this->form->fields->login->value = $user_obj->login;
+      $this->form->fields->firstname->value = $user_obj->firstname;
+      $this->form->fields->lastname->value = $user_obj->lastname;
+      $this->form->fields->email->value = $user_obj->email;
+
       if (isset($this->inputs->post->submit)){
         if ($this->inputs->post->submit == 'Update'){
           $this->form->fill($this->inputs->post);

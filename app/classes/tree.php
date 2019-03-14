@@ -46,7 +46,7 @@ class Tree{
    *
    * @return array All IDs that are above or below the item in question
    */
-  public function traverse($ids = array()){
+  public function traverse($ids = []){
     $id = $this->id;
     if ($id == NULL){
       return $ids;
@@ -76,7 +76,8 @@ class Tree{
         $ids[0] = 0;
       }
       else{
-        $ids[$search] = $search = $db->output[0]->parent_id;
+        $search = (int) $db->output[0]->parent_id;
+        $ids[$search] = $search;
       }
     }
     return $ids;
@@ -105,7 +106,8 @@ class Tree{
     $db->query($q);
     if ($db->affected_rows > 0){
       foreach ($db->output as $child){
-        $ids = $this->children($child->id,$ids);
+        $i = (int) $child->id;
+        $ids = $this->children($i,$ids);
       }
     }
     return $ids;

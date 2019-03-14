@@ -232,12 +232,12 @@ class Db{
           }
           $selects[]= $f;
         }
-        $sql .= implode(', ',$selects) . ' ';
+        $sql .= implode(', ',$selects);
       }
       else{
-        $sql .= '* ';
+        $sql .= '*';
       }
-      $sql .= 'FROM ' . $table . ' ';
+      $sql .= ' FROM ' . $table . ' ';
     }
 
     // inputs (update, insert)
@@ -349,10 +349,14 @@ class Db{
   private function convert_to_sql($value, $token = false){
     $output = false;
 
-    if (!fnmatch('*"*', $value) && $token == true){
-      $output = '"' . $value . '"';
+    if ($token == true){
+      $matches = [];
+      preg_match('/[\w-]*/', $value, $matches);
+      if (count($matches)>0 && $matches[0] == $value){
+        $output = '"' . $value . '"';
+      }
     }
-    elseif(!$token){
+    elseif($token == false){
       $type = gettype($value);
       if($value === true){
         $output = 'TRUE';
@@ -364,11 +368,12 @@ class Db{
         $output = $value;
       }
       elseif($type == 'string'){
-        $clean = str_replace("\\", "\\\\", $value);
-        $clean = str_replace("'", "\\'",$clean);
+        $search = ["\\",  "\x00", "\n",  "\r",  "'",  '"', "\x1a"];
+        $replace = ["\\\\","\\0","\\n", "\\r", "\'", '\"', "\\Z"];
+        $clean = str_replace($search, $replace, $value);
         $output = "'" . $clean . "'";
       }
-      elseif($type == 'null' || $value == null){
+      elseif($type == 'NULL' || $value == null){
         $output = 'NULL';
       }
     }
