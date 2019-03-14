@@ -532,7 +532,7 @@ class User{
     if ($this->id > 0){
       $q->command = 'update';
       $q->where = (object)[
-        'type' => 'and', 'items' [
+        'type' => 'and', 'items' => [
           (object)['type' => '=', 'value' => $this->id, 'id' => 'id']
         ]
       ];

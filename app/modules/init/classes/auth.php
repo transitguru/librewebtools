@@ -67,6 +67,13 @@ Class Auth Extends \LWT\Subapp{
         if ($this->inputs->post->submit == 'Update'){
           $this->form->fill($this->inputs->post);
           $this->form->validate();
+          if ($this->form->error == 0){
+            $user_obj->login = $this->form->fields->login->value;
+            $user_obj->firstname = $this->form->fields->firstname->value;
+            $user_obj->lastname = $this->form->fields->lastname->value;
+            $user_obj->email = $this->form->fields->email->value;
+            $user_obj->write();
+          }
         }
         elseif ($this->inputs->post->submit == 'Cancel'){
           $this->form->message = 'Cancelled...';
