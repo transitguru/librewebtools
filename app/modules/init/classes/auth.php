@@ -45,6 +45,10 @@ Class Auth Extends \LWT\Subapp{
         $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
         $this->form->message = 'Invalid username or password';
         $this->form->error = 1;
+        $this->form->fields->user->error = 99;
+        $this->form->fields->user->message = 'Invalid: please re-enter';
+        $this->form->fields->pass->error = 99;
+        $this->form->fields->pass->message = 'Invalid: please re-enter';
       }
       if (fnmatch('application/json*', $this->inputs->content_type)){
         header('Pragma: ');
