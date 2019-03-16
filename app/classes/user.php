@@ -628,6 +628,7 @@ class User{
         ];
         $db->query($q);
       }
+      $this->message = 'User successfully updated';
     }
   }
 
