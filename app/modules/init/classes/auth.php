@@ -73,6 +73,18 @@ Class Auth Extends \LWT\Subapp{
             $user_obj->lastname = $this->form->fields->lastname->value;
             $user_obj->email = $this->form->fields->email->value;
             $user_obj->write();
+            if ($user_obj->error > 0){
+              $this->form->error = $user_obj->error;
+              $this->form->message = $user_obj->message;
+            }
+            if ($user_obj->email_unique == false){
+              $this->form->fields->email->error = 99;
+              $this->form->fields->email->message = $user_obj->email_message;
+            }
+            if ($user_obj->login_unique == false){
+              $this->form->fields->login->error = 99;
+              $this->form->fields->login->message = $user_obj->login_message;
+            }
           }
         }
         elseif ($this->inputs->post->submit == 'Cancel'){

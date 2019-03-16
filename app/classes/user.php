@@ -25,6 +25,10 @@ class User{
   public $roles = array();      /**< Roles that a user is a member of */
   public $message = '';         /**< Message to view when editing or viewing a profile */
   public $error = 0;            /**< Error (zero means no error) */
+  public $login_unique = true;  /**< Flag to show if the login is unique */
+  public $email_unique = true;  /**< Flag to show if the email is unique */
+  public $email_message = '';   /**< Message for error in email unique */
+  public $login_message = '';   /**< Message for error in login unique */
 
   /**
    * Constructs user based on user ID in database, or makes an empty user
@@ -519,6 +523,8 @@ class User{
    */
   public function write(){
     $db = new Db();
+
+    /** Query object for writing */
     $q = (object)[
       'table' => 'users',
       'inputs' => (object)[
@@ -529,6 +535,41 @@ class User{
         'desc' => $this->desc,
       ]
     ];
+
+    /** Query object for testing for duplicate keys */
+    $t = (object)[
+      'table' => 'users',
+      'command' => 'select',
+      'fields' => [],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => 'or', 'items' => 
+            [
+              (object)['type' => '=', 'value' => $this->login, 'id' => 'login', 'cs' => false],
+              (object)['type' => '=', 'value' => $this->email, 'id' => 'email', 'cs' => false],
+            ],
+          ],
+          (object)['type' => '<>', 'value' => $this->id, 'id' => 'id']
+        ]
+      ]
+    ];
+    $db->query($t);
+    if ($db->affected_rows > 0){
+      $this->error = 99;
+      $this->message = 'The marked values below are already taken';
+      foreach($db->output as $field){
+        if($this->email == $field->email){
+          $this->email_unique = false;
+          $this->email_message = 'The email "' . $this->email . '" is already taken by another user.';
+        }
+        if($this->login == $field->login){
+          $this->login_unique = false;
+          $this->login_message = 'The login "' . $this->login . '" is already taken by another user.';
+        }
+      }
+      return;
+    }
+
     if ($this->id > 0){
       $q->command = 'update';
       $q->where = (object)[
