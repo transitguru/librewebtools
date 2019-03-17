@@ -38,6 +38,10 @@ Class Auth Extends \LWT\Subapp{
       $this->pathstring = '';
     }
 
+    if ($this->pathstring != 'login' && $this->session->user_id == 0){
+      header('Location: ' . BASE_URI . '/' . $this->path->root . 'login');
+      exit;
+    }
     // Do something based on path
     if ($this->pathstring == 'login'){
       $this->form = new \LWT\Form($forms->login);
