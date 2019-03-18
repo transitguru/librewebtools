@@ -38,11 +38,13 @@ Class Auth Extends \LWT\Subapp{
       $this->pathstring = '';
     }
 
-    if ($this->pathstring != 'login' && $this->session->user_id == 0){
+    //Forward request to login if not proper path for unlogged user
+    if ($this->pathstring != 'login' && $this->session->user_id <= 0){
       header('Location: ' . BASE_URI . '/' . $this->path->root . 'login');
       exit;
     }
-    // Do something based on path
+
+    // Use path to route the request
     if ($this->pathstring == 'login'){
       $this->form = new \LWT\Form($forms->login);
       if (isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
@@ -95,6 +97,7 @@ Class Auth Extends \LWT\Subapp{
         }
         elseif ($this->inputs->post->submit == 'Cancel'){
           $this->form->message = 'Cancelled...';
+          $this->form->status = 'warning';
         }
       }
       if (fnmatch('application/json*', $this->inputs->content_type)){

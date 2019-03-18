@@ -27,11 +27,13 @@ class Form{
 
   public $message = '';      /**< message to be emitted based on validation */
   public $error = 0;         /**< int error number based on validation */
+  public $status = null;     /**< Message status matching css error classes */
 
-  /**
-   * Permissible types for input element in this implementation
-   */
+  /** Permissible types for input element in this implementation */
   private $input_types = ['button','checkbox','file','password','submit','text'];
+
+  /** Permissible statuses for message bar css class */
+  private $statuses = ['success', 'warning', 'error'];
 
   /**
    * Initializes new Form
@@ -182,6 +184,7 @@ class Form{
     $form->datadash = $this->datadash;
     $form->classes = $this->classes;
     $form->styles = $this->styles;
+    $form->status = $this->status;
     $form->fields = (object)[];
     if (isset($this->fields) && is_object($this->fields)){
       foreach ($this->fields as $id => $field){
@@ -212,13 +215,17 @@ class Form{
   public function export_html(){
     $object = $this->build();
     $html = '';
-    $c = ' class="success"';
+    $status = 'success';
     if (!is_null($object->title)){
       $html .= '<h3>' . $object->title . "</h3>\n";
     }
     if ($object->error != 0){
-      $c = ' class="error"';
+      $status = 'error';
     }
+    if (isset($object->status) && in_array($object->status, $this->statuses)){
+      $status = $object->status;
+    }
+    $c = ' class="' . $status . '"';
     if (!is_null($object->message)){
       $html .= '<p' . $c . '>' . $object->message . "</p>\n";
     }
