@@ -77,6 +77,15 @@ Class Auth Extends \LWT\Subapp{
         exit;
       }
     }
+    elseif ($this->pathstring == 'forgot'){
+      $this->form = new \LWT\Form($forms->forgot);
+      if (isset($this->inputs->post->submit)){
+        $user_obj = new \LWT\User($this->session->user_id);
+        $user_obj->resetpassword($this->inputs->post->email);
+        $this->form->message = 'Email was sent to the address submitted.';
+        $this->form->status = 'warning';
+      }
+    }
     elseif ($this->pathstring == 'profile'){
       $this->form = new \LWT\Form($forms->profile);
       $user_obj = new \LWT\User($this->session->user_id);

@@ -243,8 +243,8 @@ class User{
       $db->query($q);
       if ($db->affected_rows > 0){
         foreach ($db->output as $data){
-          $user_id = (int) $data['user_id'];
-          $valid_date = $data['valid_date'];
+          $user_id = (int) $data->user_id;
+          $valid_date = $data->valid_date;
         }
       }
       $loop = true;

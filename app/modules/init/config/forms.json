@@ -10,7 +10,7 @@
   "auth":{
     "login":{
       "title":"Login",
-      "desc":"Please enter your username and password to login",
+      "desc":"",
       "name":"form_login",
       "fields":{
         "user":{"name":"user","label":"Username","element":"text",
@@ -21,9 +21,20 @@
           "format":"text","value":"Login"}
       }
     },
+    "forgot":{
+      "title":"Forgot Password",
+      "desc":"",
+      "name":"form_forgot",
+      "fields":{
+        "email":{"name":"email","label":"Email Address","element":"text",
+          "format":"email","required":true,"max_chars":255},
+        "submit":{"name":"submit","element":"submit","label":"",
+          "format":"text","value":"Reset"}
+        }
+    },
     "profile":{
       "title":"Profile",
-      "desc":"Update your profile",
+      "desc":"",
       "name":"form_profile",
       "fields":{
         "login":{"name":"login","label":"Login","element":"text",
