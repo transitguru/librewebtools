@@ -119,7 +119,7 @@ class Session{
    * @param string $password User's password
    * @param boolean $verify Set to true for testing login only, don't send headers
    *
-   * @return boolean Success when using this to verify
+   * @return boolean Success Whether password matches (is returned sooner if verify)
    */
   public function login($username, $password, $verify=false){
     $db = new Db();
@@ -207,19 +207,25 @@ class Session{
             ]
           ];
           $db->query($q);
-          $this->__construct($token);
+          if ($db->error > 0){
+            $success = false;
+            return $success;
+          }
           setcookie('librewebtools', $token, $cookie_exp, BASE_URI . '/');
-          header('Location: ' . BASE_URI . '/');
-          exit;
+          $this->__construct($token);
         }
+        return $success;
       }
     }
   }
 
   /**
    * Logs the user out, cleans up session
+   *
+   * @return boolean $success Returns success/failure status of Db query
    */
   public function logout(){
+    $success = true;
     $db = new Db();
     $q = (object)[
       'command' => 'delete',
@@ -233,8 +239,10 @@ class Session{
     $db->query($q);
     setcookie('librewebtools', '', 0, BASE_URI . '/');
     $this->__construct('');
-    header('Location: ' . BASE_URI . '/');
-    exit;
+    if ($db->error > 0){
+      $success = false;
+    }
+    return $success;
   }
 }
 

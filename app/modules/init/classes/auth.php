@@ -38,23 +38,35 @@ Class Auth Extends \LWT\Subapp{
       $this->pathstring = '';
     }
 
+    /** Paths where the user may go without being logged in */
+    $open_paths = ['login', 'forgot', 'reset'];
     //Forward request to login if not proper path for unlogged user
-    if ($this->pathstring != 'login' && $this->session->user_id <= 0){
+    if (!in_array($this->pathstring, $open_paths) && $this->session->user_id <= 0){
       header('Location: ' . BASE_URI . '/' . $this->path->root . 'login');
       exit;
     }
 
-    // Use path to route the request
+    // Route request based on path
     if ($this->pathstring == 'login'){
       $this->form = new \LWT\Form($forms->login);
       if (isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
-        $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
-        $this->form->message = 'Invalid username or password';
-        $this->form->error = 1;
-        $this->form->fields->user->error = 99;
-        $this->form->fields->user->message = 'Invalid: please re-enter';
-        $this->form->fields->pass->error = 99;
-        $this->form->fields->pass->message = 'Invalid: please re-enter';
+        $success = $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
+        if($success == true){
+          header('Location: ' . BASE_URI . '/' . $this->path->root . 'profile');
+          exit;
+        }
+        else{
+          $this->form->message = 'Invalid username or password';
+          $this->form->error = 1;
+          $this->form->fields->user->error = 99;
+          $this->form->fields->user->message = 'Invalid: please re-enter';
+          $this->form->fields->pass->error = 99;
+          $this->form->fields->pass->message = 'Invalid: please re-enter';
+        }
+      }
+      else{
+        $this->form->message = 'Please enter your username and password.';
+        $this->form->status = 'warning';
       }
       if (fnmatch('application/json*', $this->inputs->content_type)){
         header('Pragma: ');
@@ -96,9 +108,13 @@ Class Auth Extends \LWT\Subapp{
           }
         }
         elseif ($this->inputs->post->submit == 'Cancel'){
-          $this->form->message = 'Cancelled...';
+          $this->form->message = 'No changes were made.';
           $this->form->status = 'warning';
         }
+      }
+      else{
+        $this->form->message = 'Update your profile by editing the fields below.';
+        $this->form->status = 'warning';
       }
       if (fnmatch('application/json*', $this->inputs->content_type)){
         header('Pragma: ');
@@ -111,6 +127,8 @@ Class Auth Extends \LWT\Subapp{
     }
     elseif ($this->pathstring == 'logout'){
       $this->session->logout();
+      header('Location: ' . BASE_URI . '/');
+      exit;
     }
     else{
       http_response_code(404);
