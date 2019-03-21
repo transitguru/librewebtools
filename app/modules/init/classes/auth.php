@@ -79,6 +79,8 @@ Class Auth Extends \LWT\Subapp{
     }
     elseif ($this->pathstring == 'forgot'){
       $this->form = new \LWT\Form($forms->forgot);
+      $this->form->message = 'Please enter your email address to recover your password.';
+      $this->form->status = 'warning';
       if (isset($this->inputs->post->submit)){
         $user_obj = new \LWT\User($this->session->user_id);
         $user_obj->resetpassword($this->inputs->post->email);

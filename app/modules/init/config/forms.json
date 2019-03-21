@@ -37,12 +37,12 @@
       "desc":"",
       "name":"form_password",
       "fields":{
-        "current":{"name":"current","label":"Password","element":"password",
-          "format":"password","required":true},
-        "new":{"name":"new","label":"Password","element":"password",
-          "format":"password","required":true},
-        "confirm":{"name":"confirm","label":"Password","element":"password",
-          "format":"password","required":true},
+        "current":{"name":"current","label":"Current Password",
+          "element":"password","format":"password","required":true},
+        "new":{"name":"new","label":"New Password",
+          "element":"password","format":"password","required":true},
+        "confirm":{"name":"confirm","label":"Confirm Password",
+          "element":"password","format":"password","required":true},
         "submit":{"name":"submit","element":"submit","label":"",
           "format":"text","value":"Update"}
       }
