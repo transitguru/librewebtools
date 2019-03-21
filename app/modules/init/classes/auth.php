@@ -91,11 +91,28 @@ Class Auth Extends \LWT\Subapp{
     elseif (fnmatch('reset/*', $this->pathstring)){
       $reset_code = mb_substr($this->pathstring, 6);
       $user_obj = new \LWT\User(0);
-      $id = $user_obj->find($reset_code);
-      if ($id > 0){
+      $uid = $user_obj->find($reset_code);
+      if ($uid > 0){
         $this->form = new \LWT\Form($forms->reset);
         $this->form->message = 'Fill out the fields to set your password.';
         $this->form->status = 'warning';
+        if (isset($this->inputs->post->submit) && $this->inputs->post->submit == 'Update'){
+          $this->form->fill($this->inputs->post);
+          $this->form->validate();
+          if ($this->form->error == 0){
+            $user_obj = new \LWT\User($uid);
+            $login = $user_obj->login;
+            if ($this->inputs->post->new == $this->inputs->post->confirm){
+              $user_obj->setpassword($this->inputs->post->new);
+              header('Location: ' . BASE_URI . '/' . $this->path->root . 'profile');
+              exit;
+            }
+            else{
+              $this->form->message = 'Passwords do not match';
+              $this->form->status = 'error';
+            }
+          }
+        }
       }
     }
     elseif ($this->pathstring == 'password'){
