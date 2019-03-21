@@ -325,7 +325,22 @@ class User{
     $db->query($q);
     if($db->error == 0 && $db->affected_rows > 0){
       if ($db->output[0]->reset_date > $current){
-        $user_id = $db->output[0]->user_id;
+        $uid = $db->output[0]->user_id;
+        $q = (object)[
+          'table' => 'passwords',
+          'command' => 'select',
+          'fields' => [],
+          'where' => (object)[
+            'type' => 'and', 'items' => [
+              (object) [ 'type' => '=', 'value' => $uid, 'id' => 'user_id']
+            ]
+          ],
+          'sort' => [ (object)['id'=>'valid_date', 'dir' => 'd'] ]
+        ];
+        $db->query($q);
+        if ($db->output[0]->reset_code == $reset_code){
+          $user_id = $uid;
+        }
       }
     }
     return $user_id;
