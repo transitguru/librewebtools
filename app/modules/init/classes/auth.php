@@ -41,7 +41,7 @@ Class Auth Extends \LWT\Subapp{
     /** Paths where the user may go without being logged in */
     $open_paths = ['login', 'forgot', 'reset'];
     //Forward request to login if not proper path for unlogged user
-    if ((!in_array($this->pathstring, $open_paths) || !fnmatch('reset/*', $this->pathstring)) && $this->session->user_id <= 0){
+    if (!in_array($this->pathstring, $open_paths) && !fnmatch('reset/*', $this->pathstring) && $this->session->user_id <= 0){
       header('Location: ' . BASE_URI . '/' . $this->path->root . 'login');
       exit;
     }
