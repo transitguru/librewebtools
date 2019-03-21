@@ -86,6 +86,35 @@ Class Auth Extends \LWT\Subapp{
         $this->form->status = 'warning';
       }
     }
+    elseif ($this->pathstring == 'password'){
+      $this->form = new \LWT\Form($forms->password);
+      $this->form->message = 'Fill out the fields to change your password.';
+      $this->form->status = 'warning';
+      if (isset($this->inputs->post->submit) && $this->inputs->post->submit == 'Update'){
+        $this->form->fill($this->inputs->post);
+        $this->form->validate();
+        if ($this->form->error == 0){
+          $user_obj = new \LWT\User($this->session->user_id);
+          $login = $user_obj->login;
+          $success = $this->session->login($login,$this->inputs->post->current, true);
+          if ($success == true){
+            if ($this->inputs->post->new == $this->inputs->post->confirm){
+              $user_obj->setpassword($this->inputs->post->new);
+              $this->form->message = 'Password was successfully changed';
+              $this->form->status = 'success';
+            }
+            else{
+              $this->form->message = 'Passwords do not match';
+              $this->form->status = 'error';
+            }
+          }
+          else{
+            $this->form->message = 'Current password is incorrect';
+            $this->form->status = 'error';
+          }
+        }
+      }
+    }
     elseif ($this->pathstring == 'profile'){
       $this->form = new \LWT\Form($forms->profile);
       $user_obj = new \LWT\User($this->session->user_id);

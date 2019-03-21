@@ -30,7 +30,22 @@
           "format":"email","required":true,"max_chars":255},
         "submit":{"name":"submit","element":"submit","label":"",
           "format":"text","value":"Reset"}
-        }
+      }
+    },
+    "password":{
+      "title":"Change Password",
+      "desc":"",
+      "name":"form_password",
+      "fields":{
+        "current":{"name":"current","label":"Password","element":"password",
+          "format":"password","required":true},
+        "new":{"name":"new","label":"Password","element":"password",
+          "format":"password","required":true},
+        "confirm":{"name":"confirm","label":"Password","element":"password",
+          "format":"password","required":true},
+        "submit":{"name":"submit","element":"submit","label":"",
+          "format":"text","value":"Update"}
+      }
     },
     "profile":{
       "title":"Profile",

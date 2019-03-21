@@ -578,18 +578,22 @@ class User{
         ]
       ];
       $db->query($q);
-      $this->error = $db->error;
-      $this->message = $db->message;
+      if ($db->error > 0){
+        $this->error = $db->error;
+        $this->message = $db->message;
+      }
+      $msg = 'User successfully updated.';
     }
     elseif ($this->id < 0){
       $q->command = 'insert';
       $q->inputs->created = date('Y-m-d H:i:s');
-      $this->created = $inputs['created'];
+      $this->created = $q->inputs->created;
       $db->query($q);
       $this->error = $db->error;
       $this->message = $db->message;
-      if (!$db->error){
+      if ($db->error == 0){
         $this->id = (int) $db->insert_id;
+        $msg = 'User successfully created.';
       }
     }
     else{
@@ -628,7 +632,7 @@ class User{
         ];
         $db->query($q);
       }
-      $this->message = 'User successfully updated';
+      $this->message = $msg;
     }
   }
 
@@ -648,11 +652,15 @@ class User{
         ]
       ];
       $db->query($q);
-      if(!$db->error){
-        $this->clear();
+      if($db->error > 0){
+        $this->error = $db->error;
+        $this->message = $db->message;
       }
-      $this->error = $db->error;
-      $this->message = $db->message;
+      else{
+        $this->clear();
+        $this->error = 0;
+        $this->message = 'User successfully deleted.';
+      }
     }
   }
 }
