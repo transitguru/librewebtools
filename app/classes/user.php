@@ -309,6 +309,9 @@ class User{
    */
   public function find($reset_code){
     $user_id = 0;
+    if (!is_string($reset_code)){
+      return $user_id;
+    }
     $current = date('Y-m-d H:i:s');
     $db = new Db();
     $q = (object)[
@@ -335,7 +338,7 @@ class User{
               (object) [ 'type' => '=', 'value' => $uid, 'id' => 'user_id']
             ]
           ],
-          'sort' => [ (object)['id'=>'valid_date', 'dir' => 'd'] ]
+          'sort' => [ (object)['id'=> 'valid_date', 'dir' => 'd'] ]
         ];
         $db->query($q);
         if ($db->output[0]->reset_code == $reset_code){

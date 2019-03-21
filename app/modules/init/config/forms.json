@@ -32,6 +32,19 @@
           "format":"text","value":"Reset"}
       }
     },
+    "reset":{
+      "title":"Reset Password",
+      "desc":"",
+      "name":"form_reset",
+      "fields":{
+        "new":{"name":"new","label":"New Password",
+          "element":"password","format":"password","required":true},
+        "confirm":{"name":"confirm","label":"Confirm Password",
+          "element":"password","format":"password","required":true},
+        "submit":{"name":"submit","element":"submit","label":"",
+          "format":"text","value":"Update"}
+      }
+    },
     "password":{
       "title":"Change Password",
       "desc":"",

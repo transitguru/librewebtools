@@ -27,7 +27,7 @@ Class Auth Extends \LWT\Subapp{
     $directory = DOC_ROOT . '/app/modules/init/config/';
     $form_doc = file_get_contents($directory . 'forms.json');
     $forms = json_decode($form_doc)->auth;
-    $this->form = (object)[];
+    $this->form = null;
 
     // Process the path
     $begin = mb_strlen($this->path->root);
@@ -41,7 +41,7 @@ Class Auth Extends \LWT\Subapp{
     /** Paths where the user may go without being logged in */
     $open_paths = ['login', 'forgot', 'reset'];
     //Forward request to login if not proper path for unlogged user
-    if (!in_array($this->pathstring, $open_paths) && $this->session->user_id <= 0){
+    if ((!in_array($this->pathstring, $open_paths) || !fnmatch('reset/*', $this->pathstring)) && $this->session->user_id <= 0){
       header('Location: ' . BASE_URI . '/' . $this->path->root . 'login');
       exit;
     }
@@ -85,6 +85,16 @@ Class Auth Extends \LWT\Subapp{
         $user_obj = new \LWT\User($this->session->user_id);
         $user_obj->resetpassword($this->inputs->post->email);
         $this->form->message = 'Email was sent to the address submitted.';
+        $this->form->status = 'warning';
+      }
+    }
+    elseif (fnmatch('reset/*', $this->pathstring)){
+      $reset_code = mb_substr($this->pathstring, 6);
+      $user_obj = new \LWT\User(0);
+      $id = $user_obj->find($reset_code);
+      if ($id > 0){
+        $this->form = new \LWT\Form($forms->reset);
+        $this->form->message = 'Fill out the fields to set your password.';
         $this->form->status = 'warning';
       }
     }
@@ -197,6 +207,15 @@ Class Auth Extends \LWT\Subapp{
       }
       else{
         echo "No form found";
+      }
+    }
+    elseif(fnmatch('reset/*',$this->pathstring)){
+      if (is_object($this->form)){
+        $html = $this->form->export_html();
+        echo $html;
+      }
+      else{
+        echo "The reset code is incorrect";
       }
     }
     elseif($this->pathstring == ''){
