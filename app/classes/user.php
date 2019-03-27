@@ -212,8 +212,10 @@ class User{
    *
    * @param string $email User's email address
    *
+   * @return object $mail Info to email to user in object
    */
   public function resetpassword($email){
+    $mail = (object)['status' => 1];
     $db = new Db();
     $q = (object)[
       'command' => 'select',
@@ -288,16 +290,15 @@ class User{
         ],
       ];
       $db->query($q);
-      if ($db->error > 0){
-        echo $db->error;
-        echo "Fail!\n";
-      }
-      else{
-        $headers = "From: LibreWebTools <noreply@transitguru.limited>\r\n";
-        $headers .= "Content-Type: text/plain; charset=utf-8";
-        mail($email, "Password Reset", "Username: {$login}\r\nPlease visit the following url to reset your password:\r\nhttp://librewebtools.org/forgot/{$reset_code}/", $headers);
+      if ($db->error == 0){
+        $mail->status = 0;
+        $mail->reset_code = $reset_code;
+        $mail->login = $login;
+        $mail->email = $email;
+        return $mail;
       }
     }
+    return $mail;
   }
 
   /**

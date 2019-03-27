@@ -44,6 +44,13 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
   $site_root = $_SERVER['DOCUMENT_ROOT'];
   $sr_len = mb_strlen($site_root);
   define('BASE_URI', mb_substr(DOC_ROOT, $sr_len));
+  define('HOSTNAME', $_SERVER['SERVER_NAME']); //TODO: USE settings datbase table
+  if (isset($_SERVER['HTTPS'])){
+    define('PROTOCOL', 'https');
+  }
+  else{
+    define('PROTOCOL', 'http');
+  }
   $b_len = mb_strlen(BASE_URI);
   $input->uri = mb_substr($_SERVER['REQUEST_URI'], $b_len);
   $input->method = strtolower($_SERVER['REQUEST_METHOD']);
@@ -84,6 +91,8 @@ if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])){
 }
 else{
   define('BASE_URI', '/');
+  define('HOSTNAME', 'librewebtools.org');
+  define('PROTOCOL', 'https');
 }
 
 // Check to see if the application is installed

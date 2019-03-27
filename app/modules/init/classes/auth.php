@@ -38,10 +38,9 @@ Class Auth Extends \LWT\Subapp{
       $this->pathstring = '';
     }
 
-    /** Paths where the user may go without being logged in */
-    $open_paths = ['login', 'forgot', 'reset'];
     //Forward request to login if not proper path for unlogged user
-    if (!in_array($this->pathstring, $open_paths) && !fnmatch('reset/*', $this->pathstring) && $this->session->user_id <= 0){
+    if (!in_array($this->pathstring, ['login', 'forgot']) &&
+        !fnmatch('reset/*', $this->pathstring) && $this->session->user_id <= 0){
       header('Location: ' . BASE_URI . '/' . $this->path->root . 'login');
       exit;
     }
@@ -79,12 +78,27 @@ Class Auth Extends \LWT\Subapp{
     }
     elseif ($this->pathstring == 'forgot'){
       $this->form = new \LWT\Form($forms->forgot);
-      $this->form->message = 'Please enter your email address to recover your password.';
-      $this->form->status = 'warning';
       if (isset($this->inputs->post->submit)){
-        $user_obj = new \LWT\User($this->session->user_id);
-        $user_obj->resetpassword($this->inputs->post->email);
-        $this->form->message = 'Email was sent to the address submitted.';
+        $this->form->fill($this->inputs->post);
+        $this->form->validate();
+        if ($this->form->error == 0){
+          $user_obj = new \LWT\User($this->session->user_id);
+          $mail = $user_obj->resetpassword($this->inputs->post->email);
+          if ($mail->status == 0){
+            $resetpath =  BASE_URI . $this->path->root . 'reset/' . $mail->reset_code;
+            $headers = "From: LibreWebTools <noreply@" . HOSTNAME . ">\r\n";
+            $headers .= "Content-Type: text/plain; charset=utf-8";
+            $message = "Username: " . $mail->login . "\r\n";
+            $message .= "Please visit the following url to reset your password:\r\n";
+            $message .= PROTOCOL . '://' . HOSTNAME . $resetpath . "\r\n";
+            mail($mail->email, "Password Reset", $message, $headers);
+          }
+          $this->form->message = 'Email was sent to the address submitted.';
+          $this->form->status = 'warning';
+        }
+      }
+      else{
+        $this->form->message = 'Please enter your email address to recover your password.';
         $this->form->status = 'warning';
       }
     }

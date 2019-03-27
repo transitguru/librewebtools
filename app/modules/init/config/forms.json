@@ -27,7 +27,7 @@
       "name":"form_forgot",
       "fields":{
         "email":{"name":"email","label":"Email Address","element":"text",
-          "format":"email","required":true,"max_chars":255},
+          "format":"email","required":true,"trim":false,"max_chars":255},
         "submit":{"name":"submit","element":"submit","label":"",
           "format":"text","value":"Reset"}
       }
