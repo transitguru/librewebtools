@@ -32,10 +32,7 @@ class Subapp{
    *
    */
   public function render_404(){
-    $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
-?>
-  <p>Page not found. Please go <a href="<?php echo BASE_URI ?>/">Home</a>.</p>
-<?php
+    echo '<p>Page not found. Please go <a href="' . BASE_URI . '">Home</a>.</p>';
   }
 
   /**
@@ -47,18 +44,11 @@ class Subapp{
     $current_year = date('Y');
     $owner = "TransitGuru Limited";
 
-    // If the start year is not the current year: display start-current in copyright
+    echo '<p class="copy">&copy;';
     if ($start_year != $current_year){
-?>
-        <p class="copy">&copy;<?php echo "{$start_year} &ndash; {$current_year} {$owner}"; ?></p>
-<?php
+      echo $start_year . ' &ndash; ';
     }
-    // Only display current year.
-    else{
-?>
-        <p class="copy">&copy;<?php echo "{$current_year} {$owner}"; ?></p>
-<?php
-    }
+    echo $current_year . ' ' . $owner . '</p>';
   }
 }
 
