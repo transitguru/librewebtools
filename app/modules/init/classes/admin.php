@@ -83,6 +83,13 @@ Class Admin Extends \LWT\Subapp{
    * Runs while inside the template, usually rendering some HTML
    */
   public function render(){
+    echo '<a href="' . BASE_URI . $this->path->root . 'user">Users</a>&nbsp;&nbsp;';
+    echo '<a href="' . BASE_URI . $this->path->root . 'role">Roles</a>&nbsp;&nbsp;';
+    echo '<a href="' . BASE_URI . $this->path->root . 'group">Groups</a>&nbsp;&nbsp;';
+    echo '<a href="' . BASE_URI . $this->path->root . 'path">Paths</a>&nbsp;&nbsp;';
+    echo '<a href="' . BASE_URI . $this->path->root . 'module">Modules</a>&nbsp;&nbsp;';
+    echo '<a href="' . BASE_URI . $this->path->root . 'menu">Menus</a>&nbsp;&nbsp;';
+    echo '<a href="' . BASE_URI . $this->path->root . 'file">Files</a>&nbsp;&nbsp;';
     if (in_array($this->pathstring,$this->valid_paths)){
       if (is_object($this->form)){
         $html = $this->form->export_html();
@@ -93,14 +100,7 @@ Class Admin Extends \LWT\Subapp{
       }
     }
     elseif($this->pathstring == ''){
-      echo '<h3>Administration Module</h3><p>Please select an option below</p>';
-      echo '<a href="' . BASE_URI . $this->path->root . 'user">Users</a>&nbsp;&nbsp;';
-      echo '<a href="' . BASE_URI . $this->path->root . 'role">Roles</a>&nbsp;&nbsp;';
-      echo '<a href="' . BASE_URI . $this->path->root . 'group">Groups</a>&nbsp;&nbsp;';
-      echo '<a href="' . BASE_URI . $this->path->root . 'path">Paths</a>&nbsp;&nbsp;';
-      echo '<a href="' . BASE_URI . $this->path->root . 'module">Modules</a>&nbsp;&nbsp;';
-      echo '<a href="' . BASE_URI . $this->path->root . 'menu">Menus</a>&nbsp;&nbsp;';
-      echo '<a href="' . BASE_URI . $this->path->root . 'file">Files</a>&nbsp;&nbsp;';
+      echo '<h3>Administration Module</h3><p>Please select an option above</p>';
     }
     else{
       $this->render_404();

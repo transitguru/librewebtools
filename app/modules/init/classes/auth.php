@@ -229,6 +229,9 @@ Class Auth Extends \LWT\Subapp{
    * Runs while inside the template, usually rendering some HTML
    */
   public function render(){
+    echo '<a href="' . BASE_URI . $this->path->root . 'profile">Profile</a>&nbsp;&nbsp;';
+    echo '<a href="' . BASE_URI . $this->path->root . 'password">Password</a>&nbsp;&nbsp;';
+    echo '<a href="' . BASE_URI . $this->path->root . 'logout">Logout</a>&nbsp;&nbsp;';
     if (in_array($this->pathstring,$this->valid_paths)){
       if (is_object($this->form)){
         $html = $this->form->export_html();
@@ -248,10 +251,7 @@ Class Auth Extends \LWT\Subapp{
       }
     }
     elseif($this->pathstring == ''){
-      echo '<h3>User Authentication Module</h3><p>Please select an option below</p>';
-      echo '<a href="' . BASE_URI . $this->path->root . 'profile">Edit Profile</a>&nbsp;&nbsp;';
-      echo '<a href="' . BASE_URI . $this->path->root . 'password">Change Password</a>&nbsp;&nbsp;';
-      echo '<a href="' . BASE_URI . $this->path->root . 'logout">Logout</a>&nbsp;&nbsp;';
+      echo '<h3>User Authentication Module</h3><p>Please select an option above</p>';
     }
     else{
       $this->render_404();
