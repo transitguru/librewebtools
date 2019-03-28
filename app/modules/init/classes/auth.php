@@ -200,7 +200,7 @@ Class Auth Extends \LWT\Subapp{
     }
     elseif ($this->pathstring == 'logout'){
       $this->session->logout();
-      header('Location: ' . BASE_URI);
+      header('Location: ' . BASE_URI . '/');
       exit;
     }
     elseif ($this->pathstring == ''){
