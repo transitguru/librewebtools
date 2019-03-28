@@ -41,7 +41,7 @@ Class Auth Extends \LWT\Subapp{
     //Forward request to login if not proper path for unlogged user
     if (!in_array($this->pathstring, ['login', 'forgot']) &&
         !fnmatch('reset/*', $this->pathstring) && $this->session->user_id <= 0){
-      header('Location: ' . BASE_URI . '/' . $this->path->root . 'login');
+      header('Location: ' . BASE_URI . $this->path->root . 'login');
       exit;
     }
 
@@ -51,7 +51,7 @@ Class Auth Extends \LWT\Subapp{
       if (isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
         $success = $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
         if($success == true){
-          header('Location: ' . BASE_URI . '/' . $this->path->root);
+          header('Location: ' . BASE_URI . $this->path->root);
           exit;
         }
         else{
@@ -118,7 +118,7 @@ Class Auth Extends \LWT\Subapp{
             $login = $user_obj->login;
             if ($this->inputs->post->new == $this->inputs->post->confirm){
               $user_obj->setpassword($this->inputs->post->new);
-              header('Location: ' . BASE_URI . '/' . $this->path->root . 'profile');
+              header('Location: ' . BASE_URI . $this->path->root . 'profile');
               exit;
             }
             else{
@@ -200,7 +200,7 @@ Class Auth Extends \LWT\Subapp{
     }
     elseif ($this->pathstring == 'logout'){
       $this->session->logout();
-      header('Location: ' . BASE_URI . '/');
+      header('Location: ' . BASE_URI);
       exit;
     }
     elseif ($this->pathstring == ''){
@@ -260,9 +260,9 @@ Class Auth Extends \LWT\Subapp{
     }
     elseif($this->pathstring == ''){
       echo '<h3>User Authentication Module</h3><p>Please select an option below</p>';
-      echo '<a href="' . BASE_URI . '/' . $this->path->root . 'profile">Edit Profile</a>&nbsp;';
-      echo '<a href="' . BASE_URI . '/' . $this->path->root . 'password">Change Password</a>&nbsp;';
-      echo '<a href="' . BASE_URI . '/' . $this->path->root . 'logout">Logout</a>&nbsp;';
+      echo '<a href="' . BASE_URI . $this->path->root . 'profile">Edit Profile</a>&nbsp;';
+      echo '<a href="' . BASE_URI . $this->path->root . 'password">Change Password</a>&nbsp;';
+      echo '<a href="' . BASE_URI . $this->path->root . 'logout">Logout</a>&nbsp;';
     }
     else{
       $this->render_404();
