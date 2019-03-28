@@ -39,21 +39,43 @@ Class Admin Extends \LWT\Subapp{
     }
 
     // Route request based on path
-    if ($this->pathstring == 'user'){
+    if ($this->pathstring == 'role'){
+      $this->form = new \LWT\Form($forms->role);
+    }
+    elseif ($this->pathstring == 'group'){
+      $this->form = new \LWT\Form($forms->group);
+    }
+    elseif ($this->pathstring == 'user'){
+      $this->form = new \LWT\Form($forms->user);
+    }
+    elseif ($this->pathstring == 'path'){
+      $this->form = new \LWT\Form($forms->path);
+    }
+    elseif ($this->pathstring == 'module'){
+      $this->form = new \LWT\Form($forms->module);
+    }
+    elseif ($this->pathstring == 'menu'){
+      $this->form = new \LWT\Form($forms->menu);
+    }
+    elseif ($this->pathstring == 'file'){
+      $this->form = new \LWT\Form($forms->file);
     }
     else{
       http_response_code(404);
-      if (fnmatch('application/json*', $this->inputs->content_type)){
-        header('Pragma: ');
-        header('Cache-Control: ');
-        header('Content-Type: application/json');
-        $payload = (object)[
-          'status' => 'Not Found',
-          'code' => 404
-        ];
-        echo json_encode($payload, JSON_UNESCAPED_SLASHES);
-        exit;
+    }
+    if (fnmatch('application/json*', $this->inputs->content_type)){
+      header('Pragma: ');
+      header('Cache-Control: ');
+      header('Content-Type: application/json');
+      if(is_object($this->form)){
+        $json = $this->form->export_json();
       }
+      else{
+        http_response_code(404);
+        $json = '{"status":"Not Found","code":404}';
+      }
+      echo $json;
+      exit;
     }
   }
 
@@ -71,10 +93,14 @@ Class Admin Extends \LWT\Subapp{
       }
     }
     elseif($this->pathstring == ''){
-      echo '<h3>Site Admin Module</h3><p>Variable dump appears below</p>';
-      echo "\n<pre>\n\n";
-      var_dump($this);
-      echo "\n\n</pre>\n";
+      echo '<h3>Administration Module</h3><p>Please select an option below</p>';
+      echo '<a href="' . BASE_URI . $this->path->root . 'user">Users</a>&nbsp;&nbsp;';
+      echo '<a href="' . BASE_URI . $this->path->root . 'role">Roles</a>&nbsp;&nbsp;';
+      echo '<a href="' . BASE_URI . $this->path->root . 'group">Groups</a>&nbsp;&nbsp;';
+      echo '<a href="' . BASE_URI . $this->path->root . 'path">Paths</a>&nbsp;&nbsp;';
+      echo '<a href="' . BASE_URI . $this->path->root . 'module">Modules</a>&nbsp;&nbsp;';
+      echo '<a href="' . BASE_URI . $this->path->root . 'menu">Menus</a>&nbsp;&nbsp;';
+      echo '<a href="' . BASE_URI . $this->path->root . 'file">Files</a>&nbsp;&nbsp;';
     }
     else{
       $this->render_404();

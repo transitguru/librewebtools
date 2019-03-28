@@ -158,6 +158,66 @@
         "submit3":{"name":"submit","element":"submit",
           "format":"text","value":"Cancel"}
       }
+    },
+    "path":{
+      "title":"Path Administration",
+      "desc":"Manage paths where content or applications are routed.",
+      "name":"form_path",
+      "fields":{
+        "comingsoon":{"name":"comingsoon","label":"Coming Soon","element":"text",
+          "format":"nowacky","required":true,"max_chars":40},
+        "submit1":{"name":"submit","element":"submit","label":"",
+          "format":"text","value":"Update"},
+        "submit2":{"name":"submit","element":"submit",
+          "format":"text","value":"Delete"},
+        "submit3":{"name":"submit","element":"submit",
+          "format":"text","value":"Cancel"}
+      }
+    },
+    "module":{
+      "title":"Module Administration",
+      "desc":"Manage modules for enabling additional functionality.",
+      "name":"form_module",
+      "fields":{
+        "comingsoon":{"name":"comingsoon","label":"Coming Soon","element":"text",
+          "format":"nowacky","required":true,"max_chars":40},
+        "submit1":{"name":"submit","element":"submit","label":"",
+          "format":"text","value":"Update"},
+        "submit2":{"name":"submit","element":"submit",
+          "format":"text","value":"Delete"},
+        "submit3":{"name":"submit","element":"submit",
+          "format":"text","value":"Cancel"}
+      }
+    },
+    "menu":{
+      "title":"Menu Administration",
+      "desc":"Manage menus to route nagivation within the main container site.",
+      "name":"form_menu",
+      "fields":{
+        "comingsoon":{"name":"comingsoon","label":"Coming Soon","element":"text",
+          "format":"nowacky","required":true,"max_chars":40},
+        "submit1":{"name":"submit","element":"submit","label":"",
+          "format":"text","value":"Update"},
+        "submit2":{"name":"submit","element":"submit",
+          "format":"text","value":"Delete"},
+        "submit3":{"name":"submit","element":"submit",
+          "format":"text","value":"Cancel"}
+      }
+    },
+    "file":{
+      "title":"File Administration",
+      "desc":"Manage and upload files for the main container site.",
+      "name":"form_file",
+      "fields":{
+        "comingsoon":{"name":"comingsoon","label":"Coming Soon","element":"text",
+          "format":"nowacky","required":true,"max_chars":40},
+        "submit1":{"name":"submit","element":"submit","label":"",
+          "format":"text","value":"Update"},
+        "submit2":{"name":"submit","element":"submit",
+          "format":"text","value":"Delete"},
+        "submit3":{"name":"submit","element":"submit",
+          "format":"text","value":"Cancel"}
+      }
     }
   }
 }
