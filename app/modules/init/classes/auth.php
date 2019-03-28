@@ -208,17 +208,6 @@ Class Auth Extends \LWT\Subapp{
     }
     else{
       http_response_code(404);
-      if (fnmatch('application/json*', $this->inputs->content_type)){
-        header('Pragma: ');
-        header('Cache-Control: ');
-        header('Content-Type: application/json');
-        $payload = (object)[
-          'status' => 'Not Found',
-          'code' => 404
-        ];
-        echo json_encode($payload, JSON_UNESCAPED_SLASHES);
-        exit;
-      }
     }
     if (fnmatch('application/json*', $this->inputs->content_type)){
       header('Pragma: ');
@@ -260,9 +249,9 @@ Class Auth Extends \LWT\Subapp{
     }
     elseif($this->pathstring == ''){
       echo '<h3>User Authentication Module</h3><p>Please select an option below</p>';
-      echo '<a href="' . BASE_URI . $this->path->root . 'profile">Edit Profile</a>&nbsp;';
-      echo '<a href="' . BASE_URI . $this->path->root . 'password">Change Password</a>&nbsp;';
-      echo '<a href="' . BASE_URI . $this->path->root . 'logout">Logout</a>&nbsp;';
+      echo '<a href="' . BASE_URI . $this->path->root . 'profile">Edit Profile</a>&nbsp;&nbsp;';
+      echo '<a href="' . BASE_URI . $this->path->root . 'password">Change Password</a>&nbsp;&nbsp;';
+      echo '<a href="' . BASE_URI . $this->path->root . 'logout">Logout</a>&nbsp;&nbsp;';
     }
     else{
       $this->render_404();
