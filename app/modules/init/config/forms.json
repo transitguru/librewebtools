@@ -78,6 +78,86 @@
         "submit2":{"name":"submit","element":"submit",
           "format":"text","value":"Cancel"}
       }
+    },
+    "nav":{
+      "title":"Navigation",
+      "desc":"",
+      "name":"form_nav",
+      "fields":{
+        "path":{"name":"path","label":"Path","element":"select",
+          "format":"oneline","required":true,"max_chars":100, "list":[
+            {"name": "Login", "value":"login"},
+            {"name": "Profile", "value":"profile"},
+            {"name": "Password", "value":"password"},
+            {"name": "Logout", "value":"logout"}
+          ]
+        }
+      }
+    }
+  },
+  "admin":{
+    "role":{
+      "title":"User Roles",
+      "desc":"Manage roles for major user permissions classes.",
+      "name":"form_role",
+      "fields":{
+        "sortorder":{"name":"sortorder","label":"Sort Order","element":"text",
+          "format":"int","required":true,"max_chars":10},
+        "name":{"name":"name","label":"Name","element":"text",
+          "format":"oneline","required":true,"max_chars":255},
+        "desc":{"name":"desc","label":"Description","element":"text",
+          "format":"text","required":false,"max_chars":6000},
+        "submit1":{"name":"submit","element":"submit","label":"",
+          "format":"text","value":"Update"},
+        "submit2":{"name":"submit","element":"submit",
+          "format":"text","value":"Delete"},
+        "submit3":{"name":"submit","element":"submit",
+          "format":"text","value":"Cancel"}
+      }
+    },
+    "group":{
+      "title":"User Groups",
+      "desc":"Manage groups for fine-grained hierarchical membership.",
+      "name":"form_group",
+      "fields":{
+        "parent_id":{"name":"parent_id","label":"Parent ID","element":"text",
+          "format":"int","required":true,"max_chars":10},
+        "sortorder":{"name":"sortorder","label":"Sort Order","element":"text",
+          "format":"int","required":true,"max_chars":10},
+        "name":{"name":"name","label":"Name","element":"text",
+          "format":"oneline","required":true,"max_chars":255},
+        "desc":{"name":"desc","label":"Description","element":"text",
+          "format":"text","required":false,"max_chars":6000},
+        "submit1":{"name":"submit","element":"submit","label":"",
+          "format":"text","value":"Update"},
+        "submit2":{"name":"submit","element":"submit",
+          "format":"text","value":"Delete"},
+        "submit3":{"name":"submit","element":"submit",
+          "format":"text","value":"Cancel"}
+      }
+    },
+    "user":{
+      "title":"User Profile",
+      "desc":"Manage application user profiles.",
+      "name":"form_user",
+      "fields":{
+        "login":{"name":"login","label":"Login","element":"text",
+          "format":"nowacky","required":true,"max_chars":40},
+        "firstname":{"name":"firstname","label":"First Name","element":"text",
+          "format":"oneline","required":true,"max_chars":100},
+        "lastname":{"name":"lastname","label":"Last Name","element":"text",
+          "format":"oneline","required":true,"max_chars":100},
+        "email":{"name":"email","label":"Email Address","element":"text",
+          "format":"email","required":true,"max_chars":255},
+        "desc":{"name":"desc","label":"Description (optional)","element":"text",
+          "format":"text","required":false,"max_chars":6000},
+        "submit1":{"name":"submit","element":"submit","label":"",
+          "format":"text","value":"Update"},
+        "submit2":{"name":"submit","element":"submit",
+          "format":"text","value":"Delete"},
+        "submit3":{"name":"submit","element":"submit",
+          "format":"text","value":"Cancel"}
+      }
     }
   }
 }

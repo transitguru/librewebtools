@@ -51,7 +51,7 @@ Class Auth Extends \LWT\Subapp{
       if (isset($this->inputs->post->user) && isset($this->inputs->post->pass)){
         $success = $this->session->login($this->inputs->post->user,$this->inputs->post->pass);
         if($success == true){
-          header('Location: ' . BASE_URI . '/' . $this->path->root . 'profile');
+          header('Location: ' . BASE_URI . '/' . $this->path->root);
           exit;
         }
         else{
@@ -197,19 +197,14 @@ Class Auth Extends \LWT\Subapp{
         $this->form->message = 'Update your profile by editing the fields below.';
         $this->form->status = 'warning';
       }
-      if (fnmatch('application/json*', $this->inputs->content_type)){
-        header('Pragma: ');
-        header('Cache-Control: ');
-        header('Content-Type: application/json');
-        $json = $this->form->export_json();
-        echo $json;
-        exit;
-      }
     }
     elseif ($this->pathstring == 'logout'){
       $this->session->logout();
       header('Location: ' . BASE_URI . '/');
       exit;
+    }
+    elseif ($this->pathstring == ''){
+      $this->form = new \LWT\Form($forms->nav);
     }
     else{
       http_response_code(404);
@@ -224,6 +219,20 @@ Class Auth Extends \LWT\Subapp{
         echo json_encode($payload, JSON_UNESCAPED_SLASHES);
         exit;
       }
+    }
+    if (fnmatch('application/json*', $this->inputs->content_type)){
+      header('Pragma: ');
+      header('Cache-Control: ');
+      header('Content-Type: application/json');
+      if(is_object($this->form)){
+        $json = $this->form->export_json();
+      }
+      else{
+        http_response_code(404);
+        $json = '{"status":"Not Found","code":404}';
+      }
+      echo $json;
+      exit;
     }
   }
 
@@ -250,10 +259,10 @@ Class Auth Extends \LWT\Subapp{
       }
     }
     elseif($this->pathstring == ''){
-      echo '<h3>User Authentication Module</h3><p>Variable dump appears below</p>';
-      echo "\n<pre>\n\n";
-      var_dump($this);
-      echo "\n\n</pre>\n";
+      echo '<h3>User Authentication Module</h3><p>Please select an option below</p>';
+      echo '<a href="' . BASE_URI . '/' . $this->path->root . 'profile">Edit Profile</a>&nbsp;';
+      echo '<a href="' . BASE_URI . '/' . $this->path->root . 'password">Change Password</a>&nbsp;';
+      echo '<a href="' . BASE_URI . '/' . $this->path->root . 'logout">Logout</a>&nbsp;';
     }
     else{
       $this->render_404();
