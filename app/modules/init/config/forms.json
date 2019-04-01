@@ -101,6 +101,8 @@
       "desc":"Manage roles for major user permissions classes.",
       "name":"form_role",
       "fields":{
+        "id":{"name":"sortorder","label":"Sort Order","element":"hidden",
+          "format":"int","required":true,"max_chars":10},
         "sortorder":{"name":"sortorder","label":"Sort Order","element":"text",
           "format":"int","required":true,"max_chars":10},
         "name":{"name":"name","label":"Name","element":"text",

@@ -40,7 +40,46 @@ Class Admin Extends \LWT\Subapp{
 
     // Route request based on path
     if ($this->pathstring == 'role'){
+      $role_id = -1;
+      if(isset($this->inputs->post->id) && is_int($this->inputs->post->id)){
+        $role_id = (int) $this->inputs->post->id;
+      }
+      $role_obj = new \LWT\Role($role_id);
       $this->form = new \LWT\Form($forms->role);
+      $list = $role_obj->list();
+      $this->form->fields->id->value = $role_obj->id;
+      $this->form->fields->name->value = $role_obj->name;
+      $this->form->fields->sortorder->value = $role_obj->name;
+      $this->form->fields->desc->value = $role_obj->desc;
+      echo "<pre>";
+      var_dump($list);
+      echo "</pre>";
+      if (isset($this->inputs->post->submit)){
+        if(in_array($this->inputs->post->submit, ['Create','Update'])){
+          $this->form->fill($this->inputs->post);
+          $this->form->validate();
+          if ($this->form->error == 0){
+            $role_obj->name = $this->form->fields->name->value;
+            $role_obj->sortorder = $this->form->fields->sortorder->value;
+            $role_obj->desc = $this->form->fields->desc->value;
+            $role_obj->write();
+            $this->form->error = $role_obj->error;
+            $this->form->message = $role_obj->message;
+            if ($role_obj->name_unique == false){
+              $this->form->fields->name->error = 99;
+              $this->form->fields->name->message = $role_obj->email_message;
+            }
+          }
+        }
+        elseif($this->inputs->post->submit == 'Cancel'){
+          $this->form->message = 'No changes were made.';
+          $this->form->status = 'warning';
+        }
+      }
+      else{
+        $this->form->message = 'Update a role by editing the fields below.';
+        $this->form->status = 'warning';
+      }
     }
     elseif ($this->pathstring == 'group'){
       $this->form = new \LWT\Form($forms->group);

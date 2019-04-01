@@ -21,6 +21,8 @@ class Role{
   public $desc = '';      /**< Description */
   public $error = 0;      /**< Error number */
   public $message = '';   /**< Message for error reporting */
+  public $name_unique = true;  /**< Flag to show if the name is unique */
+  public $name_message = '';   /**< Message for error in name unique */
 
   /**
    * Constructs role based on role ID in database, or creates new empty role
@@ -65,6 +67,23 @@ class Role{
   }
 
   /**
+   * Lists all roles in an array
+   *
+   * @return array $list All roles as an array of objects
+   */
+  public function list(){
+    $db = new Db();
+    $q = (object)[
+      'command' => 'select',
+      'table' => 'roles',
+      'fields' => [],
+    ];
+    $db->query($q);
+    $list = $db->output;
+    return $list;
+  }
+
+  /**
    * Clears the variables
    *
    */
@@ -92,6 +111,31 @@ class Role{
         'desc' => $this->desc,
       ]
     ];
+
+    /** Query object for testing for duplicate keys */
+    $t = (object)[
+      'table' => 'roles',
+      'command' => 'select',
+      'fields' => [],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $this->name, 'id' => 'name', 'cs' => false],
+          (object)['type' => '<>', 'value' => $this->id, 'id' => 'id']
+        ]
+      ]
+    ];
+    $db->query($t);
+    if ($db->affected_rows > 0){
+      $this->error = 99;
+      $this->message = 'The marked values below are already taken';
+      foreach($db->output as $field){
+        if($this->name == $field->name){
+          $this->name_unique = false;
+          $this->name_message = 'The name "' . $this->name . '" is already taken by another role.';
+        }
+      }
+      return;
+    }
     if ($this->id >= 0){
       $q->command = 'update';
       $q->where = (object)[

@@ -30,7 +30,7 @@ class Form{
   public $status = null;     /**< Message status matching css error classes */
 
   /** Permissible types for input element in this implementation */
-  private $input_types = ['button','checkbox','file','password','submit','text'];
+  private $input_types = ['button','checkbox','file','password','submit','text','hidden'];
 
   /** Permissible statuses for message bar css class */
   private $statuses = ['success', 'warning', 'error'];
@@ -153,7 +153,7 @@ class Form{
   public function fill($inputs,$ignore_empty=true){
     if(is_object($this->fields)){
       foreach ($this->fields as $id => $field){
-        if($field->element != 'submit'){
+        if(!in_array($field->element,['submit','hidden'])){
           $n = $field->name;
           if(isset($inputs->{$n}) && !is_array($inputs->{$n}) && !is_object($inputs->{$n})){
             $this->fields->{$id}->value = $inputs->{$n};

@@ -26,6 +26,7 @@ class Field{
   public $tabindex = 0;      /**< If non-zero, special rules for tab index */
   public $list = [];         /**< Array of list items to put in list type elements */
   public $value = '';        /**< value to be validated */
+  public $multiple = false;  /**< set to true to accept an array of values */
 
   /**
    * Valid format types that can be referenced in a Field object
@@ -95,6 +96,7 @@ class Field{
    *       (object) ['name' => 'West Virginia', 'value' => 'WV'],
    *     ],
    *     'value' => 'some_value_to_test',
+   *     'multiple' => false,
    *     'format' => 'nowacky',
    *     'required' => false,
    *     'min_chars' => 0,
@@ -159,6 +161,9 @@ class Field{
     }
     if (isset($defs->value)){
       $this->value = $defs->value;
+    }
+    if (isset($defs->multiple) && $defs->multiple === true){
+      $this->multiple = true;
     }
     if (isset($defs->format) && is_string($defs->format)){
       $length = mb_strpos($defs->format, ':');
@@ -234,6 +239,11 @@ class Field{
       $this->value = trim($this->value);
     }
 
+    if ($this->multiple === true){
+      if (is_array($this->value) && count($this->value)>0){
+        //TODO: validate inputs for array
+      }
+    }
     //Handle empty inputs
     if ($this->required && $this->value === ''){
       $this->error = 11;
@@ -486,6 +496,7 @@ class Field{
       $form->list = $this->list;
     }
     $form->value = $this->value;
+    $form->multiple = $this->multiple;
     $form->message = $this->message;
     $form->error = $this->error;
     $form->format = $this->format;
