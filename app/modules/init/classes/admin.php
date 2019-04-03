@@ -40,20 +40,36 @@ Class Admin Extends \LWT\Subapp{
 
     // Route request based on path
     if ($this->pathstring == 'role'){
-      $role_id = -1;
-      if(isset($this->inputs->post->id) && is_int($this->inputs->post->id)){
+      if(isset($this->inputs->post->id)){
         $role_id = (int) $this->inputs->post->id;
+        $role_obj = new \LWT\Role($role_id);
+        $this->form = new \LWT\Form($forms->role);
+        $this->form->fields->id->value = $role_obj->id;
+        $this->form->fields->name->value = $role_obj->name;
+        $this->form->fields->sortorder->value = $role_obj->name;
+        $this->form->fields->desc->value = $role_obj->desc;
       }
-      $role_obj = new \LWT\Role($role_id);
-      $this->form = new \LWT\Form($forms->role);
-      $list = $role_obj->list();
-      $this->form->fields->id->value = $role_obj->id;
-      $this->form->fields->name->value = $role_obj->name;
-      $this->form->fields->sortorder->value = $role_obj->name;
-      $this->form->fields->desc->value = $role_obj->desc;
-      echo "<pre>";
-      var_dump($list);
-      echo "</pre>";
+      else{
+        $role_obj = new \LWT\Role(-1);
+        $list = $role_obj->list();
+        $defs = (object)[
+          'title' => 'User Roles Navigation',
+          'desc' => 'Manage roles for major user permissions classes.',
+          'name' => 'form_role_nav',
+          'fields' => (object)[],
+        ];
+        foreach($list as $r){
+          $id = 'nav_' . $r->id;
+          $defs->fields->{$id} = (object)[
+            'name' => 'id',
+            'label' => $r->name,
+            'element' => 'submit',
+            'format' => 'int',
+            'value' => $r->id,
+          ];
+        }
+        $this->form = new \LWT\Form($defs);
+      }
       if (isset($this->inputs->post->submit)){
         if(in_array($this->inputs->post->submit, ['Create','Update'])){
           $this->form->fill($this->inputs->post);
@@ -67,7 +83,7 @@ Class Admin Extends \LWT\Subapp{
             $this->form->message = $role_obj->message;
             if ($role_obj->name_unique == false){
               $this->form->fields->name->error = 99;
-              $this->form->fields->name->message = $role_obj->email_message;
+              $this->form->fields->name->message = $role_obj->name_message;
             }
           }
         }
@@ -77,7 +93,7 @@ Class Admin Extends \LWT\Subapp{
         }
       }
       else{
-        $this->form->message = 'Update a role by editing the fields below.';
+        $this->form->message = 'Select a role to begin editing.';
         $this->form->status = 'warning';
       }
     }

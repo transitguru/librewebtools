@@ -79,7 +79,16 @@ class Role{
       'fields' => [],
     ];
     $db->query($q);
-    $list = $db->output;
+    $list = [];
+    foreach($db->output as $record){
+      $list[]= (object)[
+        'id' => (int) $record->id,
+        'sortorder' => (int) $record->sortorder,
+        'name' => $record->name,
+        'created' => $record->created,
+        'desc' => $record->desc,
+      ];
+    }
     return $list;
   }
 
