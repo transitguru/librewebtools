@@ -40,13 +40,17 @@ Class Admin Extends \LWT\Subapp{
 
     // Route request based on path
     if ($this->pathstring == 'role'){
-      if(isset($this->inputs->post->id)){
+      if(isset($this->inputs->post->id) && 
+          (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Cancel')){
         $role_id = (int) $this->inputs->post->id;
         $role_obj = new \LWT\Role($role_id);
         $this->form = new \LWT\Form($forms->role);
+        if ($role_id == -1){
+          $this->form->fields->submit1->value = 'Create';
+        }
         $this->form->fields->id->value = $role_obj->id;
         $this->form->fields->name->value = $role_obj->name;
-        $this->form->fields->sortorder->value = $role_obj->name;
+        $this->form->fields->sortorder->value = $role_obj->sortorder;
         $this->form->fields->desc->value = $role_obj->desc;
       }
       else{
@@ -68,6 +72,14 @@ Class Admin Extends \LWT\Subapp{
             'value' => $r->id,
           ];
         }
+        $id = 'nav_-1';
+        $defs->fields->{$id} = (object)[
+          'name' => 'id',
+          'label' => 'Create New Role',
+          'element' => 'submit',
+          'format' => 'int',
+          'value' => -1,
+        ];
         $this->form = new \LWT\Form($defs);
       }
       if (isset($this->inputs->post->submit)){
@@ -87,9 +99,16 @@ Class Admin Extends \LWT\Subapp{
             }
           }
         }
-        elseif($this->inputs->post->submit == 'Cancel'){
-          $this->form->message = 'No changes were made.';
+        elseif($this->inputs->post->submit == 'Delete'){
+          $this->form->message = 'Are you sure you want to delete this Role?';
           $this->form->status = 'warning';
+          $this->form->fields->submit1->value = 'Yes, Delete';
+          $this->form->fields->submit2->value = 'No';
+        }
+        elseif($this->inputs->post->submit == 'Yes, Delete'){
+          $role_obj->delete();
+          $this->form->message = 'Role deleted successfully';
+          $this->form->status = 'success';
         }
       }
       else{
