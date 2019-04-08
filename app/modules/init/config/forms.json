@@ -76,7 +76,7 @@
         "submit1":{"name":"submit","element":"submit","label":"",
           "format":"text","value":"Update"},
         "submit2":{"name":"submit","element":"submit",
-          "format":"text","value":"Cancel"}
+          "format":"text","value":"Close"}
       }
     },
     "nav":{
@@ -114,7 +114,7 @@
         "submit2":{"name":"submit","element":"submit",
           "format":"text","value":"Delete"},
         "submit3":{"name":"submit","element":"submit",
-          "format":"text","value":"Cancel"}
+          "format":"text","value":"Close"}
       }
     },
     "group":{
@@ -135,7 +135,7 @@
         "submit2":{"name":"submit","element":"submit",
           "format":"text","value":"Delete"},
         "submit3":{"name":"submit","element":"submit",
-          "format":"text","value":"Cancel"}
+          "format":"text","value":"Close"}
       }
     },
     "user":{
@@ -158,7 +158,7 @@
         "submit2":{"name":"submit","element":"submit",
           "format":"text","value":"Delete"},
         "submit3":{"name":"submit","element":"submit",
-          "format":"text","value":"Cancel"}
+          "format":"text","value":"Close"}
       }
     },
     "path":{
@@ -173,7 +173,7 @@
         "submit2":{"name":"submit","element":"submit",
           "format":"text","value":"Delete"},
         "submit3":{"name":"submit","element":"submit",
-          "format":"text","value":"Cancel"}
+          "format":"text","value":"Close"}
       }
     },
     "module":{
@@ -188,7 +188,7 @@
         "submit2":{"name":"submit","element":"submit",
           "format":"text","value":"Delete"},
         "submit3":{"name":"submit","element":"submit",
-          "format":"text","value":"Cancel"}
+          "format":"text","value":"Close"}
       }
     },
     "menu":{
@@ -203,7 +203,7 @@
         "submit2":{"name":"submit","element":"submit",
           "format":"text","value":"Delete"},
         "submit3":{"name":"submit","element":"submit",
-          "format":"text","value":"Cancel"}
+          "format":"text","value":"Close"}
       }
     },
     "file":{
@@ -218,7 +218,7 @@
         "submit2":{"name":"submit","element":"submit",
           "format":"text","value":"Delete"},
         "submit3":{"name":"submit","element":"submit",
-          "format":"text","value":"Cancel"}
+          "format":"text","value":"Close"}
       }
     }
   }

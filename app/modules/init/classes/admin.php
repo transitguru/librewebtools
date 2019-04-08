@@ -41,7 +41,7 @@ Class Admin Extends \LWT\Subapp{
     // Route request based on path
     if ($this->pathstring == 'role'){
       if(isset($this->inputs->post->id) && 
-          (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Cancel')){
+          (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Close')){
         $role_id = (int) $this->inputs->post->id;
         $role_obj = new \LWT\Role($role_id);
         $this->form = new \LWT\Form($forms->role);
@@ -109,6 +109,8 @@ Class Admin Extends \LWT\Subapp{
           $role_obj->delete();
           $this->form->message = 'Role deleted successfully';
           $this->form->status = 'success';
+          $this->form->fields->submit1->value = 'Close';
+          $this->form->fields->submit2->value = 'Close';
         }
       }
       else{
