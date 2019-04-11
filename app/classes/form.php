@@ -297,8 +297,8 @@ class Form{
         elseif($f->element == 'select' && is_array($f->list) && count($f->list)>0){
           $html .= '  <select class="' . $class . '" name="' . $f->name . "\">\n";
           foreach ($f->list as $items){
-            $html .= '    <option value="' . $items['value'] . '" >' . 
-              $items['name'] . "</option>\n";
+            $html .= '    <option value="' . $items->value . '" >' . 
+              $items->name . "</option>\n";
           }
           $html .= "  </select>\n";
         }

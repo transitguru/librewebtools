@@ -77,6 +77,10 @@ class Role{
       'command' => 'select',
       'table' => 'roles',
       'fields' => [],
+      'sort' => [
+        (object) ['id' => 'sortorder'],
+        (object) ['id' => 'name'],
+      ]
     ];
     $db->query($q);
     $list = [];

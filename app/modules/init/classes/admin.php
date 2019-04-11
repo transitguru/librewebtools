@@ -56,29 +56,28 @@ Class Admin Extends \LWT\Subapp{
       else{
         $role_obj = new \LWT\Role(-1);
         $list = $role_obj->list();
+        $items = [];
+        foreach($list as $r){
+          $items[]= (object)[
+            'name' => $r->name,
+            'value' => $r->id,
+          ];
+        }
+        $items[]= (object)[
+          'name' => '(new role)',
+          'value' => -1,
+        ];
         $defs = (object)[
           'title' => 'User Roles Navigation',
           'desc' => 'Manage roles for major user permissions classes.',
           'name' => 'form_role_nav',
-          'fields' => (object)[],
-        ];
-        foreach($list as $r){
-          $id = 'nav_' . $r->id;
-          $defs->fields->{$id} = (object)[
-            'name' => 'id',
-            'label' => $r->name,
-            'element' => 'submit',
-            'format' => 'int',
-            'value' => $r->id,
-          ];
-        }
-        $id = 'nav_-1';
-        $defs->fields->{$id} = (object)[
-          'name' => 'id',
-          'label' => 'Create New Role',
-          'element' => 'submit',
-          'format' => 'int',
-          'value' => -1,
+          'fields' => (object)[
+            'id' => (object)['name' => 'id', 'element' => 'select',
+              'label' => 'Select Role', 'format' => 'text', 'list' => $items,
+              'value' => 'Navigate'],
+            'submit1' => (object)['name' => 'submit', 'element' => 'submit',
+              'label' => '', 'format' => 'text', 'value' => 'Navigate'],
+          ],
         ];
         $this->form = new \LWT\Form($defs);
       }
@@ -96,6 +95,10 @@ Class Admin Extends \LWT\Subapp{
             if ($role_obj->name_unique == false){
               $this->form->fields->name->error = 99;
               $this->form->fields->name->message = $role_obj->name_message;
+            }
+            if($this->inputs->post->submit == 'Create'){
+              $this->form->fields->id->value = $role_obj->id;
+              $this->form->fields->submit1->value = 'Update';
             }
           }
         }
