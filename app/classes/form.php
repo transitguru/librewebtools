@@ -30,7 +30,8 @@ class Form{
   public $status = null;     /**< Message status matching css error classes */
 
   /** Permissible types for input element in this implementation */
-  private $input_types = ['button','checkbox','file','password','submit','text','hidden'];
+  private $input_types = ['button','radio','checkbox','file','password',
+      'submit','text','hidden'];
 
   /** Permissible statuses for message bar css class */
   private $statuses = ['success', 'warning', 'error'];
@@ -153,7 +154,7 @@ class Form{
   public function fill($inputs,$ignore_empty=true){
     if(is_object($this->fields)){
       foreach ($this->fields as $id => $field){
-        if(!in_array($field->element,['submit','hidden'])){
+        if(!in_array($field->element,['submit','hidden','button'])){
           $n = $field->name;
           if(isset($inputs->{$n}) && !is_array($inputs->{$n}) && !is_object($inputs->{$n})){
             $this->fields->{$id}->value = $inputs->{$n};
@@ -297,8 +298,24 @@ class Form{
         elseif($f->element == 'select' && is_array($f->list) && count($f->list)>0){
           $html .= '  <select class="' . $class . '" name="' . $f->name . "\">\n";
           foreach ($f->list as $items){
-            $html .= '    <option value="' . $items->value . '" >' . 
-              $items->name . "</option>\n";
+            $html .= '    <option value="' . $items->value . '" >';
+            $html .= $items->name . "</option>\n";
+          }
+          $html .= "  </select>\n";
+        }
+        elseif($f->element == 'radiogroup' && is_array($f->list) && count($f->list)>0){
+          $checkbox = 'radio';
+          if ($f->multiple == true){
+            $checkbox = 'checkbox';
+          }
+          $html .= '  <select class="' . $class . '" name="' . $f->name . "\">\n";
+          $c = 0;
+          foreach ($f->list as $items){
+            $c ++;
+            $html .= '    <input type="' . $checkbox . ' value="' . $items->value;
+            $html .= '" id="' . $i . 'choice' . $c . '" name="' . $f->name . "\" />\n";
+            $html .= '<label for="' . $i . 'choice' . $c . '" class="checkbox">';
+            $html .= $items->name . "</label>\n";
           }
           $html .= "  </select>\n";
         }

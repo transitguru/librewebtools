@@ -112,8 +112,11 @@ Class Admin Extends \LWT\Subapp{
           $role_obj->delete();
           $this->form->message = 'Role deleted successfully';
           $this->form->status = 'success';
-          $this->form->fields->submit1->value = 'Close';
-          $this->form->fields->submit2->value = 'Close';
+          foreach ($this->form->fields as $key => $field){
+            if ($key != 'submit3'){
+              unset($this->form->fields->{$key});
+            }
+          }
         }
       }
       else{
