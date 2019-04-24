@@ -65,6 +65,38 @@ class Group extends Tree{
   }
 
   /**
+   * Lists all groups in an array
+   *
+   * @return array $list All groups as an array of objects
+   */
+  public function list(){
+    $db = new Db();
+    $q = (object)[
+      'command' => 'select',
+      'table' => 'groups',
+      'fields' => [],
+      'sort' => [
+        (object) ['id' => 'parent_id'],
+        (object) ['id' => 'sortorder'],
+        (object) ['id' => 'name'],
+      ]
+    ];
+    $db->query($q);
+    $list = [];
+    foreach($db->output as $record){
+      $list[]= (object)[
+        'id' => (int) $record->id,
+        'parent_id' => (int) $record->parent_id,
+        'sortorder' => (int) $record->sortorder,
+        'name' => $record->name,
+        'created' => $record->created,
+        'desc' => $record->desc,
+      ];
+    }
+    return $list;
+  }
+
+  /**
    * Clears the variables
    *
    */

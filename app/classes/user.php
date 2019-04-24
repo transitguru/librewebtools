@@ -351,6 +351,37 @@ class User{
   }
 
   /**
+   * Lists all users in an array
+   *
+   * @return array $list All users as an array of objects
+   */
+  public function list(){
+    $db = new Db();
+    $q = (object)[
+      'command' => 'select',
+      'table' => 'users',
+      'fields' => [],
+      'sort' => [
+        (object) ['id' => 'login'],
+      ]
+    ];
+    $db->query($q);
+    $list = [];
+    foreach($db->output as $record){
+      $list[]= (object)[
+        'id' => (int) $record->id,
+        'login' => $record->login,
+        'firstname' => $record->firstname,
+        'lastname' => $record->lastname,
+        'email' => $record->email,
+        'created' => $record->created,
+        'desc' => $record->desc,
+      ];
+    }
+    return $list;
+  }
+
+  /**
    * Writes a user profile
    */
   public function write(){

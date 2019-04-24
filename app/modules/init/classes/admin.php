@@ -96,7 +96,7 @@ Class Admin Extends \LWT\Subapp{
               $this->form->fields->name->error = 99;
               $this->form->fields->name->message = $role_obj->name_message;
             }
-            if($this->inputs->post->submit == 'Create'){
+            if($this->inputs->post->submit == 'Create' && $this->form->error == 0){
               $this->form->fields->id->value = $role_obj->id;
               $this->form->fields->submit1->value = 'Update';
             }
@@ -128,7 +128,118 @@ Class Admin Extends \LWT\Subapp{
       $this->form = new \LWT\Form($forms->group);
     }
     elseif ($this->pathstring == 'user'){
-      $this->form = new \LWT\Form($forms->user);
+      if(isset($this->inputs->post->id) && 
+          (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Close')){
+        $user_id = (int) $this->inputs->post->id;
+        $user_obj = new \LWT\User($user_id);
+        $this->form = new \LWT\Form($forms->user);
+        if ($user_id == -1){
+          $this->form->fields->submit1->value = 'Create';
+        }
+        $this->form->fields->id->value = $user_obj->id;
+        $this->form->fields->login->value = $user_obj->login;
+        $this->form->fields->firstname->value = $user_obj->firstname;
+        $this->form->fields->lastname->value = $user_obj->lastname;
+        $this->form->fields->email->value = $user_obj->email;
+        $this->form->fields->desc->value = $user_obj->desc;
+
+        // Make Role list
+        $obj = new \LWT\Role(0);
+        $l = $obj->list();
+        foreach($l as $v){
+          $this->form->fields->roles->list[] = (object)[
+            'name' => $v->name,
+            'value' => $v->id,
+          ];
+        }
+
+        // Make Group list
+        $obj = new \LWT\Group(0);
+        $l = $obj->list();
+        foreach($l as $v){
+          $this->form->fields->groups->list[] = (object)[
+            'name' => $v->name,
+            'value' => $v->id,
+          ];
+        }
+
+      }
+      else{
+        $user_obj = new \LWT\User(-1);
+        $list = $user_obj->list();
+        $items = [];
+        foreach($list as $r){
+          $items[]= (object)[
+            'name' => $r->login,
+            'value' => $r->id,
+          ];
+        }
+        $items[]= (object)[
+          'name' => '(new user)',
+          'value' => -1,
+        ];
+        $defs = (object)[
+          'title' => 'User Login Navigation',
+          'desc' => 'Manage user logins for the application.',
+          'name' => 'form_user_nav',
+          'fields' => (object)[
+            'id' => (object)['name' => 'id', 'element' => 'select',
+              'label' => 'Select Role', 'format' => 'text', 'list' => $items,
+              'value' => 'Navigate'],
+            'submit1' => (object)['name' => 'submit', 'element' => 'submit',
+              'label' => '', 'format' => 'text', 'value' => 'Navigate'],
+          ],
+        ];
+        $this->form = new \LWT\Form($defs);
+      }
+      if (isset($this->inputs->post->submit)){
+        if(in_array($this->inputs->post->submit, ['Create','Update'])){
+          $this->form->fill($this->inputs->post);
+          $this->form->validate();
+          if ($this->form->error == 0){
+            $user_obj->login = $this->form->fields->login->value;
+            $user_obj->firstname = $this->form->fields->firstname->value;
+            $user_obj->lastname = $this->form->fields->lastname->value;
+            $user_obj->email = $this->form->fields->email->value;
+            $user_obj->desc = $this->form->fields->desc->value;
+            $user_obj->write();
+            $this->form->error = $user_obj->error;
+            $this->form->message = $user_obj->message;
+            if ($user_obj->email_unique == false){
+              $this->form->fields->email->error = 99;
+              $this->form->fields->email->message = $user_obj->email_message;
+            }
+            if ($user_obj->email_unique == false){
+              $this->form->fields->login->error = 99;
+              $this->form->fields->login->message = $user_obj->login_message;
+            }
+            if($this->inputs->post->submit == 'Create' && $this->form->error == 0){
+              $this->form->fields->id->value = $user_obj->id;
+              $this->form->fields->submit1->value = 'Update';
+            }
+          }
+        }
+        elseif($this->inputs->post->submit == 'Delete'){
+          $this->form->message = 'Are you sure you want to delete this User?';
+          $this->form->status = 'warning';
+          $this->form->fields->submit1->value = 'Yes, Delete';
+          $this->form->fields->submit2->value = 'No';
+        }
+        elseif($this->inputs->post->submit == 'Yes, Delete'){
+          $role_obj->delete();
+          $this->form->message = 'Role deleted successfully';
+          $this->form->status = 'success';
+          foreach ($this->form->fields as $key => $field){
+            if ($key != 'submit3'){
+              unset($this->form->fields->{$key});
+            }
+          }
+        }
+      }
+      else{
+        $this->form->message = 'Select a user to begin editing.';
+        $this->form->status = 'warning';
+      }
     }
     elseif ($this->pathstring == 'path'){
       $this->form = new \LWT\Form($forms->path);
