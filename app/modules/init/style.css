@@ -75,6 +75,10 @@ label strong {
   color: #ff3300;
 }
 
+fieldset.choices label{
+  display: inline;
+}
+
 .required {
   border: 2px solid black;
 }

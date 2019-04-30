@@ -308,16 +308,16 @@ class Form{
           if ($f->multiple == true){
             $checkbox = 'checkbox';
           }
-          $html .= '  <select class="' . $class . '" name="' . $f->name . "\">\n";
+          $html .= '  <fieldset class="choices">' . "\n";
           $c = 0;
           foreach ($f->list as $items){
             $c ++;
-            $html .= '    <input type="' . $checkbox . ' value="' . $items->value;
+            $html .= '    <input type="' . $checkbox . '" value="' . $items->value;
             $html .= '" id="' . $i . 'choice' . $c . '" name="' . $f->name . "\" />\n";
-            $html .= '<label for="' . $i . 'choice' . $c . '" class="checkbox">';
+            $html .= '<label for="' . $i . 'choice' . $c . '">';
             $html .= $items->name . "</label>\n";
           }
-          $html .= "  </select>\n";
+          $html .= "  </fieldset>\n";
         }
       }
     }
