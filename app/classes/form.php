@@ -298,7 +298,11 @@ class Form{
         elseif($f->element == 'select' && is_array($f->list) && count($f->list)>0){
           $html .= '  <select class="' . $class . '" name="' . $f->name . "\">\n";
           foreach ($f->list as $items){
-            $html .= '    <option value="' . $items->value . '" >';
+            $checked = '';
+            if (isset($items->checked) && $items->checked == true){
+              $checked = 'selected';
+            }
+            $html .= '    <option value="' . $items->value . '" ' . $checked . ' >';
             $html .= $items->name . "</option>\n";
           }
           $html .= "  </select>\n";
@@ -312,8 +316,13 @@ class Form{
           $c = 0;
           foreach ($f->list as $items){
             $c ++;
+            $checked = '';
+            if (isset($items->checked) && $items->checked == true){
+              $checked = 'checked';
+            }
             $html .= '    <input type="' . $checkbox . '" value="' . $items->value;
-            $html .= '" id="' . $i . 'choice' . $c . '" name="' . $f->name . "\" />\n";
+            $html .= '" id="' . $i . 'choice' . $c . '" name="' . $f->name;
+            $html .= '" ' . $checked . " />\n";
             $html .= '<label for="' . $i . 'choice' . $c . '">';
             $html .= $items->name . "</label>\n";
           }

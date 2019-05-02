@@ -92,7 +92,7 @@ class Field{
    *     'tabindex' => 0,
    *     'list' => [
    *       (object) ['name' => 'Pennsylvania', 'value' => 'PA'],
-   *       (object) ['name' => 'Ohio', 'value' => 'OH'],
+   *       (object) ['name' => 'Ohio', 'value' => 'OH', 'checked' => true],
    *       (object) ['name' => 'West Virginia', 'value' => 'WV'],
    *     ],
    *     'value' => 'some_value_to_test',
@@ -154,7 +154,7 @@ class Field{
     if (isset($defs->list) && is_array($defs->list)){
       $this->list = [];
       foreach($defs->list as $items){
-        if (is_object($items) && isset($items->name) && isset($items->value)){
+        if (is_object($items) && isset($items->name)){
           $this->list[] = $items;
         }
       }

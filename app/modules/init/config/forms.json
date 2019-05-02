@@ -155,7 +155,7 @@
           "format":"email","required":true,"max_chars":255},
         "roles":{"name":"roles[]","label":"Roles","element":"radiogroup",
           "format":"int","multiple":true,"list":[]},
-        "groups":{"name":"groups[]","label":"Roles","element":"radiogroup",
+        "groups":{"name":"groups[]","label":"Groups","element":"radiogroup",
           "format":"int","multiple":true,"list":[]},
         "desc":{"name":"desc","label":"Description (optional)","element":"text",
           "format":"text","required":false,"max_chars":6000},

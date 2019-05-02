@@ -147,9 +147,17 @@ Class Admin Extends \LWT\Subapp{
         $obj = new \LWT\Role(0);
         $l = $obj->list();
         foreach($l as $v){
+          if (in_array($v->id, $user_obj->roles)){
+            $checked = true;
+          }
+          else{
+            $checked = false;
+          }
+
           $this->form->fields->roles->list[] = (object)[
             'name' => $v->name,
             'value' => $v->id,
+            'checked' => $checked,
           ];
         }
 
@@ -157,9 +165,17 @@ Class Admin Extends \LWT\Subapp{
         $obj = new \LWT\Group(0);
         $l = $obj->list();
         foreach($l as $v){
+          if (in_array($v->id, $user_obj->groups)){
+            $checked = true;
+          }
+          else{
+            $checked = false;
+          }
+
           $this->form->fields->groups->list[] = (object)[
             'name' => $v->name,
             'value' => $v->id,
+            'checked' => $checked,
           ];
         }
 
