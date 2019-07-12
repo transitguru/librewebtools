@@ -122,6 +122,8 @@
       "desc":"Manage groups for fine-grained hierarchical membership.",
       "name":"form_group",
       "fields":{
+        "id":{"name":"id","element":"hidden",
+          "format":"int","max_chars":10},
         "parent_id":{"name":"parent_id","label":"Parent ID","element":"text",
           "format":"int","required":true,"max_chars":10},
         "sortorder":{"name":"sortorder","label":"Sort Order","element":"text",

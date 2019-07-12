@@ -491,7 +491,7 @@ class User{
         $q = (object)[
           'command' => 'insert',
           'table' => 'user_roles',
-          'inputs' => (object)['group_id' => $role, 'user_id' => $this->id]
+          'inputs' => (object)['role_id' => $role, 'user_id' => $this->id]
         ];
         $db->query($q);
       }

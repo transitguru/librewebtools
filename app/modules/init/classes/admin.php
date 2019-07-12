@@ -125,7 +125,91 @@ Class Admin Extends \LWT\Subapp{
       }
     }
     elseif ($this->pathstring == 'group'){
-      $this->form = new \LWT\Form($forms->group);
+      if(isset($this->inputs->post->id) && 
+          (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Close')){
+        $group_id = (int) $this->inputs->post->id;
+        $group_obj = new \LWT\Role($group_id);
+        $this->form = new \LWT\Form($forms-group);
+        if ($group_id == -1){
+          $this->form->fields->submit1->value = 'Create';
+        }
+        $this->form->fields->id->value = $group_obj->id;
+        $this->form->fields->parent_id->value = $group_obj->parent_id;
+        $this->form->fields->name->value = $group_obj->name;
+        $this->form->fields->sortorder->value = $group_obj->sortorder;
+        $this->form->fields->desc->value = $group_obj->desc;
+      }
+      else{
+        $group_obj = new \LWT\Group(-1);
+        $list = $group_obj->list();
+        $items = [];
+        foreach($list as $g){
+          $items[]= (object)[
+            'name' => $g->name,
+            'value' => $g->id,
+          ];
+        }
+        $items[]= (object)[
+          'name' => '(new group)',
+          'value' => -1,
+        ];
+        $defs = (object)[
+          'title' => 'User Groups Navigation',
+          'desc' => 'Manage fine-grained groups for hierarchical user management.',
+          'name' => 'form_group_nav',
+          'fields' => (object)[
+            'id' => (object)['name' => 'id', 'element' => 'select',
+              'label' => 'Select Group', 'format' => 'text', 'list' => $items,
+              'value' => 'Navigate'],
+            'submit1' => (object)['name' => 'submit', 'element' => 'submit',
+              'label' => '', 'format' => 'text', 'value' => 'Navigate'],
+          ],
+        ];
+        $this->form = new \LWT\Form($defs);
+      }
+      if (isset($this->inputs->post->submit)){
+        if(in_array($this->inputs->post->submit, ['Create','Update'])){
+          $this->form->fill($this->inputs->post);
+          $this->form->validate();
+          if ($this->form->error == 0){
+            $group_obj->name = $this->form->fields->name->value;
+            $group_obj->parent_id = $this->form->fields->parent_id->value;
+            $group_obj->sortorder = $this->form->fields->sortorder->value;
+            $group_obj->desc = $this->form->fields->desc->value;
+            $group_obj->write();
+            $this->form->error = $group_obj->error;
+            $this->form->message = $group_obj->message;
+            if ($group_obj->name_unique == false){
+              $this->form->fields->name->error = 99;
+              $this->form->fields->name->message = $group_obj->name_message;
+            }
+            if($this->inputs->post->submit == 'Create' && $this->form->error == 0){
+              $this->form->fields->id->value = $group_obj->id;
+              $this->form->fields->submit1->value = 'Update';
+            }
+          }
+        }
+        elseif($this->inputs->post->submit == 'Delete'){
+          $this->form->message = 'Are you sure you want to delete this Group?';
+          $this->form->status = 'warning';
+          $this->form->fields->submit1->value = 'Yes, Delete';
+          $this->form->fields->submit2->value = 'No';
+        }
+        elseif($this->inputs->post->submit == 'Yes, Delete'){
+          $group_obj->delete();
+          $this->form->message = 'Role deleted successfully';
+          $this->form->status = 'success';
+          foreach ($this->form->fields as $key => $field){
+            if ($key != 'submit3'){
+              unset($this->form->fields->{$key});
+            }
+          }
+        }
+      }
+      else{
+        $this->form->message = 'Select a group to begin editing.';
+        $this->form->status = 'warning';
+      }
     }
     elseif ($this->pathstring == 'user'){
       if(isset($this->inputs->post->id) && 
