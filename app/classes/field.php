@@ -242,6 +242,7 @@ class Field{
     if ($this->multiple === true){
       if (is_array($this->value) && count($this->value)>0){
         //TODO: validate inputs for array
+        return;
       }
     }
     //Handle empty inputs

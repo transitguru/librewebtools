@@ -21,8 +21,8 @@ class User{
   public $email = '';           /**< Email address */
   public $created = '';         /**< Date that the user was created */
   public $desc = '';            /**< Description of user */
-  public $groups = array();     /**< Groups that the user is a member of */
-  public $roles = array();      /**< Roles that a user is a member of */
+  public $groups = [];          /**< Groups that the user is a member of */
+  public $roles = [];           /**< Roles that a user is a member of */
   public $message = '';         /**< Message to view when editing or viewing a profile */
   public $error = 0;            /**< Error (zero means no error) */
   public $login_unique = true;  /**< Flag to show if the login is unique */
@@ -73,7 +73,7 @@ class User{
         if ($db->affected_rows > 0){
           foreach ($db->output as $field){
             $rid = (int) $field->role_id;
-            $this->roles[$rid] = $rid;
+            $this->roles[] = $rid;
           }
         }
         $q = (object)[
@@ -91,7 +91,7 @@ class User{
         if ($db->affected_rows > 0){
           foreach ($db->output as $field){
             $gid = (int) $field->group_id;
-            $this->groups[$gid] = $gid;
+            $this->groups[] = $gid;
           }
         }
       }

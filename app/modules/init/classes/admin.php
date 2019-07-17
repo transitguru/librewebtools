@@ -284,7 +284,7 @@ Class Admin Extends \LWT\Subapp{
           'name' => 'form_user_nav',
           'fields' => (object)[
             'id' => (object)['name' => 'id', 'element' => 'select',
-              'label' => 'Select Role', 'format' => 'text', 'list' => $items,
+              'label' => 'Select User', 'format' => 'text', 'list' => $items,
               'value' => 'Navigate'],
             'submit1' => (object)['name' => 'submit', 'element' => 'submit',
               'label' => '', 'format' => 'text', 'value' => 'Navigate'],
@@ -302,6 +302,24 @@ Class Admin Extends \LWT\Subapp{
             $user_obj->lastname = $this->form->fields->lastname->value;
             $user_obj->email = $this->form->fields->email->value;
             $user_obj->desc = $this->form->fields->desc->value;
+            $groups = $this->form->fields->groups->value;
+            $roles = $this->form->fields->roles->value;
+            $user_obj->roles = [];
+            $user_obj->groups = [];
+            if (is_array($roles) && count($roles)>0){
+              foreach ($roles as $rid){
+                if (is_numeric($rid)){
+                  $user_obj->roles[] = $rid;
+                }
+              }
+            }
+            if (is_array($groups) && count($groups)>0){
+              foreach ($groups as $gid){
+                if (is_numeric($gid)){
+                  $user_obj->groups[] = $gid;
+                }
+              }
+            }
             $user_obj->write();
             $this->form->error = $user_obj->error;
             $this->form->message = $user_obj->message;
@@ -327,7 +345,7 @@ Class Admin Extends \LWT\Subapp{
         }
         elseif($this->inputs->post->submit == 'Yes, Delete'){
           $role_obj->delete();
-          $this->form->message = 'Role deleted successfully';
+          $this->form->message = 'User deleted successfully';
           $this->form->status = 'success';
           foreach ($this->form->fields as $key => $field){
             if ($key != 'submit3'){

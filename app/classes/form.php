@@ -156,7 +156,7 @@ class Form{
       foreach ($this->fields as $id => $field){
         if(!in_array($field->element,['submit','hidden','button'])){
           $n = $field->name;
-          if(isset($inputs->{$n}) && !is_array($inputs->{$n}) && !is_object($inputs->{$n})){
+          if(isset($inputs->{$n}) && !is_object($inputs->{$n})){
             $this->fields->{$id}->value = $inputs->{$n};
           }
           elseif(!$ignore_empty){
