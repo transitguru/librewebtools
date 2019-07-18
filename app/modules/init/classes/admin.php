@@ -308,16 +308,12 @@ Class Admin Extends \LWT\Subapp{
             $user_obj->groups = [];
             if (is_array($roles) && count($roles)>0){
               foreach ($roles as $rid){
-                if (is_numeric($rid)){
-                  $user_obj->roles[] = $rid;
-                }
+                $user_obj->roles[] = $rid;
               }
             }
             if (is_array($groups) && count($groups)>0){
               foreach ($groups as $gid){
-                if (is_numeric($gid)){
-                  $user_obj->groups[] = $gid;
-                }
+                $user_obj->groups[] = $gid;
               }
             }
             $user_obj->write();

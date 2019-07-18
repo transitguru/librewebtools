@@ -215,6 +215,7 @@ class Field{
    *
    * Error Numbers:
    *  0 = no error
+   *  1 = Object or Array found, single value expected
    * 11 = Empty value
    * 12 = String too long
    * 13 = String too short
@@ -234,40 +235,62 @@ class Field{
    * 67 = Value does not match resolution (too precise)
    */
   public function validate(){
-    //handle trimming
-    if ($this->trim){
-      $this->value = trim($this->value);
+    if ($this->multiple === true){
+      $values = [];
+      if (is_array($this->value) && count($this->value)>0){
+        foreach($this->value as $value){
+          $values[] = $this->check($value);
+        }
+      }
+      $this->value = $values;
+    }
+    elseif(!is_array($this->value) && !is_object($this->value)){
+      $this->value = $this->check($this->value);
+    }
+    else{
+      $this->error = 1;
+      $this->message = 'Invalid: Too many values, please only use one value';
+    }
+  }
+
+  private function check($value){
+    //Individual values cannot be objects or arrays (yet)
+    if(is_array($value) || is_object($value)){
+      $this->error = 2;
+      $this->message = 'Invalid: Cannot have a list within a list.';
+      return $value;
     }
 
-    if ($this->multiple === true){
-      if (is_array($this->value) && count($this->value)>0){
-        //TODO: validate inputs for array
-        return;
-      }
+    //handle trimming
+    if ($this->trim){
+      $value = trim($value);
     }
+
     //Handle empty inputs
-    if ($this->required && $this->value === ''){
-      $this->error = 11;
-      $this->message = 'Required: Please enter a value.';
-      return;
-    }
-    elseif ($this->value === ''){
-      $this->error = 0;
-      $this->message = "";
-      return;
+    if ($value === '' || $value == null){
+      if ($this->required){
+        $this->error = 11;
+        $this->message = 'Required: Please enter a value.';
+        return $value;
+      }
+      else{
+        $this->error = 0;
+        $this->message = "";
+        return $value;
+      }
     }
 
     //Handle too many characters
-    if ($this->max_chars > 0 && mb_strlen($this->value) > $this->max_chars){
+    if ($this->max_chars > 0 && mb_strlen($value) > $this->max_chars){
       $this->error = 12;
       $this->message = "Invalid: Please enter a value with no more than {$this->max_chars} characters";
-      return;
+      return $value;
     }
     // Handle too few characters
-    if ($this->min_chars > 0 && mb_strlen($this->value) < $this->min_chars){
+    if ($this->min_chars > 0 && mb_strlen($value) < $this->min_chars){
       $this->error = 13;
       $this->message = "Invalid: Please enter a value with no less than {$this->min_chars} characters";
-      return;
+      return $value;
     }
 
     //Formats that have a colon separator
@@ -279,29 +302,29 @@ class Field{
       //Regular expression
       if ($type == 'preg'){
         $matches = [];
-        preg_match($format, $this->value, $matches);
-        if (count($matches)==0 || $matches[0] != $this->value){
+        preg_match($format, $value, $matches);
+        if (count($matches)==0 || $matches[0] != $value){
           $this->error = 21;
           $this->message = 'Invalid: Value does not match the pattern expected.';
-          return;
+          return $value;
         }
       }
 
       //Check time against $format (which uses PHP date() format string)
       elseif ($type == 'date'){
-        if(date_create_from_format($format, $this->value)){
-          $date = date_create_from_format($format, $this->value);
+        if(date_create_from_format($format, $value)){
+          $date = date_create_from_format($format, $value);
           $formatted = date_format($date, $format);
-          if ($formatted != $this->value){
+          if ($formatted != $value){
             $this->error = 52;
             $this->message = 'Invalid: Value is not a valid date.';
-            return;
+            return $value;
           }
         }
         else{
           $this->error = 51;
           $this->message = 'Invalid: Date format is wrong.';
-          return;
+          return $value;
         }
       }
 
@@ -341,42 +364,42 @@ class Field{
       $qualifier = 'simple';
     }
     elseif($format=='nohtml'){
-      $this->value = htmlspecialchars($this->value);
+      $value = htmlspecialchars($value);
     }
 
     // Check for text types
     elseif ($format=='password'){
       //Allow nearly everything for a oneline password
-      if(fnmatch("*\t*",$this->value) || fnmatch("*\r*",$this->value) || fnmatch("*\n*",$this->value)){
+      if(fnmatch("*\t*",$value) || fnmatch("*\r*",$value) || fnmatch("*\n*",$value)){
         $this->error = 41;
         $this->message = 'Invalid: Please remove line breaks (hard returns) or tabs.';
-        return;
+        return $value;
       }
     }
     elseif($format=='oneline' || $format=='text'){
       //Allow only one line text, do not allow CR or LF
-      if(fnmatch("*\r*",$this->value) || fnmatch("*\n*",$this->value)){
+      if(fnmatch("*\r*",$value) || fnmatch("*\n*",$value)){
         $this->error = 42;
         $this->message = 'Invalid: Please remove line breaks (hard returns).';
-        return;
+        return $value;
       }
     }
     elseif($format=='email'){
       //Email formatting only
-      preg_match('/([\w\-\.%+-]+\@[\w\-]+\.[\w\-]+)/',$this->value, $matches);
-      if (count($matches)==0 || $matches[0] != $this->value){
+      preg_match('/([\w\-\.%+-]+\@[\w\-]+\.[\w\-]+)/',$value, $matches);
+      if (count($matches)==0 || $matches[0] != $value){
         $this->error = 43;
         $this->message = 'Invalid: Not a valid email address.';
-        return;
+        return $value;
       }
     }
     elseif($format=='nowacky'){
       //No special characters
-      preg_match('/[\w-]*/', $this->value, $matches);
-      if (count($matches)==0 || $matches[0] != $this->value){
+      preg_match('/[\w-]*/', $value, $matches);
+      if (count($matches)==0 || $matches[0] != $value){
         $this->error = 44;
         $this->message = 'Invalid: Special characters exist, please only use numbers, letters, hyphens, and underscores.';
-        return;
+        return $value;
       }
     }
 
@@ -384,22 +407,22 @@ class Field{
     elseif ($format == 'dec' || $format == 'int'){
       if ($format=='int'){
         //Integer Numbers
-        $this->value = str_replace(',','',$this->value);
-        $this->value = str_replace(' ','',$this->value);
-        if (!is_numeric($this->value) || fmod($this->value,1) != 0){
+        $value = str_replace(',','',$value);
+        $value = str_replace(' ','',$value);
+        if (!is_numeric($value) || fmod($value,1) != 0){
           $this->error = 61;
           $this->message = 'Invalid: Value is not an integer.';
-          return;
+          return $value;
         }
       }
       elseif($format=='dec'){
         //Decimal Numbers
-        $this->value = str_replace(',','',$this->value);
-        $this->value = str_replace(" ","",$this->value);
-        if (!is_numeric($this->value)){
+        $value = str_replace(',','',$value);
+        $value = str_replace(" ","",$value);
+        if (!is_numeric($value)){
           $this->error = 62;
           $this->message = 'Invalid: Value is not a number.';
-          return;
+          return $value;
         }
       }
 
@@ -410,42 +433,42 @@ class Field{
         $this->max = $this->min;
         $this->min = $temp;
       }
-      if (!$this->inc_min && !is_null($this->min) && $this->value <= $this->min){
+      if (!$this->inc_min && !is_null($this->min) && $value <= $this->min){
         $this->error = 63;
         $this->message = "Out of Range: Must be greater than {$this->min}.";
-        return;
+        return $value;
       }
-      elseif(!is_null($this->min) && $this->value < $this->min){
+      elseif(!is_null($this->min) && $value < $this->min){
         $this->error = 64;
         $this->message = "Out of Range: Must be at least {$this->min}.";
-        return;
+        return $value;
       }
-      if (!$this->inc_max && !is_null($this->max) && $this->value >= $this->max){
+      if (!$this->inc_max && !is_null($this->max) && $value >= $this->max){
         $this->error = 65;
         $this->message = "Out of Range: Must be less than {$this->max}.";
-        return;
+        return $value;
       }
-      elseif(!is_null($this->max) && $this->value > $this->max){
+      elseif(!is_null($this->max) && $value > $this->max){
         $this->error = 66;
         $this->message = "Out of Range: Must at most {$this->max}.";
-        return;
+        return $value;
       }
 
       //Check for step (or autoround)
       if (!is_null($this->step)){
-        if (!$this->auto_step && fmod($this->value - $this->min , $this->step) != 0 && $this->value != $this->max){
+        if (!$this->auto_step && fmod($value - $this->min , $this->step) != 0 && $value != $this->max){
           $this->error = 67;
           $this->message = "Too precise: Must be a value from {$this->min} every {$this->step}.";
-          return;
+          return $value;
         }
-        elseif(fmod($this->value - $this->min , $this->step) != 0 && $this->value != $this->max){
-          $offset = $this->value - $this->min;
+        elseif(fmod($value - $this->min , $this->step) != 0 && $value != $this->max){
+          $offset = $value - $this->min;
           $steps = $offset/$this->step;
           if (fmod($steps, 1) < 0.5){
-            $this->value = floor($steps) * $this->step + $this->min;
+            $value = floor($steps) * $this->step + $this->min;
           }
           else{
-            $this->value = ceil($steps) * $this->step + $this->min;
+            $value = ceil($steps) * $this->step + $this->min;
           }
         }
       }
@@ -453,15 +476,15 @@ class Field{
 
     //Scrub HTML if requested from a format above
     if (!is_null($qualifier) && $qualifier != ''){
-      $xml = new Xml($this->value, $qualifier);
+      $xml = new Xml($value, $qualifier);
       $xml->scrub();
-      $this->value = $xml->markup;
+      $value = $xml->markup;
     }
 
     //successful output
     $this->error = 0;
     $this->message = '';
-    return;
+    return $value;
   }
 
   /**
