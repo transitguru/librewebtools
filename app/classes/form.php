@@ -311,6 +311,10 @@ class Form{
           $checkbox = 'radio';
           if ($f->multiple == true){
             $checkbox = 'checkbox';
+            $bb = '[]';
+          }
+          else{
+            $bb = '';
           }
           $html .= '  <fieldset class="choices">' . "\n";
           $c = 0;
@@ -321,7 +325,7 @@ class Form{
               $checked = 'checked';
             }
             $html .= '    <input type="' . $checkbox . '" value="' . $items->value;
-            $html .= '" id="' . $i . 'choice' . $c . '" name="' . $f->name;
+            $html .= '" id="' . $i . 'choice' . $c . '" name="' . $f->name . $bb;
             $html .= '" ' . $checked . " />\n";
             $html .= '<label for="' . $i . 'choice' . $c . '">';
             $html .= $items->name . "</label>\n";

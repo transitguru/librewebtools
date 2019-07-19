@@ -367,6 +367,8 @@ Class Admin Extends \LWT\Subapp{
     elseif ($this->pathstring == 'file'){
       $this->form = new \LWT\Form($forms->file);
     }
+    elseif ($this->pathstring == ''){
+    }
     else{
       http_response_code(404);
     }
