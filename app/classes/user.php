@@ -72,8 +72,7 @@ class User{
         $this->roles = [];
         if ($db->affected_rows > 0){
           foreach ($db->output as $field){
-            $rid = (int) $field->role_id;
-            $this->roles[] = $rid;
+            $this->roles[] = (int) $field->role_id;
           }
         }
         $q = (object)[
@@ -90,8 +89,7 @@ class User{
         $this->groups = [];
         if ($db->affected_rows > 0){
           foreach ($db->output as $field){
-            $gid = (int) $field->group_id;
-            $this->groups[] = $gid;
+            $this->groups[] = (int) $field->group_id;
           }
         }
       }

@@ -219,6 +219,7 @@ Class Admin Extends \LWT\Subapp{
         $this->form = new \LWT\Form($forms->user);
         if ($user_id == -1){
           $this->form->fields->submit1->value = 'Create';
+          unset($this->form->fields->submit2);
         }
         $this->form->fields->id->value = $user_obj->id;
         $this->form->fields->login->value = $user_obj->login;
@@ -226,22 +227,16 @@ Class Admin Extends \LWT\Subapp{
         $this->form->fields->lastname->value = $user_obj->lastname;
         $this->form->fields->email->value = $user_obj->email;
         $this->form->fields->desc->value = $user_obj->desc;
+        $this->form->fields->roles->value = $user_obj->roles;
+        $this->form->fields->groups->value = $user_obj->groups;
 
         // Make Role list
         $obj = new \LWT\Role(0);
         $l = $obj->list();
         foreach($l as $v){
-          if (in_array($v->id, $user_obj->roles)){
-            $checked = true;
-          }
-          else{
-            $checked = false;
-          }
-
           $this->form->fields->roles->list[] = (object)[
             'name' => $v->name,
             'value' => $v->id,
-            'checked' => $checked,
           ];
         }
 
@@ -249,17 +244,9 @@ Class Admin Extends \LWT\Subapp{
         $obj = new \LWT\Group(0);
         $l = $obj->list();
         foreach($l as $v){
-          if (in_array($v->id, $user_obj->groups)){
-            $checked = true;
-          }
-          else{
-            $checked = false;
-          }
-
           $this->form->fields->groups->list[] = (object)[
             'name' => $v->name,
             'value' => $v->id,
-            'checked' => $checked,
           ];
         }
 
@@ -340,7 +327,7 @@ Class Admin Extends \LWT\Subapp{
           $this->form->fields->submit2->value = 'No';
         }
         elseif($this->inputs->post->submit == 'Yes, Delete'){
-          $role_obj->delete();
+          $user_obj->delete();
           $this->form->message = 'User deleted successfully';
           $this->form->status = 'success';
           foreach ($this->form->fields as $key => $field){

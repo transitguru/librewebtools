@@ -321,7 +321,8 @@ class Form{
           foreach ($f->list as $items){
             $c ++;
             $checked = '';
-            if (isset($items->checked) && $items->checked == true){
+            if (($f->multiple == true && is_array($f->value) && in_array($items->value, $f->value)) 
+              || ($items->value == $f->value && $f->multiple == false)){
               $checked = 'checked';
             }
             $html .= '    <input type="' . $checkbox . '" value="' . $items->value;
