@@ -299,7 +299,9 @@ class Form{
           $html .= '  <select class="' . $class . '" name="' . $f->name . "\">\n";
           foreach ($f->list as $items){
             $checked = '';
-            if (isset($items->checked) && $items->checked == true){
+            if (($f->multiple == true && is_array($f->value)
+                && in_array($items->value, $f->value))
+                || ($items->value == $f->value && $f->multiple == false)){
               $checked = 'selected';
             }
             $html .= '    <option value="' . $items->value . '" ' . $checked . ' >';
@@ -321,8 +323,9 @@ class Form{
           foreach ($f->list as $items){
             $c ++;
             $checked = '';
-            if (($f->multiple == true && is_array($f->value) && in_array($items->value, $f->value)) 
-              || ($items->value == $f->value && $f->multiple == false)){
+            if (($f->multiple == true && is_array($f->value)
+                && in_array($items->value, $f->value))
+                || ($items->value == $f->value && $f->multiple == false)){
               $checked = 'checked';
             }
             $html .= '    <input type="' . $checkbox . '" value="' . $items->value;

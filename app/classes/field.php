@@ -92,7 +92,7 @@ class Field{
    *     'tabindex' => 0,
    *     'list' => [
    *       (object) ['name' => 'Pennsylvania', 'value' => 'PA'],
-   *       (object) ['name' => 'Ohio', 'value' => 'OH', 'checked' => true],
+   *       (object) ['name' => 'Ohio', 'value' => 'OH'],
    *       (object) ['name' => 'West Virginia', 'value' => 'WV'],
    *     ],
    *     'value' => 'some_value_to_test',
