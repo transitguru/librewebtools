@@ -73,11 +73,11 @@ class Tree{
       $db->query($q);
       if ($db->output[0]->parent_id == 0){
         $loop = false;
-        $ids[0] = 0;
+        $ids[] = 0;
       }
       else{
         $search = (int) $db->output[0]->parent_id;
-        $ids[$search] = $search;
+        $ids[] = $search;
       }
     }
     return $ids;
@@ -91,7 +91,7 @@ class Tree{
    * @return array Array of IDs (this gets appended to the input)
    */
   public function children($parent, $ids){
-    $ids[$parent] = $parent;
+    $ids[] = $parent;
     $db = new Db();
     $q = (object)[
       'command' => 'select',
