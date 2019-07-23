@@ -156,17 +156,7 @@ class Path extends Tree{
     $access = false;
 
     //Load the user's grouptree
-    $all_groups = [];
-    if (count($user->groups) > 0){
-      foreach ($user->groups as $group_id){
-        $group = new Group($group_id);
-        $all_groups = $group->traverse($all_groups);
-      }
-    }
-    else{
-      $group = new Group(1);
-      $all_groups = $group->traverse($all_groups);
-    }
+    $all_groups = $user->allgroups();
 
     // Get the allowable groups for the path
     $db = new Db();

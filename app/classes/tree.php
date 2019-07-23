@@ -48,7 +48,7 @@ class Tree{
    */
   public function traverse($ids = []){
     $id = $this->id;
-    if ($id == NULL){
+    if ($id == null){
       return $ids;
     }
 
@@ -71,9 +71,8 @@ class Tree{
         ]
       ];
       $db->query($q);
-      if ($db->output[0]->parent_id == 0){
+      if ($db->output[0]->parent_id == null){
         $loop = false;
-        $ids[] = 0;
       }
       else{
         $search = (int) $db->output[0]->parent_id;

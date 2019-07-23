@@ -349,6 +349,31 @@ class User{
   }
 
   /**
+   * Loads all implicit groups a user is a member based on hierarchy
+   *
+   * @return array $all_groups All groups that a user may implicitly be a member
+   */
+  public function allgroups(){
+    $all_groups = [];
+    if (count($this->groups) > 0){
+      foreach ($this->groups as $group_id){
+        $group = new Group($group_id);
+        $grps = $group->traverse([]);
+        foreach($grps as $grp){
+          if (!in_array($grp,$all_groups)){
+            $all_groups[] = $grp;
+          }
+        }
+      }
+    }
+    else{
+      $group = new Group(1);
+      $all_groups = $group->traverse([]);
+    }
+    return $all_groups;
+  }
+
+  /**
    * Lists all users in an array
    *
    * @return array $list All users as an array of objects
