@@ -106,6 +106,23 @@ else{
   $user = new LWT\User(0);
 }
 
+// Ensure path is properly formed
+$newuri = $input->uri;
+while (fnmatch('*//*', $newuri)){
+  $newuri = preg_replace('/\/+/', '/', $newuri);
+}
+while (fnmatch('*../*', $newuri)){
+  $newuri = preg_replace('/\.\.\/+/', '/', $newuri);
+}
+while (strlen($uri) > 1 && substr($newuri, -1) == '/'){
+  $newuri = substr($newuri, 0, -1);
+}
+
+if ($newuri != $input->uri){
+  header('Location: ' . BASE_URI . $newuri);
+  exit;
+}
+
 // Load enabled modules and chosen theme
 $path = new LWT\Path($input->uri,$user);
 $module = new LWT\Module($path->module_id,$input,$session);

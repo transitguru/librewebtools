@@ -157,34 +157,8 @@ class Module{
    * Load all Javascripts and CSS in the template
    */
   public function loadScripts(){
-    $db = new Db();
-    $q = (object)[
-      'command' => 'select',
-      'table' => 'paths',
-      'fields' => ['url_code', 'parent_id'],
-      'where' => (object)[
-        'type' => 'and', 'items' => [
-          (object)['type' => '=', 'value' => '\\LWT\\Modules\\Init\\Script', 'id' => 'app']
-        ]
-      ]
-    ];
-    $db->query($q);
-    if ($db->affected_rows > 0){
-      $path = $db->output[0]->url_code;
-      while ($db->output[0]->parent_id != 0){
-        $q = (object)[
-          'command' => 'select',
-          'table' => 'paths',
-          'fields' => ['url_code', 'parent_id'],
-          'where' => (object)[
-            'type' => 'and', 'items' => [
-              (object)['type' => '=', 'value' => $db->output[0]->parent_id, 'id' => 'id']
-            ]
-          ]
-        ];
-        $db->query($q);
-        $path = $db->output[0]->url_code . '/' . $path;
-      }
+    $path = Path::findapp('\\LWT\\Modules\\Init\\Script');
+    if (is_string($path)){
       if (count($this->javascripts)>0){
         foreach ($this->javascripts as $script){
           echo '    <script type="application/javascript" src="' . BASE_URI;

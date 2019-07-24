@@ -35,22 +35,6 @@ class Path extends Tree{
    * @param User $user User object requesting the path
    */
   public function __construct($uri, $user){
-    $newuri = $uri;
-    while (fnmatch('*//*', $newuri)){
-      $newuri = preg_replace('/\/+/', '/', $newuri);
-    }
-    while (fnmatch('*../*', $newuri)){
-      $newuri = preg_replace('/\.\.\/+/', '/', $newuri);
-    }
-    while (strlen($uri) > 1 && substr($newuri, -1) == '/'){
-      $newuri = substr($newuri, 0, -1);
-    }
-
-    if ($newuri != $uri){
-      header('Location: ' . BASE_URI . $newuri);
-      exit;
-    }
-
     $this->uri = $uri;
     $db = new Db();
     $path = explode("/",$uri);
@@ -140,13 +124,54 @@ class Path extends Tree{
   }
 
   /**
+   * Looks up path based on subapp module object class name
+   *
+   * @param $class Full class path of the subapp
+   *
+   * @return $path URI path of the subapp
+   */
+  public static function findapp($class){
+    $path = false;
+    $db = new Db();
+    $q = (object)[
+      'command' => 'select',
+      'table' => 'paths',
+      'fields' => ['url_code', 'parent_id'],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $class, 'id' => 'app']
+        ]
+      ]
+    ];
+    $db->query($q);
+    if ($db->affected_rows > 0){
+      $path = $db->output[0]->url_code;
+      while ($db->output[0]->parent_id != 0){
+        $q = (object)[
+          'command' => 'select',
+          'table' => 'paths',
+          'fields' => ['url_code', 'parent_id'],
+          'where' => (object)[
+            'type' => 'and', 'items' => [
+              (object)['type' => '=', 'value' => $db->output[0]->parent_id, 'id' => 'id']
+            ]
+          ]
+        ];
+        $db->query($q);
+        $path = $db->output[0]->url_code . '/' . $path;
+      }
+    }
+    return $path;
+  }
+
+  /**
    * Processes permissions to content based on group and role
    *
    * @param User $user User object containing authentication information
    *
    * @return boolean $access Whether the user is allowed to access the location
    */
-  private function permissions($user){
+  public function permissions($user){
     //First, never ever lockout THE Admin user
     if ($user->id == 1){
       return true;
