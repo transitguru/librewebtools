@@ -254,7 +254,8 @@ Class Auth Extends \LWT\Subapp{
       echo '<h3>User Authentication Module</h3><p>Please select an option above</p>';
     }
     else{
-      $this->render_404();
+      echo "<h3>User Authentication Module<h3>\n";
+      echo "<p>The form is not found, please try an option above</p>";
     }
   }
 }

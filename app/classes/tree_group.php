@@ -65,33 +65,44 @@ class Group extends Tree{
   }
 
   /**
-   * Lists all groups in an array
+   * Lists all items in a nested array
    *
-   * @return array $list All groups as an array of objects
+   * @param int $parent_id Parent ID of items being searched (default null)
+   *
+   * @return array $list All group items as a nested array of objects
    */
-  public function list(){
+  public function list($parent_id = null){
     $db = new Db();
     $q = (object)[
       'command' => 'select',
       'table' => 'groups',
       'fields' => [],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $parent_id, 'parent_id' => 'id']
+        ]
+      ],
       'sort' => [
-        (object) ['id' => 'parent_id'],
         (object) ['id' => 'sortorder'],
         (object) ['id' => 'name'],
       ]
     ];
     $db->query($q);
     $list = [];
-    foreach($db->output as $record){
-      $list[]= (object)[
-        'id' => (int) $record->id,
-        'parent_id' => (int) $record->parent_id,
-        'sortorder' => (int) $record->sortorder,
-        'name' => $record->name,
-        'created' => $record->created,
-        'desc' => $record->desc,
-      ];
+    if ($db->affected_rows > 0){
+      foreach($db->output as $record){
+        $id = (int) $record->id;
+        $children = $this->list($record->id);
+        $list[] = (object)[
+          'id' => $id,
+          'parent_id' => (int) $record->parent_id,
+          'sortorder' => (int) $record->sortorder,
+          'name' => $record->name,
+          'created' => $record->created,
+          'desc' => $record->desc,
+          'children' => $children,
+        ];
+      }
     }
     return $list;
   }

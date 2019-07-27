@@ -38,6 +38,10 @@ Class Admin Extends \LWT\Subapp{
       $this->pathstring = '';
     }
 
+    // Prevent caching of the page
+    header('Pragma: ');
+    header('Cache-Control: ');
+
     // Route request based on path
     if ($this->pathstring == 'role'){
       if(isset($this->inputs->post->id) && 
@@ -360,8 +364,6 @@ Class Admin Extends \LWT\Subapp{
       http_response_code(404);
     }
     if (fnmatch('application/json*', $this->inputs->content_type)){
-      header('Pragma: ');
-      header('Cache-Control: ');
       header('Content-Type: application/json');
       if(is_object($this->form)){
         $json = $this->form->export_json();
@@ -392,14 +394,16 @@ Class Admin Extends \LWT\Subapp{
         echo $html;
       }
       else{
-        echo "No form found";
+        echo "<h3>Administration Module</h3>\n";
+        echo "<p>The form is not found, please try an option above</p>";
       }
     }
     elseif($this->pathstring == ''){
       echo '<h3>Administration Module</h3><p>Please select an option above</p>';
     }
     else{
-      $this->render_404();
+      echo "<h3>Administration Module</h3>\n";
+      echo "<p>The form is not found, please try an option above</p>";
     }
   }
 }

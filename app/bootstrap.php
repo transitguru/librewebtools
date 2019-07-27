@@ -114,7 +114,7 @@ while (fnmatch('*//*', $newuri)){
 while (fnmatch('*../*', $newuri)){
   $newuri = preg_replace('/\.\.\/+/', '/', $newuri);
 }
-while (strlen($uri) > 1 && substr($newuri, -1) == '/'){
+while (strlen($newuri) > 1 && substr($newuri, -1) == '/'){
   $newuri = substr($newuri, 0, -1);
 }
 
