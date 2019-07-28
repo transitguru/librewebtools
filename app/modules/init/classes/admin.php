@@ -146,13 +146,7 @@ Class Admin Extends \LWT\Subapp{
       else{
         $group_obj = new \LWT\Group(-1);
         $list = $group_obj->list();
-        $items = [];
-        foreach($list as $g){
-          $items[]= (object)[
-            'name' => $g->name,
-            'value' => $g->id,
-          ];
-        }
+        $items = $this->treeitems($list);
         $items[]= (object)[
           'name' => '(new group)',
           'value' => -1,
@@ -375,6 +369,28 @@ Class Admin Extends \LWT\Subapp{
       echo $json;
       exit;
     }
+  }
+
+  /**
+   * Helper to make items for select from hierarchical tree list
+   *
+   * @param Array $list List of items in hierarchical tree
+   * @param Array $items Running list of items to eventually return
+   * @param int $depth Depth of current list to aid in visual nesting
+   *
+   * @return Array $items Array of items to use for select element
+   */
+  private function treeitems($list, $items = [], $depth = 0){
+    $depth ++;
+    foreach($list as $g){
+      $name = str_repeat('-', $depth) . ' ' . $g->name;
+      $items[]= (object)[
+        'name' => $name,
+        'value' => $g->id,
+      ];
+      $items = $this->treeitems($g->children, $items, $depth);
+    }
+    return $items;
   }
 
   /**

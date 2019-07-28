@@ -79,7 +79,7 @@ class Group extends Tree{
       'fields' => [],
       'where' => (object)[
         'type' => 'and', 'items' => [
-          (object)['type' => '=', 'value' => $parent_id, 'parent_id' => 'id']
+          (object)['type' => '=', 'value' => $parent_id, 'id' => 'parent_id']
         ]
       ],
       'sort' => [
@@ -92,7 +92,7 @@ class Group extends Tree{
     if ($db->affected_rows > 0){
       foreach($db->output as $record){
         $id = (int) $record->id;
-        $children = $this->list($record->id);
+        $children = $this->list($id);
         $list[] = (object)[
           'id' => $id,
           'parent_id' => (int) $record->parent_id,
