@@ -90,11 +90,8 @@ class Path extends Tree{
     }
 
     // Check permissions
-    if (count($user->roles)>0){
-      $roles = $user->roles;
-    }
-    else{
-      $roles = [0];
+    if (count($user->roles)==0){
+      $user->roles = [0];
     }
     $this->access = $this->permissions($user);
     if ($this->access){
@@ -161,7 +158,7 @@ class Path extends Tree{
         $path = $db->output[0]->url_code . '/' . $path;
       }
     }
-    return $path;
+    return '/' . $path;
   }
 
   /**
