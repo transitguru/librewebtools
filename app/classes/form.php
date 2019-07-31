@@ -310,36 +310,70 @@ class Form{
           $html .= "  </select>\n";
         }
         elseif($f->element == 'radiogroup' && is_array($f->list) && count($f->list)>0){
-          $checkbox = 'radio';
+          $depth = 0;
           if ($f->multiple == true){
-            $checkbox = 'checkbox';
-            $bb = '[]';
+            $con = (object)[
+              'checkbox' => 'checkbox',
+              'bb' => '[]',
+              'i' => $i,
+            ];
           }
           else{
-            $bb = '';
+            $con = (object)[
+              'checkbox' => 'radio',
+              'bb' => '',
+              'i' => $i,
+            ];
           }
-          $html .= '  <fieldset class="choices">' . "\n";
-          $c = 0;
-          foreach ($f->list as $items){
-            $c ++;
-            $checked = '';
-            if (($f->multiple == true && is_array($f->value)
-                && in_array($items->value, $f->value))
-                || ($items->value == $f->value && $f->multiple == false)){
-              $checked = 'checked';
-            }
-            $html .= '    <input type="' . $checkbox . '" value="' . $items->value;
-            $html .= '" id="' . $i . 'choice' . $c . '" name="' . $f->name . $bb;
-            $html .= '" ' . $checked . " />\n";
-            $html .= '<label for="' . $i . 'choice' . $c . '">';
-            $html .= $items->name . "</label>\n";
-          }
-          $html .= "  </fieldset>\n";
+          $html .= '  <fieldset class="choices">' . "\n  <ul>";
+          $html .= $this->radio_tree($f, $f->list, $con, $depth);
+          $html .= "  </ul>\n  </fieldset>\n";
         }
       }
     }
     $html .= "</form>\n";
 
+    return $html;
+  }
+
+  /**
+   * Creates markup for nested tree of checkboxes or radios
+   *
+   * @param Object $f Field object currently being processed
+   * @param Array $list Field list that will be iterated upon
+   * @param Object $con Constants needed for proper rendering of HTML
+   * @param int $depth Depth of recursion
+   *
+   * @return string $html HTML that would be outputted to render the form
+   */
+  private function radio_tree($f, $list, $con, $depth){
+    $depth ++;
+    $c = 0;
+    $p = str_repeat('  ', $depth);
+    foreach ($list as $items){
+      $c ++;
+      if (($f->multiple == true && is_array($f->value)
+          && in_array($items->value, $f->value))
+          || ($items->value == $f->value && $f->multiple == false)){
+        $checked = 'checked';
+      }
+      else{
+        $checked = '';
+      }
+      $id = $con->i . 'd' . $depth . 'c' . $c;
+      $html .= $p . '    <li>';
+      $html .= $p . '    <input type="' . $con->checkbox . '" value="' . $items->value;
+      $html .= '" id="' . $id . '" name="' . $f->name . $con->bb;
+      $html .= '" ' . $checked . " />\n";
+      $html .= $p . '    <label for="' . $id . '">';
+      $html .= $items->name . "</label>\n";
+      if (isset($items->list) && is_array($items->list)){
+        $html .= $p . "    <ul>";
+        $html .= $this->radio_tree($f, $items->list, $con, $depth);
+        $html .= $p . "    </ul>";
+      }
+      $html .= $p . '    </li>';
+    }
     return $html;
   }
 }
