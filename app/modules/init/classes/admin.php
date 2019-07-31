@@ -241,12 +241,7 @@ Class Admin Extends \LWT\Subapp{
         // Make Group list
         $obj = new \LWT\Group(0);
         $l = $obj->list();
-        foreach($l as $v){
-          $this->form->fields->groups->list[] = (object)[
-            'name' => $v->name,
-            'value' => $v->id,
-          ];
-        }
+        $this->form->fields->groups->list = $this->treelist($l);
 
       }
       else{
@@ -391,6 +386,24 @@ Class Admin Extends \LWT\Subapp{
       $items = $this->treeitems($g->children, $items, $depth);
     }
     return $items;
+  }
+
+  private function treelist($items){
+    $list = [];
+    foreach($items as $v){
+      if (isset($v->children) && is_array($v->children)){
+        $children = $this->treelist($v->children);
+      }
+      else{
+        $children = [];
+      }
+      $list[] = (object)[
+        'name' => $v->name,
+        'value' => $v->id,
+        'list' => $children,
+      ];
+    }
+    return $list;
   }
 
   /**

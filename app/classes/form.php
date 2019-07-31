@@ -367,7 +367,7 @@ class Form{
       $html .= '" ' . $checked . " />\n";
       $html .= $p . '    <label for="' . $id . '">';
       $html .= $items->name . "</label>\n";
-      if (isset($items->list) && is_array($items->list)){
+      if (isset($items->list) && is_array($items->list) && count($items->list)>0){
         $html .= $p . "    <ul>";
         $html .= $this->radio_tree($f, $items->list, $con, $depth);
         $html .= $p . "    </ul>";
