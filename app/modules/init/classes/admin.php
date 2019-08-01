@@ -136,6 +136,7 @@ Class Admin Extends \LWT\Subapp{
         $this->form = new \LWT\Form($forms->group);
         if ($group_id == -1){
           $this->form->fields->submit1->value = 'Create';
+          unset($this->form->fields->submit2);
         }
         $this->form->fields->id->value = $group_obj->id;
         $this->form->fields->parent_id->value = $group_obj->parent_id;
@@ -250,7 +251,6 @@ Class Admin Extends \LWT\Subapp{
         $obj = new \LWT\Group(0);
         $l = $obj->list();
         $this->form->fields->groups->list = $this->treelist($l);
-
       }
       else{
         $user_obj = new \LWT\User(-1);

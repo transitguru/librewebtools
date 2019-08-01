@@ -139,8 +139,9 @@ class Group extends Tree{
    */
   public function write(){
     if($this->id === $this->parent_id){
+      $this->error = 99;
       $this->parent_id_unique = false;
-      $this->parent_id_message = 'The parent ID cannot equal the ID of this group (' . $this->id . ').';
+      $this->parent_id_message = 'The parent equal group (' . $this->name . ').';
       return;
     }
     $db = new Db();

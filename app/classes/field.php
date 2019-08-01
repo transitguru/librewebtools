@@ -209,7 +209,6 @@ class Field{
     }
   }
 
-
   /**
    * Tests the value for validity for database import and application safety
    *
@@ -253,6 +252,11 @@ class Field{
     }
   }
 
+  /**
+   * Helper to check values of fields
+   *
+   * @param mixed $value Value being checked
+   */
   private function check($value){
     //Individual values cannot be objects or arrays (yet)
     if(is_array($value) || is_object($value)){
@@ -412,7 +416,7 @@ class Field{
         if (!is_numeric($value) || fmod($value,1) != 0){
           $this->error = 61;
           $this->message = 'Invalid: Value is not an integer.';
-          return $value;
+          $value;
         }
       }
       elseif($format=='dec'){
@@ -484,7 +488,15 @@ class Field{
     //successful output
     $this->error = 0;
     $this->message = '';
-    return $value;
+    if ($format=='int'){
+      return (int) $value;
+    }
+    elseif ($format=='int'){
+      return (double) $value;
+    }
+    else{
+      return $value;
+    }
   }
 
   /**
