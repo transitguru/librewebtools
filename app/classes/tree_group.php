@@ -41,10 +41,10 @@ class Group extends Tree{
       ];
       $db->query($q);
       if ($db->affected_rows == 1){
-        $this->id = $db->output[0]->id;
-        $this->parent_id = $db->output[0]->parent_id;
+        $this->id = (int) $db->output[0]->id;
+        $this->parent_id = (int) $db->output[0]->parent_id;
         $this->name = $db->output[0]->name;
-        $this->sortorder = $db->output[0]->sortorder;
+        $this->sortorder = (int) $db->output[0]->sortorder;
         $this->created = $db->output[0]->created;
         $this->desc = $db->output[0]->desc;
         $this->error = 0;
@@ -91,11 +91,17 @@ class Group extends Tree{
     $list = [];
     if ($db->affected_rows > 0){
       foreach($db->output as $record){
+        if (is_null($record->parent_id)){
+          $pid = null;
+        }
+        else{
+          $pid = (int) $record->parent_id;
+        }
         $id = (int) $record->id;
         $children = $this->list($id);
         $list[] = (object)[
           'id' => $id,
-          'parent_id' => (int) $record->parent_id,
+          'parent_id' => $pid,
           'sortorder' => (int) $record->sortorder,
           'name' => $record->name,
           'created' => $record->created,
@@ -129,6 +135,9 @@ class Group extends Tree{
    */
   public function write(){
     $db = new Db();
+    if ($this->id == 0){
+      $this->parent_id = null;
+    }
     $q = (object)[
       'table' => $this->table,
       'inputs' => (object)[
