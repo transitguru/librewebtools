@@ -316,6 +316,7 @@ class Form{
               'checkbox' => 'checkbox',
               'bb' => '[]',
               'i' => $i,
+              'c' => 0,
             ];
           }
           else{
@@ -323,10 +324,13 @@ class Form{
               'checkbox' => 'radio',
               'bb' => '',
               'i' => $i,
+              'c' => 0,
             ];
           }
-          $html .= '  <fieldset class="choices">' . "\n  <ul>";
-          $html .= $this->radio_tree($f, $f->list, $con, $depth);
+          $o = $this->radio_tree($f, $f->list, $con, $depth);
+          $html .= '  <fieldset class="choices">' . "\n";
+          $html .= '  <ul id="childof' . $con->i . 'choice' . $con->c .'">' . "\n";
+          $html .= $o->html;
           $html .= "  </ul>\n  </fieldset>\n";
         }
       }
@@ -344,14 +348,14 @@ class Form{
    * @param Object $con Constants needed for proper rendering of HTML
    * @param int $depth Depth of recursion
    *
-   * @return string $html HTML that would be outputted to render the form
+   * @return Object $output HTML and id number needed for rendering
    */
   private function radio_tree($f, $list, $con, $depth){
     $depth ++;
-    $c = 0;
+    $html = '';
     $p = str_repeat('  ', $depth);
     foreach ($list as $items){
-      $c ++;
+      $con->c ++;
       if (($f->multiple == true && is_array($f->value)
           && in_array($items->value, $f->value))
           || ($items->value == $f->value && $f->multiple == false)){
@@ -360,7 +364,7 @@ class Form{
       else{
         $checked = '';
       }
-      $id = $con->i . 'd' . $depth . 'c' . $c;
+      $id = $con->i . 'choice' . $con->c;
       $html .= $p . '    <li>';
       $html .= $p . '    <input type="' . $con->checkbox . '" value="' . $items->value;
       $html .= '" id="' . $id . '" name="' . $f->name . $con->bb;
@@ -368,13 +372,16 @@ class Form{
       $html .= $p . '    <label for="' . $id . '">';
       $html .= $items->name . "</label>\n";
       if (isset($items->list) && is_array($items->list) && count($items->list)>0){
-        $html .= $p . "    <ul>";
-        $html .= $this->radio_tree($f, $items->list, $con, $depth);
-        $html .= $p . "    </ul>";
+        $o = $this->radio_tree($f, $items->list, $con, $depth);
+        $html .= $p . '    <ul id="childof' . $id . '">';
+        $html .= $o->html;
+        $html .= $p . '    </ul>';
+        $con->c = $o->c;
       }
       $html .= $p . '    </li>';
     }
-    return $html;
+    $output = (object) ['html' => $html, 'c' => $con->c];
+    return $output;
   }
 }
 
