@@ -229,14 +229,14 @@ Class Auth Extends \LWT\Subapp{
    * Runs while inside the template, usually rendering some HTML
    */
   public function render(){
-    echo '<a href="' . BASE_URI . $this->path->root . 'profile">Profile</a>&nbsp;&nbsp;';
-    echo '<a href="' . BASE_URI . $this->path->root . 'password">Password</a>&nbsp;&nbsp;';
-    echo '<a href="' . BASE_URI . $this->path->root . 'logout">Logout</a>&nbsp;&nbsp;';
+    echo '<a href="' . BASE_URI . $this->path->root . 'profile">Profile</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . 'password">Password</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . 'logout">Logout</a>&nbsp;&nbsp;' . "\n";
     $user_obj = new \LWT\User($this->session->user_id);
     $admin_path = \LWT\Path::findapp("\\LWT\\Modules\\Init\\Admin");
     $admin_area = new \LWT\Path($admin_path, $user_obj);
     if (mb_strlen($admin_area->root) > 1 && isset($admin_area->http_status) && $admin_area->http_status == 200){
-      echo '<a href="' . BASE_URI . $admin_area->root . '">Administration</a>&nbsp;&nbsp;';
+      echo '<a href="' . BASE_URI . $admin_area->root . '">Administration</a>&nbsp;&nbsp;' . "\n";
     }
     if (in_array($this->pathstring,$this->valid_paths)){
       if (is_object($this->form)){

@@ -144,7 +144,8 @@ Class Admin Extends \LWT\Subapp{
         $this->form->fields->desc->value = $group_obj->desc;
         // Make Group list
         $l = $group_obj->list();
-        $this->form->fields->parent_id->list = $this->treelist($l);
+        $ids = $group_obj->children($group_obj->id);
+        $this->form->fields->parent_id->list = $this->treelist($l, $ids);
       }
       else{
         $group_obj = new \LWT\Group(-1);
@@ -397,21 +398,27 @@ Class Admin Extends \LWT\Subapp{
    * @param Array $items Items that are being processed at that certain level
    *
    * @return Array $list List to be displayed at a particular level
+   * @return Array $ids IDs to disable (defaults to empty array)
    */
-  private function treelist($items){
+  private function treelist($items, $ids = []){
     $list = [];
     foreach($items as $v){
       if (isset($v->children) && is_array($v->children)){
-        $children = $this->treelist($v->children);
+        $children = $this->treelist($v->children, $ids);
       }
       else{
         $children = [];
       }
-      $list[] = (object)[
+      $obj = (object)[
         'name' => $v->name,
         'value' => $v->id,
         'list' => $children,
       ];
+      if (in_array($v->id, $ids, true)){
+        $obj->nope = true;
+      }
+
+      $list[] = $obj;
     }
     return $list;
   }
@@ -420,13 +427,13 @@ Class Admin Extends \LWT\Subapp{
    * Runs while inside the template, usually rendering some HTML
    */
   public function render(){
-    echo '<a href="' . BASE_URI . $this->path->root . 'user">Users</a>&nbsp;&nbsp;';
-    echo '<a href="' . BASE_URI . $this->path->root . 'role">Roles</a>&nbsp;&nbsp;';
-    echo '<a href="' . BASE_URI . $this->path->root . 'group">Groups</a>&nbsp;&nbsp;';
-    echo '<a href="' . BASE_URI . $this->path->root . 'path">Paths</a>&nbsp;&nbsp;';
-    echo '<a href="' . BASE_URI . $this->path->root . 'module">Modules</a>&nbsp;&nbsp;';
-    echo '<a href="' . BASE_URI . $this->path->root . 'menu">Menus</a>&nbsp;&nbsp;';
-    echo '<a href="' . BASE_URI . $this->path->root . 'file">Files</a>&nbsp;&nbsp;';
+    echo '<a href="' . BASE_URI . $this->path->root . 'user">Users</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . 'role">Roles</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . 'group">Groups</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . 'path">Paths</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . 'module">Modules</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . 'menu">Menus</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . 'file">Files</a>&nbsp;&nbsp;' . "\n";
     if (in_array($this->pathstring,$this->valid_paths)){
       if (is_object($this->form)){
         $html = $this->form->export_html();

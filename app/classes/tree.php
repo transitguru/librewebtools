@@ -87,9 +87,10 @@ class Tree{
    *
    * @param int $parent Parent ID to find the children
    * @param array $ids Array of IDs that are available to keep appending
+   *
    * @return array Array of IDs (this gets appended to the input)
    */
-  public function children($parent, $ids){
+  public function children($parent, $ids = []){
     $ids[] = $parent;
     $db = new Db();
     $q = (object)[

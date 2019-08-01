@@ -363,12 +363,18 @@ class Form{
       else{
         $checked = '';
       }
+      if (isset($items->nope) && $items->nope == true){
+        $disabled = 'disabled';
+      }
+      else{
+        $disabled = '';
+      }
       $id = $con->i . 'choice' . $con->c;
       $html .= $p . "    <li>\n";
       $html .= $p . '    <input type="' . $con->checkbox . '" value="' . $items->value;
       $html .= '" id="' . $id . '" name="' . $f->name . $con->bb;
-      $html .= '" ' . $checked . " />\n";
-      $html .= $p . '    <label for="' . $id . '">';
+      $html .= '" ' . $checked . ' ' . $disabled . " />\n";
+      $html .= $p . '    <label for="' . $id . '" class="' . $disabled . '">';
       $html .= $items->name . "</label>\n";
       if (isset($items->list) && is_array($items->list) && count($items->list)>0){
         $o = $this->radio_tree($f, $items->list, $con, $depth);
