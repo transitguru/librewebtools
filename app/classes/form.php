@@ -300,8 +300,8 @@ class Form{
           foreach ($f->list as $items){
             $checked = '';
             if (($f->multiple == true && is_array($f->value)
-                && in_array($items->value, $f->value))
-                || ($items->value == $f->value && $f->multiple == false)){
+                && in_array($items->value, $f->value, true))
+                || ($items->value === $f->value && $f->multiple == false)){
               $checked = 'selected';
             }
             $html .= '    <option value="' . $items->value . '" ' . $checked . ' >';
@@ -356,8 +356,8 @@ class Form{
     foreach ($list as $items){
       $con->c ++;
       if (($f->multiple == true && is_array($f->value)
-          && in_array($items->value, $f->value))
-          || ($items->value == $f->value && $f->multiple == false)){
+          && in_array($items->value, $f->value, true))
+          || ($items->value === $f->value && $f->multiple == false)){
         $checked = 'checked';
       }
       else{
