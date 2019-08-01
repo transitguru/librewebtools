@@ -132,8 +132,8 @@ Class Admin Extends \LWT\Subapp{
       if(isset($this->inputs->post->id) && 
           (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Close')){
         $group_id = (int) $this->inputs->post->id;
-        $group_obj = new \LWT\Role($group_id);
-        $this->form = new \LWT\Form($forms-group);
+        $group_obj = new \LWT\Group($group_id);
+        $this->form = new \LWT\Form($forms->group);
         if ($group_id == -1){
           $this->form->fields->submit1->value = 'Create';
         }
@@ -142,6 +142,9 @@ Class Admin Extends \LWT\Subapp{
         $this->form->fields->name->value = $group_obj->name;
         $this->form->fields->sortorder->value = $group_obj->sortorder;
         $this->form->fields->desc->value = $group_obj->desc;
+        // Make Group list
+        $l = $group_obj->list();
+        $this->form->fields->parent_id->list = $this->treelist($l);
       }
       else{
         $group_obj = new \LWT\Group(-1);
@@ -388,6 +391,13 @@ Class Admin Extends \LWT\Subapp{
     return $items;
   }
 
+  /**
+   * Recursively makes list for nested radio lists
+   *
+   * @param Array $items Items that are being processed at that certain level
+   *
+   * @return Array $list List to be displayed at a particular level
+   */
   private function treelist($items){
     $list = [];
     foreach($items as $v){
