@@ -327,11 +327,10 @@ class Form{
               'c' => 0,
             ];
           }
-          $o = $this->radio_tree($f, $f->list, $con, $depth);
           $html .= '  <fieldset class="choices">' . "\n";
-          $html .= '  <ul id="childof' . $con->i . 'choice' . $con->c .'">' . "\n";
-          $html .= $o->html;
-          $html .= "  </ul>\n  </fieldset>\n";
+          $html .= '    <ul id="childof' . $con->i . 'choice' . $con->c .'">' . "\n";
+          $html .= $this->radio_tree($f, $f->list, $con, $depth)->html;
+          $html .= "    </ul>\n  </fieldset>\n";
         }
       }
     }
@@ -365,7 +364,7 @@ class Form{
         $checked = '';
       }
       $id = $con->i . 'choice' . $con->c;
-      $html .= $p . '    <li>';
+      $html .= $p . "    <li>\n";
       $html .= $p . '    <input type="' . $con->checkbox . '" value="' . $items->value;
       $html .= '" id="' . $id . '" name="' . $f->name . $con->bb;
       $html .= '" ' . $checked . " />\n";
@@ -373,15 +372,14 @@ class Form{
       $html .= $items->name . "</label>\n";
       if (isset($items->list) && is_array($items->list) && count($items->list)>0){
         $o = $this->radio_tree($f, $items->list, $con, $depth);
-        $html .= $p . '    <ul id="childof' . $id . '">';
-        $html .= $o->html;
-        $html .= $p . '    </ul>';
         $con->c = $o->c;
+        $html .= $p . '    <ul id="childof' . $id . '">' . "\n";
+        $html .= $o->html;
+        $html .= $p . "    </ul>\n";
       }
-      $html .= $p . '    </li>';
+      $html .= $p . "    </li>\n";
     }
-    $output = (object) ['html' => $html, 'c' => $con->c];
-    return $output;
+    return (object) ['html' => $html, 'c' => $con->c];
   }
 }
 
