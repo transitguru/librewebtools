@@ -185,6 +185,10 @@ Class Admin Extends \LWT\Subapp{
               $this->form->fields->name->error = 99;
               $this->form->fields->name->message = $group_obj->name_message;
             }
+            if ($group_obj->parent_id_unique == false){
+              $this->form->fields->parent_id->error = 99;
+              $this->form->fields->parent_id->message = $group_obj->parent_id_message;
+            }
             if($this->inputs->post->submit == 'Create' && $this->form->error == 0){
               $this->form->fields->id->value = $group_obj->id;
               $this->form->fields->submit1->value = 'Update';

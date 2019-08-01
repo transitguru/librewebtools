@@ -23,6 +23,10 @@ class Group extends Tree{
   public $desc = '';        /**< Description */
   public $error = 0;        /**< Error number */
   public $message = '';     /**< Message for error reporting */
+  public $name_unique = true;       /**< Flag to show if the name is unique */
+  public $parent_id_unique = true;  /**< Flag to show if the parent_id is unique */
+  public $name_message = '';        /**< Message for error in name unique */
+  public $parent_id_message = '';   /**< Message for error in parent_id unique */
 
 
   public function __construct($id = 0){
@@ -134,6 +138,11 @@ class Group extends Tree{
    *
    */
   public function write(){
+    if($this->id === $this->parent_id){
+      $this->parent_id_unique = false;
+      $this->parent_id_message = 'The parent ID cannot equal the ID of this group (' . $this->id . ').';
+      return;
+    }
     $db = new Db();
     if ($this->id == 0){
       $this->parent_id = null;
@@ -147,6 +156,31 @@ class Group extends Tree{
         'desc' => $this->desc,
       ],
     ];
+
+    /** Query object for testing for duplicate keys */
+    $t = (object)[
+      'table' => 'groups',
+      'command' => 'select',
+      'fields' => [],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $this->name, 'id' => 'name', 'cs' => false],
+          (object)['type' => '<>', 'value' => $this->id, 'id' => 'id']
+        ]
+      ]
+    ];
+    $db->query($t);
+    if ($db->affected_rows > 0){
+      $this->error = 99;
+      $this->message = 'The marked values below are already taken';
+      foreach($db->output as $field){
+        if($this->name == $field->name){
+          $this->name_unique = false;
+          $this->name_message = 'The name "' . $this->name . '" is already taken by another group.';
+        }
+      }
+      return;
+    }
     if ($this->id >= 0){
       $q->command = 'update';
       $q->where = (object)[
