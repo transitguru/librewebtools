@@ -214,7 +214,7 @@ class Group extends Tree{
    * Deletes the record, then clears the object
    */
   public function delete(){
-    if ($this->id >= 0){
+    if ($this->id > 2){
       $db = new Db();
       $q = (object)[
         'command' => 'delete',
@@ -231,6 +231,10 @@ class Group extends Tree{
       }
       $this->error = $db->error;
       $this->message = $db->message;
+    }
+    else{
+      $this->error = 99;
+      $this->message = 'You cannot delete the core group "' . $this->name . '".';
     }
   }
 }

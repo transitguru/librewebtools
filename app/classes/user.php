@@ -526,7 +526,7 @@ class User{
    * Deletes the record, then clears the object
    */
   public function delete(){
-    if ($this->id > 0){
+    if ($this->id > 1){
       $db = new Db();
       $q = (object)[
         'command' => 'delete',
@@ -547,6 +547,10 @@ class User{
         $this->error = 0;
         $this->message = 'User successfully deleted.';
       }
+    }
+    else{
+      $this->error = 99;
+      $this->message = 'You cannot delete the root user "' . $this->login . '".';
     }
   }
 }
