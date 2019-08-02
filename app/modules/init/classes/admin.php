@@ -180,6 +180,11 @@ Class Admin Extends \LWT\Subapp{
             $group_obj->sortorder = $this->form->fields->sortorder->value;
             $group_obj->desc = $this->form->fields->desc->value;
             $group_obj->write();
+            // Reload Group list
+            $l = $group_obj->list();
+            $ids = $group_obj->children($group_obj->id);
+            $this->form->fields->parent_id->list = $this->treelist($l, $ids);
+            // Show errors
             $this->form->error = $group_obj->error;
             $this->form->message = $group_obj->message;
             if ($group_obj->name_unique == false){
