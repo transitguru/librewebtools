@@ -46,7 +46,12 @@ class Group extends Tree{
       $db->query($q);
       if ($db->affected_rows == 1){
         $this->id = (int) $db->output[0]->id;
-        $this->parent_id = (int) $db->output[0]->parent_id;
+        if (is_null($db->output[0]->parent_id)){
+          $this->parent_id = null;
+        }
+        else{
+          $this->parent_id = (int) $db->output[0]->parent_id;
+        }
         $this->name = $db->output[0]->name;
         $this->sortorder = (int) $db->output[0]->sortorder;
         $this->created = $db->output[0]->created;
@@ -141,7 +146,7 @@ class Group extends Tree{
     if($this->id === $this->parent_id){
       $this->error = 99;
       $this->parent_id_unique = false;
-      $this->parent_id_message = 'The parent equal group (' . $this->name . ').';
+      $this->parent_id_message = 'The parent cannot equal group (' . $this->name . ').';
       return;
     }
     $db = new Db();

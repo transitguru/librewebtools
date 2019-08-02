@@ -134,6 +134,9 @@ Class Admin Extends \LWT\Subapp{
         $group_id = (int) $this->inputs->post->id;
         $group_obj = new \LWT\Group($group_id);
         $this->form = new \LWT\Form($forms->group);
+        if ($group_obj->id == 0){
+          $this->form->fields->parent_id->required = false;
+        }
         if ($group_id == -1){
           $this->form->fields->submit1->value = 'Create';
           unset($this->form->fields->submit2);

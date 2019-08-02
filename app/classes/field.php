@@ -25,7 +25,7 @@ class Field{
   public $styles = [];       /**< Object of CSS styles */
   public $tabindex = 0;      /**< If non-zero, special rules for tab index */
   public $list = [];         /**< Array of list items to put in list type elements */
-  public $value = '';        /**< value to be validated */
+  public $value = null;      /**< value to be validated */
   public $multiple = false;  /**< set to true to accept an array of values */
 
   /**
@@ -266,7 +266,7 @@ class Field{
     }
 
     //handle trimming
-    if ($this->trim){
+    if ($this->trim && !is_null($value)){
       $value = trim($value);
     }
 
@@ -488,10 +488,10 @@ class Field{
     //successful output
     $this->error = 0;
     $this->message = '';
-    if ($format=='int'){
+    if ($format=='int' && !is_null($value)){
       return (int) $value;
     }
-    elseif ($format=='int'){
+    elseif ($format=='dec' && !is_null($value)){
       return (double) $value;
     }
     else{
