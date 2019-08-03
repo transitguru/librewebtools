@@ -109,10 +109,10 @@ Class Admin Extends \LWT\Subapp{
         elseif($this->inputs->post->submit == 'Delete'){
           $this->form->message = 'Are you sure you want to delete this Role?';
           $this->form->status = 'warning';
-          $this->form->fields->submit1->value = 'Yes, Delete';
-          $this->form->fields->submit2->value = 'No';
+          $this->form->fields->submit1->value = 'Yes';
+          $this->form->fields->submit2->value = 'Cancel';
         }
-        elseif($this->inputs->post->submit == 'Yes, Delete'){
+        elseif($this->inputs->post->submit == 'Yes'){
           $role_obj->delete();
           $this->form->message = 'Role deleted successfully';
           $this->form->status = 'success';
@@ -207,10 +207,10 @@ Class Admin Extends \LWT\Subapp{
         elseif($this->inputs->post->submit == 'Delete'){
           $this->form->message = 'Are you sure you want to delete this Group?';
           $this->form->status = 'warning';
-          $this->form->fields->submit1->value = 'Yes, Delete';
-          $this->form->fields->submit2->value = 'No';
+          $this->form->fields->submit1->value = 'Yes';
+          $this->form->fields->submit2->value = 'Cancel';
         }
-        elseif($this->inputs->post->submit == 'Yes, Delete'){
+        elseif($this->inputs->post->submit == 'Yes'){
           $group_obj->delete();
           $this->form->message = 'Role deleted successfully';
           $this->form->status = 'success';
@@ -326,16 +326,24 @@ Class Admin Extends \LWT\Subapp{
             if($this->inputs->post->submit == 'Create' && $this->form->error == 0){
               $this->form->fields->id->value = $user_obj->id;
               $this->form->fields->submit1->value = 'Update';
+              $user_obj->setpassword();
+              $mail = $user_obj->resetpassword($user_obj->email);
+              $this->form->message .= '  The password reset code for the user is <em>' . $mail->reset_code . '</em>';
+            }
+            elseif($this->form->error == 0 && $this->form->fields->reset->value == 1){
+              $user_obj->setpassword();
+              $mail = $user_obj->resetpassword($user_obj->email);
+              $this->form->message = 'The password reset code for the user is <em>' . $mail->reset_code . '</em>';
             }
           }
         }
         elseif($this->inputs->post->submit == 'Delete'){
           $this->form->message = 'Are you sure you want to delete this User?';
           $this->form->status = 'warning';
-          $this->form->fields->submit1->value = 'Yes, Delete';
-          $this->form->fields->submit2->value = 'No';
+          $this->form->fields->submit1->value = 'Yes';
+          $this->form->fields->submit2->value = 'Cancel';
         }
-        elseif($this->inputs->post->submit == 'Yes, Delete'){
+        elseif($this->inputs->post->submit == 'Yes'){
           $user_obj->delete();
           $this->form->message = 'User deleted successfully';
           $this->form->status = 'success';
