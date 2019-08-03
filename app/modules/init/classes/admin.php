@@ -114,11 +114,15 @@ Class Admin Extends \LWT\Subapp{
         }
         elseif($this->inputs->post->submit == 'Yes'){
           $role_obj->delete();
-          $this->form->message = 'Role deleted successfully';
-          $this->form->status = 'success';
-          foreach ($this->form->fields as $key => $field){
-            if ($key != 'submit3'){
-              unset($this->form->fields->{$key});
+          $this->form->error = $role_obj->error;
+          $this->form->message = $role_obj->message;
+          if($this->form->error == 0){
+            $this->form->message = 'Role deleted successfully';
+            $this->form->status = 'success';
+            foreach ($this->form->fields as $key => $field){
+              if ($key != 'submit3'){
+                unset($this->form->fields->{$key});
+              }
             }
           }
         }
@@ -212,11 +216,15 @@ Class Admin Extends \LWT\Subapp{
         }
         elseif($this->inputs->post->submit == 'Yes'){
           $group_obj->delete();
-          $this->form->message = 'Role deleted successfully';
-          $this->form->status = 'success';
-          foreach ($this->form->fields as $key => $field){
-            if ($key != 'submit3'){
-              unset($this->form->fields->{$key});
+          $this->form->error = $group_obj->error;
+          $this->form->message = $group_obj->message;
+          if ($this->form->error == 0){
+            $this->form->message = 'Group deleted successfully';
+            $this->form->status = 'success';
+            foreach ($this->form->fields as $key => $field){
+              if ($key != 'submit3'){
+                unset($this->form->fields->{$key});
+              }
             }
           }
         }
@@ -345,11 +353,15 @@ Class Admin Extends \LWT\Subapp{
         }
         elseif($this->inputs->post->submit == 'Yes'){
           $user_obj->delete();
-          $this->form->message = 'User deleted successfully';
-          $this->form->status = 'success';
-          foreach ($this->form->fields as $key => $field){
-            if ($key != 'submit3'){
-              unset($this->form->fields->{$key});
+          $this->form->error = $user_obj->error;
+          $this->form->message = $user_obj->message;
+          if ($this->form->error == 0){
+            $this->form->message = 'User deleted successfully';
+            $this->form->status = 'success';
+            foreach ($this->form->fields as $key => $field){
+              if ($key != 'submit3'){
+                unset($this->form->fields->{$key});
+              }
             }
           }
         }
