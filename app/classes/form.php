@@ -29,9 +29,8 @@ class Form{
   public $error = 0;         /**< int error number based on validation */
   public $status = null;     /**< Message status matching css error classes */
 
-  /** Permissible types for input element in this implementation */
-  private $input_types = ['button','radio','checkbox','file','password',
-      'submit','text','hidden'];
+  /** Permissible types for standard input element in this implementation */
+  private $input_types = ['button','file','password','submit','text','hidden'];
 
   /** Permissible statuses for message bar css class */
   private $statuses = ['success', 'warning', 'error'];
@@ -288,12 +287,24 @@ class Form{
           $maxlength = '';
         }
         if (in_array($f->element, $this->input_types)){
-          $html .= '  <input class="' . $class . '" type="' . $f->element . '" value="' . 
-            $f->value . '" id="' . $i . '" name="' . $f->name . '" ' . $maxlength . " />\n";
+          $html .= '  <input class="' . $class . '" type="' . $f->element;
+          $html .=  '" value="' . $f->value . '" id="' . $i . '" name="';
+          $html .= $f->name . '" ' . $maxlength . " />\n";
+        }
+        elseif($f->element == 'checkbox'){
+          if (!is_null($f->default) && $f->value === $f->default){
+            $checked = 'checked';
+          }
+          else{
+            $checked = '';
+          }
+          $html .= '  <input class="' . $class . '" type="' . $f->element;
+          $html .=  '" value="' . $f->default . '" id="' . $i . '" name="';
+          $html .= $f->name . '" ' . $checked . " />\n";
         }
         elseif($f->element == 'textarea'){
-          $html .= '  <textarea class="' . $class . '" name="' . $f->name . '" ' . 
-            $maxlength . ' id="' . $i . '" >' . $f->value . "</textarea>\n";
+          $html .= '  <textarea class="' . $class . '" name="' . $f->name . '" ';
+          $html .=  $maxlength . ' id="' . $i . '" >' . $f->value . "</textarea>\n";
         }
         elseif($f->element == 'select' && is_array($f->list) && count($f->list)>0){
           $html .= '  <select class="' . $class . '" name="' . $f->name . "\">\n";
@@ -326,7 +337,7 @@ class Form{
               'c' => 0,
             ];
           }
-          $html .= '  <fieldset class="choices">' . "\n";
+          $html .= '  <fieldset class="choices ' . $class . '">' . "\n";
           $html .= '    <ul id="childof' . $con->i . 'choice' . $con->c .'">' . "\n";
           $html .= $this->radio_tree($f, $f->list, $con, $depth)->html;
           $html .= "    </ul>\n  </fieldset>\n";

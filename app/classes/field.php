@@ -25,6 +25,7 @@ class Field{
   public $styles = [];       /**< Object of CSS styles */
   public $tabindex = 0;      /**< If non-zero, special rules for tab index */
   public $list = [];         /**< Array of list items to put in list type elements */
+  public $default = null;    /**< Default value if used as a simple checkbox */
   public $value = null;      /**< value to be validated */
   public $multiple = false;  /**< set to true to accept an array of values */
 
@@ -95,6 +96,7 @@ class Field{
    *       (object) ['name' => 'Ohio', 'value' => 'OH'],
    *       (object) ['name' => 'West Virginia', 'value' => 'WV'],
    *     ],
+   *     'default' => 'some_default_for_checkbox',
    *     'value' => 'some_value_to_test',
    *     'multiple' => false,
    *     'format' => 'nowacky',
@@ -158,6 +160,9 @@ class Field{
           $this->list[] = $items;
         }
       }
+    }
+    if (isset($defs->default)){
+      $this->default = $defs->default;
     }
     if (isset($defs->value)){
       $this->value = $defs->value;
@@ -531,6 +536,7 @@ class Field{
     if (count($this->list)>0){
       $form->list = $this->list;
     }
+    $form->default = $this->default;
     $form->value = $this->value;
     $form->multiple = $this->multiple;
     $form->message = $this->message;
