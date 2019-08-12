@@ -30,7 +30,7 @@ Class Admin Extends \LWT\Subapp{
     $this->form = null;
 
     // Process the path
-    $begin = mb_strlen($this->path->root);
+    $begin = mb_strlen($this->path->root) + 1;
     if (mb_strlen($this->inputs->uri) > $begin){
       $this->pathstring = mb_substr($this->inputs->uri, $begin);
     }
@@ -588,13 +588,13 @@ Class Admin Extends \LWT\Subapp{
    * Runs while inside the template, usually rendering some HTML
    */
   public function render(){
-    echo '<a href="' . BASE_URI . $this->path->root . 'user">Users</a>&nbsp;&nbsp;' . "\n";
-    echo '<a href="' . BASE_URI . $this->path->root . 'role">Roles</a>&nbsp;&nbsp;' . "\n";
-    echo '<a href="' . BASE_URI . $this->path->root . 'group">Groups</a>&nbsp;&nbsp;' . "\n";
-    echo '<a href="' . BASE_URI . $this->path->root . 'path">Paths</a>&nbsp;&nbsp;' . "\n";
-    echo '<a href="' . BASE_URI . $this->path->root . 'module">Modules</a>&nbsp;&nbsp;' . "\n";
-    echo '<a href="' . BASE_URI . $this->path->root . 'menu">Menus</a>&nbsp;&nbsp;' . "\n";
-    echo '<a href="' . BASE_URI . $this->path->root . 'file">Files</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . '/user">Users</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . '/role">Roles</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . '/group">Groups</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . '/path">Paths</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . '/module">Modules</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . '/menu">Menus</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . '/file">Files</a>&nbsp;&nbsp;' . "\n";
     if (in_array($this->pathstring,$this->valid_paths)){
       if (is_object($this->form)){
         $html = $this->form->export_html();

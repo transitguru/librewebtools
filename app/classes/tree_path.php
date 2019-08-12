@@ -77,7 +77,7 @@ class Path extends Tree{
         $db->query($q);
         $path = $db->output[0]->url_code . '/' . $path;
       }
-      $this->root = '/' . $path . '/';
+      $this->root = '/' . $path;
 
       //Find Roles
       $q = (object)[
@@ -159,7 +159,7 @@ class Path extends Tree{
         $q = (object)[
           'command' => 'select',
           'table' => 'paths',
-          'fields' => [],
+          'fields' => ['id','app'],
         ];
         if ($i == 0){
           $q->where = (object)[
@@ -181,6 +181,7 @@ class Path extends Tree{
         }
         if ($db->affected_rows > 0){
           $this->id = (int) $db->output[0]->id;
+          $this->app = $db->output[0]->app;
         }
         else{
           $this->id = null;
@@ -240,8 +241,7 @@ class Path extends Tree{
         ]
       ],
       'sort' => [
-        (object) ['id' => 'sortorder'],
-        (object) ['id' => 'title'],
+        (object) ['id' => 'url_code'],
       ]
     ];
     $db->query($q);
@@ -262,6 +262,7 @@ class Path extends Tree{
           'user_id' => (int) $record->user_id,
           'module_id' => (int) $record->module_id,
           'url_code' => $record->url_code,
+          'name' => $record->url_code,
           'title' => $record->title,
           'app' => $record->app,
           'core' => (int) $record->core,

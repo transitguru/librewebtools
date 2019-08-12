@@ -30,7 +30,7 @@ Class Auth Extends \LWT\Subapp{
     $this->form = null;
 
     // Process the path
-    $begin = mb_strlen($this->path->root);
+    $begin = mb_strlen($this->path->root) + 1;
     if (mb_strlen($this->inputs->uri) > $begin){
       $this->pathstring = mb_substr($this->inputs->uri, $begin);
     }
@@ -41,7 +41,7 @@ Class Auth Extends \LWT\Subapp{
     //Forward request to login if not proper path for unlogged user
     if (!in_array($this->pathstring, ['login', 'forgot']) &&
         !fnmatch('reset/*', $this->pathstring) && $this->session->user_id <= 0){
-      header('Location: ' . BASE_URI . $this->path->root . 'login');
+      header('Location: ' . BASE_URI . $this->path->root . '/login');
       exit;
     }
 
@@ -85,7 +85,7 @@ Class Auth Extends \LWT\Subapp{
           $user_obj = new \LWT\User($this->session->user_id);
           $mail = $user_obj->resetpassword($this->inputs->post->email);
           if ($mail->status == 0){
-            $resetpath =  BASE_URI . $this->path->root . 'reset/' . $mail->reset_code;
+            $resetpath =  BASE_URI . $this->path->root . '/reset/' . $mail->reset_code;
             $headers = "From: LibreWebTools <noreply@" . HOSTNAME . ">\r\n";
             $headers .= "Content-Type: text/plain; charset=utf-8";
             $message = "Username: " . $mail->login . "\r\n";
@@ -118,7 +118,7 @@ Class Auth Extends \LWT\Subapp{
             $login = $user_obj->login;
             if ($this->inputs->post->new == $this->inputs->post->confirm){
               $user_obj->setpassword($this->inputs->post->new);
-              header('Location: ' . BASE_URI . $this->path->root . 'profile');
+              header('Location: ' . BASE_URI . $this->path->root . '/profile');
               exit;
             }
             else{
@@ -229,12 +229,13 @@ Class Auth Extends \LWT\Subapp{
    * Runs while inside the template, usually rendering some HTML
    */
   public function render(){
-    echo '<a href="' . BASE_URI . $this->path->root . 'profile">Profile</a>&nbsp;&nbsp;' . "\n";
-    echo '<a href="' . BASE_URI . $this->path->root . 'password">Password</a>&nbsp;&nbsp;' . "\n";
-    echo '<a href="' . BASE_URI . $this->path->root . 'logout">Logout</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . '/profile">Profile</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . '/password">Password</a>&nbsp;&nbsp;' . "\n";
+    echo '<a href="' . BASE_URI . $this->path->root . '/logout">Logout</a>&nbsp;&nbsp;' . "\n";
     $user_obj = new \LWT\User($this->session->user_id);
     $admin_path = \LWT\Path::findapp("\\LWT\\Modules\\Init\\Admin");
-    $admin_area = new \LWT\Path($admin_path, $user_obj);
+    $admin_area = new \LWT\Path(-1);
+    $admin_area->request($admin_path, $user_obj);
     if (mb_strlen($admin_area->root) > 1 && isset($admin_area->http_status) && $admin_area->http_status == 200){
       echo '<a href="' . BASE_URI . $admin_area->root . '">Administration</a>&nbsp;&nbsp;' . "\n";
     }
