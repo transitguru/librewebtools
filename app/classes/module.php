@@ -20,16 +20,16 @@ class Module{
   public $name = 'Init'; /**< Human Readable name of module */
   public $enabled = 1;  /**< Determines if the module is enabled */
   public $required = 1; /**< Determines if a module is required to be enabled */
-  public $javascripts = array(); /**< Array of javascripts loaded from modules and themes */
-  public $stylesheets = array(); /**< Array of stylesheets loaded from modules and themes */
-  public $user_input = array(); /**< Object of user input (URI, POST, FILES, GET) */
-  public $session = array(); /**< Object of user session */
+  public $javascripts = []; /**< Array of javascripts loaded from modules and themes */
+  public $stylesheets = []; /**< Array of stylesheets loaded from modules and themes */
+  public $user_input = []; /**< Object of user input (URI, POST, FILES, GET) */
+  public $session = []; /**< Object of user session */
 
   /**
    * Construct the theme
    * @param int $id ID for the theme
    */
-  public function __construct($id = null, $user_input = array(), $session = array()){
+  public function __construct($id = null, $user_input = [], $session = []){
     if (!is_null($id) && $id > 0){
       $db = new Db();
       $q = (object)[
@@ -42,8 +42,18 @@ class Module{
           ]
         ]
       ];
-      $this->user_input = $user_input;
-      $this->session = $session;
+      if (is_object($user_input)){
+        $this->user_input = $user_input;
+      }
+      else{
+        $this->user_input = (object)[];
+      }
+      if (is_object($session)){
+        $this->session = $session;
+      }
+      else{
+        $this->session = (object)[];
+      }
       $db->query($q);
       if ($db->affected_rows > 0){
         $this->id = (int) $id;
@@ -86,7 +96,7 @@ class Module{
   public function loadTemplate($path){
     $this->loadMods(1);
     $this->loadMods(0);
-    if (is_null($path->path_id) || $path->path_id < 0 || is_null($this->id)){
+    if (is_null($path->id) || $path->id < 0 || is_null($this->id)){
       $this->core = 1;
       $this->code = 'init';
     }
@@ -162,16 +172,47 @@ class Module{
       if (count($this->javascripts)>0){
         foreach ($this->javascripts as $script){
           echo '    <script type="application/javascript" src="' . BASE_URI;
-          echo '/' . $path . '/' . $script . '"></script>' . "\n";
+          echo $path . '/' . $script . '"></script>' . "\n";
         }
       }
       if (count($this->stylesheets)>0){
         foreach ($this->stylesheets as $sheet){
           echo '    <link rel="stylesheet" type="text/css" href="' . BASE_URI;
-          echo '/' . $path . '/' . $sheet . '" />' . "\n";
+          echo $path . '/' . $sheet . '" />' . "\n";
         }
       }
     }
+  }
+
+  /**
+   * Lists all modules in an array
+   *
+   * @return array $list All modules as an array of objects
+   */
+  public function list(){
+    $db = new Db();
+    $q = (object)[
+      'command' => 'select',
+      'table' => 'modules',
+      'fields' => [],
+      'sort' => [
+        (object) ['id' => 'core'],
+        (object) ['id' => 'code'],
+      ]
+    ];
+    $db->query($q);
+    $list = [];
+    foreach($db->output as $record){
+      $list[]= (object)[
+        'id' => (int) $record->id,
+        'core' => (int) $record->core,
+        'code' => $record->code,
+        'name' => $record->name,
+        'enabled' => (int) $record->enabled,
+        'required' => (int) $record->required,
+      ];
+    }
+    return $list;
   }
 
   /**
@@ -184,7 +225,6 @@ class Module{
         'core' => $this->core,
         'code' => $this->code,
         'name' => $this->name,
-        'type' => $this->type,
         'enabled' => $this->enabled,
         'required' => $this->required,
       ]

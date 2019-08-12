@@ -124,7 +124,8 @@ if ($newuri != $input->uri){
 }
 
 // Load enabled modules and chosen theme
-$path = new LWT\Path($input->uri,$user);
+$path = new LWT\Path(-1);
+$path->request($input->uri,$user);
 $module = new LWT\Module($path->module_id,$input,$session);
 $module->loadTemplate($path);
 

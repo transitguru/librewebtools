@@ -372,7 +372,136 @@ Class Admin Extends \LWT\Subapp{
       }
     }
     elseif ($this->pathstring == 'path'){
-      $this->form = new \LWT\Form($forms->path);
+      if(isset($this->inputs->post->id) && 
+          (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Close')){
+        $path_id = (int) $this->inputs->post->id;
+        $path_obj = new \LWT\Path($path_id);
+        $this->form = new \LWT\Form($forms->path);
+        if ($path_obj->id == 0){
+          $this->form->fields->parent_id->required = false;
+        }
+        if ($path_id == -1){
+          $this->form->fields->submit1->value = 'Create';
+          unset($this->form->fields->submit2);
+        }
+        $this->form->fields->id->value = $path_obj->id;
+        $this->form->fields->parent_id->value = $path_obj->parent_id;
+        $this->form->fields->user_id->value = $path_obj->user_id;
+        $this->form->fields->module_id->value = $path_obj->module_id;
+        $this->form->fields->url_code->value = $path_obj->url_code;
+        $this->form->fields->title->value = $path_obj->title;
+        $this->form->fields->app->value = $path_obj->app;
+        $this->form->fields->core->value = $path_obj->core;
+        $this->form->fields->created->value = $path_obj->created;
+        $this->form->fields->activated->value = $path_obj->activated;
+        $this->form->fields->deactivated->value = $path_obj->deactivated;
+        // Make Path list
+        $l = $path_obj->list();
+        $ids = $path_obj->children($path_obj->id);
+        $this->form->fields->parent_id->list = $this->treelist($l, $ids);
+        // Make User list
+        $obj = new \LWT\User(0);
+        $l = $obj->list();
+        foreach($l as $v){
+          $this->form->fields->user_id->list[] = (object)[
+            'name' => $v->name . '(' . $v->login . ')',
+            'value' => $v->id,
+          ];
+        }
+        // Make Module list
+        $obj = new \LWT\Module(0);
+        $l = $obj->list();
+        foreach($l as $v){
+          $this->form->fields->module_id->list[] = (object)[
+            'name' => $v->name,
+            'value' => $v->id,
+          ];
+        }
+      }
+      else{
+        $path_obj = new \LWT\Path(-1);
+        $list = $path_obj->list();
+        $items = $this->treeitems($list);
+        $items[]= (object)[
+          'name' => '(new path)',
+          'value' => -1,
+        ];
+        $defs = (object)[
+          'title' => 'Path Navigation',
+          'desc' => 'Manage url paths within the main application.',
+          'name' => 'form_path_nav',
+          'fields' => (object)[
+            'id' => (object)['name' => 'id', 'element' => 'select',
+              'label' => 'Select Group', 'format' => 'text', 'list' => $items,
+              'value' => 'Navigate'],
+            'submit1' => (object)['name' => 'submit', 'element' => 'submit',
+              'label' => '', 'format' => 'text', 'value' => 'Navigate'],
+          ],
+        ];
+        $this->form = new \LWT\Form($defs);
+      }
+      if (isset($this->inputs->post->submit)){
+        if(in_array($this->inputs->post->submit, ['Create','Update'])){
+          $this->form->fill($this->inputs->post);
+          $this->form->validate();
+          if ($this->form->error == 0){
+            $path_obj->parent_id = $this->form->fields->parent_id->value;
+            $path_obj->user_id = $this->form->fields->user_id->value;
+            $path_obj->module_id = $this->form->fields->module_id->value;
+            $path_obj->url_code = $this->form->fields->url_code->value;
+            $path_obj->title = $this->form->fields->title->value;
+            $path_obj->app = $this->form->fields->app->value;
+            $path_obj->core = $this->form->fields->core->value;
+            $path_obj->created = $this->form->fields->created->value;
+            $path_obj->activated = $this->form->fields->activated->value;
+            $path_obj->deactivated = $this->form->fields->deactivated->value;
+            $path_obj->write();
+            // Reload Path list
+            $l = $path_obj->list();
+            $ids = $path_obj->children($path_obj->id);
+            $this->form->fields->parent_id->list = $this->treelist($l, $ids);
+            // Show errors
+            $this->form->error = $path->error;
+            $this->form->message = $path->message;
+            if ($path->name_unique == false){
+              $this->form->fields->name->error = 99;
+              $this->form->fields->name->message = $path->name_message;
+            }
+            if ($path->parent_id_unique == false){
+              $this->form->fields->parent_id->error = 99;
+              $this->form->fields->parent_id->message = $path->parent_id_message;
+            }
+            if($this->inputs->post->submit == 'Create' && $this->form->error == 0){
+              $this->form->fields->id->value = $path->id;
+              $this->form->fields->submit1->value = 'Update';
+            }
+          }
+        }
+        elseif($this->inputs->post->submit == 'Delete'){
+          $this->form->message = 'Are you sure you want to delete this Path?';
+          $this->form->status = 'warning';
+          $this->form->fields->submit1->value = 'Yes';
+          $this->form->fields->submit2->value = 'Cancel';
+        }
+        elseif($this->inputs->post->submit == 'Yes'){
+          $path_obj->delete();
+          $this->form->error = $path_obj->error;
+          $this->form->message = $path_obj->message;
+          if ($this->form->error == 0){
+            $this->form->message = 'Path deleted successfully';
+            $this->form->status = 'success';
+            foreach ($this->form->fields as $key => $field){
+              if ($key != 'submit3'){
+                unset($this->form->fields->{$key});
+              }
+            }
+          }
+        }
+      }
+      else{
+        $this->form->message = 'Select a path to begin editing.';
+        $this->form->status = 'warning';
+      }
     }
     elseif ($this->pathstring == 'module'){
       $this->form = new \LWT\Form($forms->module);

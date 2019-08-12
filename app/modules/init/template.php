@@ -30,8 +30,8 @@ if (!is_null($sub_app) && method_exists($path->app, 'ajax')){
       <div class="content">
         <h1><?php echo $path->title; ?></h1>
 <?php
-if (!is_null($path->path_id) && $path->path_id >= 0){
-  echo $path->content;
+if (!is_null($path->id) && $path->id >= 0){
+  echo $path->content->content;
   if (!is_null($sub_app) && method_exists($path->app, 'render')){
     $sub_app->render();
   }
