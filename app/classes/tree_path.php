@@ -35,7 +35,9 @@ class Path extends Tree{
   public $root = ''; /**< Application root where database stopped */
   public $content = []; /**< Path content to be shown if valid content */
   public $name_unique = true;  /**< Flag to show if the URL code is unique */
+  public $parent_id_unique = true;  /**< Flag to show if the parent_id is unique */
   public $name_message = '';   /**< Message for error in URL code is unique */
+  public $parent_id_message = '';   /**< Message for error in parent_id unique */
 
   /**
    * Creates Path object
@@ -43,110 +45,117 @@ class Path extends Tree{
    * @param int $id ID of path
    */
   public function __construct($id){
-    $path = false;
-    $db = new Db();
-    $q = (object)[
-      'command' => 'select',
-      'table' => 'paths',
-      'fields' => [],
-      'where' => (object)[
-        'type' => 'and', 'items' => [
-          (object)['type' => '=', 'value' => $id, 'id' => 'id']
-        ]
-      ]
-    ];
-    $db->query($q);
-    if ($db->affected_rows > 0){
-      $path = $db->output[0]->name;
-      $this->id = (int) $db->output[0]->id;
-      if (is_null($db->output[0]->parent_id)){
-        $this->parent_id = null;
-      }
-      else{
-        $this->parent_id = (int) $db->output[0]->parent_id;
-      }
-      $this->user_id = (int) $db->output[0]->user_id;
-      $this->module_id = (int) $db->output[0]->module_id;
-      $this->name = $db->output[0]->name;
-      $this->title = $db->output[0]->title;
-      $this->app = $db->output[0]->app;
-      $this->core = (int) $db->output[0]->core;
-      $this->created = $db->output[0]->created;
-      $this->activated = $db->output[0]->activated;
-      $this->deactivated = $db->output[0]->deactivated;
-      while ($db->output[0]->parent_id != 0 && !is_null($db->output[0]->parent_id)){
-        $q = (object)[
-          'command' => 'select',
-          'table' => 'paths',
-          'fields' => ['name', 'parent_id'],
-          'where' => (object)[
-            'type' => 'and', 'items' => [
-              (object)['type' => '=', 'value' => $db->output[0]->parent_id, 'id' => 'id']
-            ]
-          ]
-        ];
-        $db->query($q);
-        $path = $db->output[0]->name . '/' . $path;
-      }
-      $this->root = '/' . $path;
-
-      //Find Roles
+    if ($id>=0){
+      $path = false;
+      $db = new Db();
       $q = (object)[
         'command' => 'select',
-        'table' => 'path_roles',
+        'table' => 'paths',
         'fields' => [],
         'where' => (object)[
           'type' => 'and', 'items' => [
-            (object)['type' => '=', 'value' => $id, 'id' => 'path_id']
+            (object)['type' => '=', 'value' => $id, 'id' => 'id']
           ]
         ]
       ];
       $db->query($q);
-      $this->roles = [];
       if ($db->affected_rows > 0){
-        foreach ($db->output as $field){
-          $this->roles[] = (int) $field->role_id;
+        $path = $db->output[0]->name;
+        $this->id = (int) $db->output[0]->id;
+        if (is_null($db->output[0]->parent_id)){
+          $this->parent_id = null;
         }
-      }
-
-      //Find Groups
-      $q->table = 'path_groups';
-      $db->query($q);
-      $this->groups = [];
-      if ($db->affected_rows > 0){
-        foreach ($db->output as $field){
-          $this->groups[] = (int) $field->group_id;
+        else{
+          $this->parent_id = (int) $db->output[0]->parent_id;
         }
-      }
+        $this->user_id = (int) $db->output[0]->user_id;
+        $this->module_id = (int) $db->output[0]->module_id;
+        $this->name = $db->output[0]->name;
+        $this->title = $db->output[0]->title;
+        $this->app = $db->output[0]->app;
+        $this->core = (int) $db->output[0]->core;
+        $this->created = $db->output[0]->created;
+        $this->activated = $db->output[0]->activated;
+        $this->deactivated = $db->output[0]->deactivated;
+        while ($db->output[0]->parent_id != 0 && !is_null($db->output[0]->parent_id)){
+          $q = (object)[
+            'command' => 'select',
+            'table' => 'paths',
+            'fields' => ['name', 'parent_id'],
+            'where' => (object)[
+              'type' => 'and', 'items' => [
+                (object)['type' => '=', 'value' => $db->output[0]->parent_id, 'id' => 'id']
+              ]
+            ]
+          ];
+          $db->query($q);
+          $path = $db->output[0]->name . '/' . $path;
+        }
+        $this->root = '/' . $path;
 
-      // Retrieve any path content history, if it exists
-      $q->table = 'path_content';
-      $q->sort = (object) ['id' => 'created', 'dir' => 'd'];
-      $db->query($q);
-      if ($db->affected_rows > 0){
-        $this->history = [];
-        foreach ($db->output as $field){
-          $this->history[] = (object)[
-            'id' => (int) $field->id,
-            'user_id' => (int) $field->user_id,
-            'created' => $field->created,
-            'title' => $field->title,
-            'summary' => $field->summary,
-            'content' => $field->content,
+        //Find Roles
+        $q = (object)[
+          'command' => 'select',
+          'table' => 'path_roles',
+          'fields' => [],
+          'where' => (object)[
+            'type' => 'and', 'items' => [
+              (object)['type' => '=', 'value' => $id, 'id' => 'path_id']
+            ]
+          ]
+        ];
+        $db->query($q);
+        $this->roles = [];
+        if ($db->affected_rows > 0){
+          foreach ($db->output as $field){
+            $this->roles[] = (int) $field->role_id;
+          }
+        }
+
+        //Find Groups
+        $q->table = 'path_groups';
+        $db->query($q);
+        $this->groups = [];
+        if ($db->affected_rows > 0){
+          foreach ($db->output as $field){
+            $this->groups[] = (int) $field->group_id;
+          }
+        }
+
+        // Retrieve any path content history, if it exists
+        $q->table = 'path_content';
+        $q->sort = (object) ['id' => 'created', 'dir' => 'd'];
+        $db->query($q);
+        if ($db->affected_rows > 0){
+          $this->history = [];
+          foreach ($db->output as $field){
+            $this->history[] = (object)[
+              'id' => (int) $field->id,
+              'user_id' => (int) $field->user_id,
+              'created' => $field->created,
+              'title' => $field->title,
+              'summary' => $field->summary,
+              'content' => $field->content,
+            ];
+          }
+          $this->content = $this->history[0];
+        }
+        else{
+          $this->content = (object)[
+            'id' => (int) -1,
+            'user_id' => 1,
+            'created' => '',
+            'title' => '',
+            'summary' => '',
+            'content' => '',
           ];
         }
-        $this->content = $this->history[0];
       }
-      else{
-        $this->content = (object)[
-          'id' => (int) -1,
-          'user_id' => 1,
-          'created' => '',
-          'title' => '',
-          'summary' => '',
-          'content' => '',
-        ];
-      }
+    }
+    else{
+      // Ensure it is empty
+      $this->clear();
+      $this->id = $id;
     }
   }
 
@@ -305,7 +314,6 @@ class Path extends Tree{
     $q = (object)[
       'table' => 'paths',
       'inputs' => (object)[
-        'id' => $this->id,
         'parent_id' => $this->parent_id,
         'user_id' => $this->user_id,
         'module_id' => $this->module_id,
