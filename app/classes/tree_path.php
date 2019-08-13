@@ -34,6 +34,7 @@ class Path extends Tree{
   public $history = []; /**< Path content history */
   public $root = ''; /**< Application root where database stopped */
   public $content = []; /**< Path content to be shown if valid content */
+  public $error = 0;        /**< Error number */
   public $name_unique = true;  /**< Flag to show if the URL code is unique */
   public $parent_id_unique = true;  /**< Flag to show if the parent_id is unique */
   public $name_message = '';   /**< Message for error in URL code is unique */

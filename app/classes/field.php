@@ -285,7 +285,7 @@ class Field{
       else{
         $this->error = 0;
         $this->message = "";
-        return $value;
+        return null;
       }
     }
 

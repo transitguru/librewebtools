@@ -445,6 +445,9 @@ Class Admin Extends \LWT\Subapp{
         if(in_array($this->inputs->post->submit, ['Create','Update'])){
           $this->form->fill($this->inputs->post);
           $this->form->validate();
+          if (is_null($this->form->fields->created->value)){
+            $this->form->fields->created->value = date('Y-m-d H:i:s');
+          }
           if ($this->form->error == 0){
             $path_obj->parent_id = $this->form->fields->parent_id->value;
             $path_obj->user_id = $this->form->fields->user_id->value;
@@ -463,18 +466,18 @@ Class Admin Extends \LWT\Subapp{
             $ids = $path_obj->listapp($ids);
             $this->form->fields->parent_id->list = $this->treelist($l, $ids);
             // Show errors
-            $this->form->error = $path->error;
-            $this->form->message = $path->message;
-            if ($path->name_unique == false){
+            $this->form->error = $path_obj->error;
+            $this->form->message = $path_obj->message;
+            if ($path_obj->name_unique == false){
               $this->form->fields->name->error = 99;
-              $this->form->fields->name->message = $path->name_message;
+              $this->form->fields->name->message = $path_obj->name_message;
             }
-            if ($path->parent_id_unique == false){
+            if ($path_obj->parent_id_unique == false){
               $this->form->fields->parent_id->error = 99;
-              $this->form->fields->parent_id->message = $path->parent_id_message;
+              $this->form->fields->parent_id->message = $path_obj->parent_id_message;
             }
             if($this->inputs->post->submit == 'Create' && $this->form->error == 0){
-              $this->form->fields->id->value = $path->id;
+              $this->form->fields->id->value = $path_obj->id;
               $this->form->fields->submit1->value = 'Update';
             }
           }
