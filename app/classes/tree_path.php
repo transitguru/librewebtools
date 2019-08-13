@@ -21,7 +21,7 @@ class Path extends Tree{
   public $access = false; /**< Whether this request can be fulfilled */
   public $id = null; /**< Path ID that would be fetched from database */
   public $app = null; /**< Determines if this request is a function */
-  public $url_code = null; /**< URL code at particular level */
+  public $name = null; /**< URL code at particular level */
   public $created = null; /**< Date created in ISO format */
   public $activated = null; /**< Date when it is desired for path to be valid */
   public $deactivated = null; /**< Date when it is desired to deactivate the path */
@@ -31,8 +31,8 @@ class Path extends Tree{
   public $history = []; /**< Path content history */
   public $root = ''; /**< Application root where database stopped */
   public $content = []; /**< Path content to be shown if valid content */
-  public $url_unique = true;  /**< Flag to show if the url_code is unique */
-  public $url_message = '';   /**< Message for error in url_code unique */
+  public $name_unique = true;  /**< Flag to show if the URL code is unique */
+  public $name_message = '';   /**< Message for error in URL code is unique */
 
   /**
    * Creates Path object
@@ -54,10 +54,10 @@ class Path extends Tree{
     ];
     $db->query($q);
     if ($db->affected_rows > 0){
-      $path = $db->output[0]->url_code;
+      $path = $db->output[0]->name;
       $this->id = (int) $db->output[0]->id;
       $this->app = $db->output[0]->app;
-      $this->url_code = $db->output[0]->url_code;
+      $this->name = $db->output[0]->name;
       $this->created = $db->output[0]->created;
       $this->activated = $db->output[0]->activated;
       $this->deactivated = $db->output[0]->deactivated;
@@ -67,7 +67,7 @@ class Path extends Tree{
         $q = (object)[
           'command' => 'select',
           'table' => 'paths',
-          'fields' => ['url_code', 'parent_id'],
+          'fields' => ['name', 'parent_id'],
           'where' => (object)[
             'type' => 'and', 'items' => [
               (object)['type' => '=', 'value' => $db->output[0]->parent_id, 'id' => 'id']
@@ -75,7 +75,7 @@ class Path extends Tree{
           ]
         ];
         $db->query($q);
-        $path = $db->output[0]->url_code . '/' . $path;
+        $path = $db->output[0]->name . '/' . $path;
       }
       $this->root = '/' . $path;
 
@@ -154,8 +154,8 @@ class Path extends Tree{
     $this->id = null;
     $this->root = '';
     $this->content = '';
-    foreach ($path as $i => $url_code){
-      if($this->app == null && ($i == 0 || ($i > 0 && $url_code !== ''))){
+    foreach ($path as $i => $name){
+      if($this->app == null && ($i == 0 || ($i > 0 && $name !== ''))){
         $q = (object)[
           'command' => 'select',
           'table' => 'paths',
@@ -165,7 +165,7 @@ class Path extends Tree{
           $q->where = (object)[
             'type' => 'and', 'items' => [
               (object)['type' => '=', 'value' => $this->id, 'id' => 'parent_id'],
-              (object)['type' => '=', 'value' => '/', 'id' => 'url_code'],
+              (object)['type' => '=', 'value' => '/', 'id' => 'name'],
             ]
           ];
           $db->query($q);
@@ -174,7 +174,7 @@ class Path extends Tree{
           $q->where = (object)[
             'type' => 'and', 'items' => [
               (object)['type' => '=', 'value' => $this->id, 'id' => 'parent_id'],
-              (object)['type' => '=', 'value' => $url_code, 'id' => 'url_code'],
+              (object)['type' => '=', 'value' => $name, 'id' => 'name'],
             ]
           ];
           $db->query($q);
@@ -241,7 +241,7 @@ class Path extends Tree{
         ]
       ],
       'sort' => [
-        (object) ['id' => 'url_code'],
+        (object) ['id' => 'name'],
       ]
     ];
     $db->query($q);
@@ -261,8 +261,7 @@ class Path extends Tree{
           'parent_id' => $pid,
           'user_id' => (int) $record->user_id,
           'module_id' => (int) $record->module_id,
-          'url_code' => $record->url_code,
-          'name' => $record->url_code,
+          'name' => $record->name,
           'title' => $record->title,
           'app' => $record->app,
           'core' => (int) $record->core,
@@ -280,7 +279,16 @@ class Path extends Tree{
    * Writes a path object
    */
   public function write(){
+    if($this->id === $this->parent_id){
+      $this->error = 99;
+      $this->parent_id_unique = false;
+      $this->parent_id_message = 'The parent cannot equal group (' . $this->name . ').';
+      return;
+    }
     $db = new Db();
+    if ($this->id == 0){
+      $this->parent_id = null;
+    }
 
     /** Query object for writing */
     $q = (object)[
@@ -290,7 +298,7 @@ class Path extends Tree{
         'parent_id' => $this->parent_id,
         'user_id' => $this->user_id,
         'module_id' => $this->module_id,
-        'url_code' => $this->url_code,
+        'name' => $this->name,
         'title' => $this->title,
         'app' => $this->app,
         'core' => $this->core,
@@ -309,7 +317,7 @@ class Path extends Tree{
         'type' => 'and', 'items' => [
           (object)['type' => 'and', 'items' => 
             [
-              (object)['type' => '=', 'value' => $this->url_code, 'id' => 'login', 'cs' => false],
+              (object)['type' => '=', 'value' => $this->name, 'id' => 'name', 'cs' => false],
               (object)['type' => '=', 'value' => $this->parent_id, 'id' => 'parent_id'],
             ],
           ],
@@ -322,9 +330,9 @@ class Path extends Tree{
       $this->error = 99;
       $this->message = 'The marked values below are already taken';
       foreach($db->output as $field){
-        if($this->url_code == $field->url_code){
-          $this->url_unique = false;
-          $this->url_message = 'The email "' . $this->url_code . '" is already taken by another path at this level.';
+        if($this->name == $field->name){
+          $this->name_unique = false;
+          $this->name_message = 'The URL "' . $this->name . '" is already taken by another path at this level.';
         }
       }
       return;
@@ -405,7 +413,7 @@ class Path extends Tree{
     $q = (object)[
       'command' => 'select',
       'table' => 'paths',
-      'fields' => ['url_code', 'parent_id'],
+      'fields' => ['name', 'parent_id'],
       'where' => (object)[
         'type' => 'and', 'items' => [
           (object)['type' => '=', 'value' => $class, 'id' => 'app']
@@ -414,12 +422,12 @@ class Path extends Tree{
     ];
     $db->query($q);
     if ($db->affected_rows > 0){
-      $path = $db->output[0]->url_code;
+      $path = $db->output[0]->name;
       while ($db->output[0]->parent_id != 0){
         $q = (object)[
           'command' => 'select',
           'table' => 'paths',
-          'fields' => ['url_code', 'parent_id'],
+          'fields' => ['name', 'parent_id'],
           'where' => (object)[
             'type' => 'and', 'items' => [
               (object)['type' => '=', 'value' => $db->output[0]->parent_id, 'id' => 'id']
@@ -427,7 +435,7 @@ class Path extends Tree{
           ]
         ];
         $db->query($q);
-        $path = $db->output[0]->url_code . '/' . $path;
+        $path = $db->output[0]->name . '/' . $path;
       }
     }
     return '/' . $path;
@@ -482,7 +490,7 @@ class Path extends Tree{
     $this->parent_id = null;
     $this->user_id = 0;
     $this->module_id = null;
-    $this->url_code = null;
+    $this->name = null;
     $this->title = null;
     $this->app = null;
     $this->core = 0;

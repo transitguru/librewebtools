@@ -388,7 +388,7 @@ Class Admin Extends \LWT\Subapp{
         $this->form->fields->parent_id->value = $path_obj->parent_id;
         $this->form->fields->user_id->value = $path_obj->user_id;
         $this->form->fields->module_id->value = $path_obj->module_id;
-        $this->form->fields->url_code->value = $path_obj->url_code;
+        $this->form->fields->name->value = $path_obj->name;
         $this->form->fields->title->value = $path_obj->title;
         $this->form->fields->app->value = $path_obj->app;
         $this->form->fields->core->value = $path_obj->core;
@@ -448,7 +448,7 @@ Class Admin Extends \LWT\Subapp{
             $path_obj->parent_id = $this->form->fields->parent_id->value;
             $path_obj->user_id = $this->form->fields->user_id->value;
             $path_obj->module_id = $this->form->fields->module_id->value;
-            $path_obj->url_code = $this->form->fields->url_code->value;
+            $path_obj->name = $this->form->fields->name->value;
             $path_obj->title = $this->form->fields->title->value;
             $path_obj->app = $this->form->fields->app->value;
             $path_obj->core = $this->form->fields->core->value;

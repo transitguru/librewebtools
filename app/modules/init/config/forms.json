@@ -183,7 +183,7 @@
           "element":"radiogroup","format":"int","required":true},
         "module_id":{"name":"module_id","label":"Module ID",
           "element":"radiogroup","format":"int","required":true},
-        "url_code":{"name":"url_code","label":"URL Code","element":"text",
+        "name":{"name":"name","label":"URL Code","element":"text",
           "format":"nowacky","required":true,"max_chars":100},
         "title":{"name":"title","label":"Title","element":"text",
           "format":"oneline","required":true,"max_chars":255},
