@@ -459,6 +459,7 @@ Class Admin Extends \LWT\Subapp{
             // Reload Path list
             $l = $path_obj->list();
             $ids = $path_obj->children($path_obj->id);
+            $ids = $path_obj->listapp($ids);
             $this->form->fields->parent_id->list = $this->treelist($l, $ids);
             // Show errors
             $this->form->error = $path->error;

@@ -401,6 +401,35 @@ class Path extends Tree{
   }
 
   /**
+   * Lists all ids that have subapps
+   *
+   * @param array $ids IDs to append if adding to another list
+   *
+   * @return array $ids IDs that have subapps
+   */
+  public function listapp($ids = []){
+    $db = new Db();
+    $q = (object)[
+      'command' => 'select',
+      'table' => 'paths',
+      'fields' => ['id'],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '<>', 'value' => null, 'id' => 'app']
+        ]
+      ]
+    ];
+    $db->query($q);
+    if ($db->affected_rows > 0){
+      foreach ($db->output as $record){
+        if (!in_array($record->id,$ids)){
+          $ids[] = $record->id;
+        }
+      }
+    }
+    return $ids;
+  }
+  /**
    * Looks up path based on subapp module object class name
    *
    * @param $class Full class path of the subapp
