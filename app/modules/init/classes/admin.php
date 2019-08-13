@@ -138,7 +138,7 @@ Class Admin Extends \LWT\Subapp{
         $group_id = (int) $this->inputs->post->id;
         $group_obj = new \LWT\Group($group_id);
         $this->form = new \LWT\Form($forms->group);
-        if ($group_obj->id == 0){
+        if ($group_id == 0){
           $this->form->fields->parent_id->required = false;
         }
         if ($group_id == -1){
@@ -377,7 +377,7 @@ Class Admin Extends \LWT\Subapp{
         $path_id = (int) $this->inputs->post->id;
         $path_obj = new \LWT\Path($path_id);
         $this->form = new \LWT\Form($forms->path);
-        if ($path_obj->id == 0){
+        if ($path_id == 0){
           $this->form->fields->parent_id->required = false;
         }
         if ($path_id == -1){
@@ -398,13 +398,14 @@ Class Admin Extends \LWT\Subapp{
         // Make Path list
         $l = $path_obj->list();
         $ids = $path_obj->children($path_obj->id);
+        $ids = $path_obj->listapp($ids);
         $this->form->fields->parent_id->list = $this->treelist($l, $ids);
         // Make User list
         $obj = new \LWT\User(0);
         $l = $obj->list();
         foreach($l as $v){
           $this->form->fields->user_id->list[] = (object)[
-            'name' => $v->name . '(' . $v->login . ')',
+            'name' => $v->firstname . ' ' . $v->lastname . ' (' . $v->login . ')',
             'value' => $v->id,
           ];
         }
@@ -432,7 +433,7 @@ Class Admin Extends \LWT\Subapp{
           'name' => 'form_path_nav',
           'fields' => (object)[
             'id' => (object)['name' => 'id', 'element' => 'select',
-              'label' => 'Select Group', 'format' => 'text', 'list' => $items,
+              'label' => 'Select Path', 'format' => 'text', 'list' => $items,
               'value' => 'Navigate'],
             'submit1' => (object)['name' => 'submit', 'element' => 'submit',
               'label' => '', 'format' => 'text', 'value' => 'Navigate'],

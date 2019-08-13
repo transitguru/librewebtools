@@ -188,7 +188,7 @@
         "title":{"name":"title","label":"Title","element":"text",
           "format":"oneline","required":true,"max_chars":255},
         "app":{"name":"app","label":"App (full path to application Class)","element":"text",
-          "format":"oneline","required":true,"max_chars":255},
+          "format":"oneline","max_chars":255},
         "core":{"name":"core","label":"Core Path",
           "element":"checkbox","format":"int","default":1},
         "created":{"name":"created","label":"Date created",

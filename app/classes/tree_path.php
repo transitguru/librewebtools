@@ -20,8 +20,11 @@ class Path extends Tree{
   public $http_status = 200;  /**< HTTP status of the request */
   public $access = false; /**< Whether this request can be fulfilled */
   public $id = null; /**< Path ID that would be fetched from database */
+  public $parent_id = null; /**< Path ID of parent */
+  public $user_id = null; /**< ID of owner of Path */
   public $app = null; /**< Determines if this request is a function */
   public $name = null; /**< URL code at particular level */
+  public $core = null; /**< If 1 this is a core (protected) path */
   public $created = null; /**< Date created in ISO format */
   public $activated = null; /**< Date when it is desired for path to be valid */
   public $deactivated = null; /**< Date when it is desired to deactivate the path */
@@ -56,14 +59,22 @@ class Path extends Tree{
     if ($db->affected_rows > 0){
       $path = $db->output[0]->name;
       $this->id = (int) $db->output[0]->id;
-      $this->app = $db->output[0]->app;
+      if (is_null($db->output[0]->parent_id)){
+        $this->parent_id = null;
+      }
+      else{
+        $this->parent_id = (int) $db->output[0]->parent_id;
+      }
+      $this->user_id = (int) $db->output[0]->user_id;
+      $this->module_id = (int) $db->output[0]->module_id;
       $this->name = $db->output[0]->name;
+      $this->title = $db->output[0]->title;
+      $this->app = $db->output[0]->app;
+      $this->core = (int) $db->output[0]->core;
       $this->created = $db->output[0]->created;
       $this->activated = $db->output[0]->activated;
       $this->deactivated = $db->output[0]->deactivated;
-      $this->title = $db->output[0]->title;
-      $this->module_id = (int) $db->output[0]->module_id;
-      while ($db->output[0]->parent_id != 0){
+      while ($db->output[0]->parent_id != 0 && !is_null($db->output[0]->parent_id)){
         $q = (object)[
           'command' => 'select',
           'table' => 'paths',
@@ -422,8 +433,9 @@ class Path extends Tree{
     $db->query($q);
     if ($db->affected_rows > 0){
       foreach ($db->output as $record){
-        if (!in_array($record->id,$ids)){
-          $ids[] = $record->id;
+        $id = (int) $record->id;
+        if (!in_array($id,$ids)){
+          $ids[] = $id;
         }
       }
     }
