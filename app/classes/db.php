@@ -30,6 +30,8 @@ class Db{
   protected $group_types = ['and', 'or'];
   protected $db = null;       /**< DB information for this object */
   protected $pdo = null;      /**< PDO object to use for querying */
+  /** Statistics (or similar) functions that are used understood in all SQL dialects */
+  protected $functions = ['sum','avg','max','min','count','lower','upper'];
 
   /**
    * Create the database object
@@ -158,8 +160,8 @@ class Db{
    *     'command' => 'select',   // select, delete, insert, update
    *     'table' => 'sometable',  // Table being worked on
    *     'fields' => [            // Fields to select (empty, null, or missing means *)
-   *       (object) ['id' => 'col_1'],  // TODO: future SUM, COUNT, LOWER, etc.
-   *       (object) ['id' => 'col_2'],
+   *       (object) ['id' => 'col_1'],
+   *       (object) ['id' => 'col_2', 'stat' => 'sum', 'as' => 'sum_of_col_2],
    *       (object) ['id' => 'col_3'],
    *     ],
    *     'inputs' => (object)[    // Fields that would be set for insert or update
@@ -221,6 +223,15 @@ class Db{
         foreach($query->fields as $field){
           if (isset($field->id)){
             $f = $this->convert_to_sql($field->id, true);
+            if (isset($field->fun) && in_array($field->fun,$this->functions)){
+              $f = mb_strtoupper($field->fun) . '(' . $f . ')';
+            }
+            if (isset($field->as)){
+              $a = $this->convert_to_sql($field->as, true);
+              if ($a !== false){
+                $f = $f . ' AS ' . $a;
+              }
+            }
           }
           else{
             $f = $this->convert_to_sql($field, true);
