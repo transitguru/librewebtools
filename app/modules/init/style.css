@@ -43,17 +43,44 @@ html {height: 100%}
 body {font-family: "Liberation Sans", Sans; background-color: #999999;}
 
 /* vanilla framework */
-h1 {font-size: 300%; font-weight: bold;}
-h2 {font-size: 250%; font-weight: bold;}
-h3 {font-size: 200%; font-weight: bold;}
-h4 {font-size: 150%; font-weight: bold;}
-h5 {font-size: 125%; font-weight: bold;}
-h6 {font-size: 100%; font-weight: bold;}
+h1,h2,h3,h4,h5,h6 {font-weight: bold; line-height:1.5; clear: both;}
+h1 {font-size: 300%;}
+h2 {font-size: 250%;}
+h3 {font-size: 200%;}
+h4 {font-size: 150%;}
+h5 {font-size: 125%;}
+h6 {font-size: 100%;}
+p {margin: 0.5em 0;}
+ul li {margin-left: 1.5em;}
+figure {font-family: "Liberation Sans Narrow", "Arial Narrow", Sans; font-style: italic;}
+figure img {max-width: 500px;display: block; padding: 4px}
 
-ul li{margin-left: 1.5em;}
-input, select, fieldset {border: 1px solid grey; border-radius: 4px; padding: 4px;}
-input[type="text"], input[type="password"] {min-width: 30em;}
-textarea {width: 100%; min-height: 10em; border-radius: 4px; padding: 4px; border: 1px solid grey;}
+input, select, fieldset {
+  border: 1px solid grey;
+  border-radius: 4px;
+  padding: 4px;
+}
+input[type="text"], input[type="password"] {
+  width: 30em;
+  max-width: 100%;
+}
+textarea {
+  width: 100%;
+  min-height: 10em;
+  border-radius: 4px;
+  padding: 4px;
+  border: 1px solid grey;
+}
+label {
+  display: block;
+  font-style: italic;
+}
+label strong {
+  color: #ff3300;
+}
+fieldset.choices label{
+  display: inline;
+}
 
 .alert {background-color: #990000}
 .alert:hover {background-color: #ff0000;}
@@ -96,40 +123,20 @@ textarea {width: 100%; min-height: 10em; border-radius: 4px; padding: 4px; borde
   border: 1px dotted #009900;
   padding: 2px;
 }
-
-label {
-  display: block;
-  font-style: italic;
-}
-
-label strong {
-  color: #ff3300;
-}
-
-fieldset.choices label{
-  display: inline;
-}
-
 .required {
   border: 2px solid black;
 }
-
 .invalid {
   border-color: #ff3300;
 }
-
 .hand {
   cursor: pointer;
 }
 
-h1, h2, h3, h4, h5, h6 {clear: both}
-
-figure {font-family: "Liberation Sans Narrow", "Arial Narrow", Sans; font-style: italic;}
-figure img {max-width: 500px;display: block; padding: 4px}
-
 .copy {color: #ffffff; font-family: "Liberation Sans Narrow", "Arial Narrow", Sans;}
 .credit {color: #ffffff; float: right; font-family: "Liberation Sans Narrow", "Arial Narrow", Sans;}
 .credit a {color: #ffffff; font-weight: bold;}
+
 
 /* calendar */
 .calendar {background-color: #ffff99; width: 200px; padding: 10px; border-radius: 10px; border: 1px solid #000000}
@@ -172,6 +179,4 @@ figure img {max-width: 500px;display: block; padding: 4px}
   opacity: 0.5;
   background-color: #777777;
 }
-
-
 
