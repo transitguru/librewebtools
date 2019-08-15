@@ -49,19 +49,17 @@ html {height: 100%}
 body {font-family: "Liberation Sans", Sans; background-color: #999999;}
 
 /* vanilla framework */
+h1 {font-size: 300%; font-weight: bold;}
+h2 {font-size: 250%; font-weight: bold;}
+h3 {font-size: 200%; font-weight: bold;}
+h4 {font-size: 150%; font-weight: bold;}
+h5 {font-size: 125%; font-weight: bold;}
+h6 {font-size: 100%; font-weight: bold;}
+
 ul li{margin-left: 1.5em;}
-input {width: 30em; border: 1px solid grey; border-radius: 4px; padding: 2px;}
-input[type="checkbox"], input[type="radio"] {width: 1em;}
-input[type="submit"], input[type="button"] {width: auto; margin: 4px;}
-
-textarea {width: 90%; min-height: 10em; border-radius: 4px; border: 1px solid grey;}
-
-.adminmenu li{ display: inline; padding: 5px; list-style: none; border-radius: 5px; background-color: #559900;}
-.adminmenu li a {color: #ffffff;}
-.adminmenu li:hover, .adminmenu li.current {background-color: #333333;}
-
-.button {background-color: #333333; color: #ffffff; padding: 5px; margin: 5px; border-radius: 5px; border: none; cursor: pointer; font-size: inherit;}
-.button:hover {background-color: #999999;}
+input, select, fieldset {border: 1px solid grey; border-radius: 4px; padding: 4px;}
+input[type="text"], input[type="password"] {min-width: 30em;}
+textarea {width: 100%; min-height: 10em; border-radius: 4px; padding: 4px; border: 1px solid grey;}
 
 .alert {background-color: #990000}
 .alert:hover {background-color: #ff0000;}
@@ -71,25 +69,23 @@ textarea {width: 90%; min-height: 10em; border-radius: 4px; border: 1px solid gr
 }
 
 .container {
-  width: 1000px;
-  top: 20px;
-  margin-left: auto;
-  margin-right: auto;
+  width: 90%;
+  margin: 1em auto;
 }
 
 .content {
   width: 100%;
-  padding: 10px;
+  padding: 1em;
   background-color: #ffffff;
 }
 
 .right { float:right;}
 .left { float:left;}
 .clear { clear:both;}
+
 .disabled {color: #aaaaaa; }
 
 .hide {display: none}
-
 
 .error {
   background-color: #ff9999;
