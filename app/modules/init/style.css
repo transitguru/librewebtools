@@ -5,15 +5,56 @@
  *
  */
 
+/* Reset */
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary, time, mark, audio, video,
+input, textarea {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol, ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after, q:before, q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
 /* Background */
 
 html {height: 100%}
 body {font-family: "Liberation Sans", Sans; background-color: #999999;}
 
 /* vanilla framework */
-input[type="text"], input[type="password"] {width: 400px;}
+ul li{margin-left: 1.5em;}
+input {width: 30em; border: 1px solid grey; border-radius: 4px; padding: 2px;}
+input[type="checkbox"], input[type="radio"] {width: 1em;}
+input[type="submit"], input[type="button"] {width: auto; margin: 4px;}
 
-textarea {width: 90%; min-height: 300px;}
+textarea {width: 90%; min-height: 10em; border-radius: 4px; border: 1px solid grey;}
 
 .adminmenu li{ display: inline; padding: 5px; list-style: none; border-radius: 5px; background-color: #559900;}
 .adminmenu li a {color: #ffffff;}
