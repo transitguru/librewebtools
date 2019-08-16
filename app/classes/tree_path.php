@@ -309,6 +309,7 @@ class Path extends Tree{
     $db = new Db();
     if ($this->id == 0){
       $this->parent_id = null;
+      $this->app = '/';
     }
 
     /** Query object for writing */
@@ -413,6 +414,27 @@ class Path extends Tree{
           'command' => 'insert',
           'table' => 'path_roles',
           'inputs' => (object)['role_id' => $role, 'path_id' => $this->id]
+        ];
+        $db->query($q);
+      }
+
+      // Write new content, if new content exists
+      if ($this->content->title != $this->history[0]->title
+          || $this->content->summary != $this->history[0]->summary
+          || $this->content->content != $this->history[0]->content){
+        $this->content->created = date('Y-m-d H:i:s');
+        $this->content->user_id = 1;
+        $q = (object)[
+          'command' => 'insert',
+          'table' => 'path_content',
+          'inputs' => (object)[
+            'path_id' => $this->id,
+            'user_id' => $this->content->user_id,
+            'created' => $this->content->created,
+            'title' => $this->content->title,
+            'summary' => $this->content->summary,
+            'content' => $this->content->content,
+          ],
         ];
         $db->query($q);
       }
