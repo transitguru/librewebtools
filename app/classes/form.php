@@ -257,19 +257,26 @@ class Form{
     $html .= ">\n";
     if (is_object($object->fields)){
       foreach ($object->fields as $i => $f){
+        if (isset($f->disabled) && $f->disabled == true){
+          $dis = ' disabled ';
+          $class = 'disabled ';
+        }
+        else{
+          $dis = '';
+          $class = '';
+        }
         if (!is_null($f->label)){
-          $label = '  <label for="' . $f->name . '">' . $f->label;
+          $label = '  <label for="' . $f->name . '" class="' . $class . '">' . $f->label;
         }
         else{
           $label = '';
         }
         if ($f->error){
           $label .= " <strong>{$f->message}</strong></label>";
-          $class = 'invalid ';
+          $class .= 'invalid ';
         }
         else{
           $label .= "</label>\n";
-          $class = '';
         }
         if (isset($f->required) && $f->required == true){
           $class .= 'required';
@@ -287,9 +294,9 @@ class Form{
           $maxlength = '';
         }
         if (in_array($f->element, $this->input_types)){
-          $html .= '  <input class="' . $class . '" type="' . $f->element;
+          $html .= '  <input class="' . $class . '" ' . $dis . ' type="' . $f->element;
           $html .=  '" value="' . $f->value . '" id="' . $i . '" name="';
-          $html .= $f->name . '" ' . $maxlength . " />\n";
+          $html .= $f->name . '" ' . $maxlength . $dis . " />\n";
         }
         elseif($f->element == 'checkbox'){
           if (!is_null($f->default) && $f->value === $f->default){
@@ -300,14 +307,16 @@ class Form{
           }
           $html .= '  <input class="' . $class . '" type="' . $f->element;
           $html .=  '" value="' . $f->default . '" id="' . $i . '" name="';
-          $html .= $f->name . '" ' . $checked . " />\n";
+          $html .= $f->name . '" ' . $checked . $dis . " />\n";
         }
         elseif($f->element == 'textarea'){
           $html .= '  <textarea class="' . $class . '" name="' . $f->name . '" ';
-          $html .=  $maxlength . ' id="' . $i . '" >' . $f->value . "</textarea>\n";
+          $html .=  $maxlength . $dis . ' id="' . $i . '" >';
+          $html .= $f->value . "</textarea>\n";
         }
         elseif($f->element == 'select' && is_array($f->list) && count($f->list)>0){
-          $html .= '  <select class="' . $class . '" name="' . $f->name . "\">\n";
+          $html .= '  <select class="' . $class . '" ' . $dis;
+          $html .= ' name="' . $f->name . "\">\n";
           foreach ($f->list as $items){
             $checked = '';
             if ((is_array($f->value) && in_array($items->value, $f->value, true))
@@ -337,7 +346,7 @@ class Form{
               'c' => 0,
             ];
           }
-          $html .= '  <fieldset class="choices ' . $class . '">' . "\n";
+          $html .= '  <fieldset class="choices ' . $class . '" ' . $dis . ">\n";
           $html .= '    <ul id="childof' . $con->i . 'choice' . $con->c .'">' . "\n";
           $html .= $this->radio_tree($f, $f->list, $con, $depth)->html;
           $html .= "    </ul>\n  </fieldset>\n";

@@ -19,6 +19,7 @@ class Field{
   public $element = '';      /**< Type of form element */
   public $autocomplete= 'on';/**< Autocomplete behavior on form element */
   public $autofocus = false; /**< Whether to allow autofocus on form element */
+  public $disabled = false;  /**< Disables an element */
   public $onstar = [];       /**< Object of on* javascript actions (omit 'on' in key)*/
   public $datadash = [];     /**< Object of data-* attributes (omit 'data-' in key) */
   public $classes = [];      /**< Array of CSS classes */
@@ -77,6 +78,7 @@ class Field{
    *     'element' => 'text',
    *     'autocomplete' => 'on',
    *     'autofocus' => false,
+   *     'disabled' => false,
    *     'onstar' => (object) [
    *       'blur' => 'somefunction()',
    *       'keyup' => 'someotherfunction()',
@@ -140,6 +142,9 @@ class Field{
     }
     if (isset($defs->autofocus)){
       $this->autofocus = $defs->autofocus;
+    }
+    if (isset($defs->disabled)){
+      $this->disabled = $defs->disabled;
     }
     if (isset($defs->onstar) && is_object($defs->onstar)){
       $this->onstar = $defs->onstar;
@@ -517,6 +522,9 @@ class Field{
     $form->autocomplete = $this->autocomplete;
     if ($this->autofocus == true){
       $form->autofocus = true;
+    }
+    if ($this->disabled == true){
+      $form->disabled = true;
     }
     if ($this->tabindex != 0){
       $form->tabindex = $this->tabindex;

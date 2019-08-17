@@ -309,7 +309,7 @@ class Path extends Tree{
     $db = new Db();
     if ($this->id == 0){
       $this->parent_id = null;
-      $this->app = '/';
+      $this->name = '/';
     }
 
     /** Query object for writing */
