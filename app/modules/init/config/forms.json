@@ -197,8 +197,6 @@
           "element":"text","format":"date:Y-m-d H:i:s"},
         "deactivated":{"name":"deactivated","label":"Date to deactivate path",
           "element":"text","format":"date:Y-m-d H:i:s"},
-        "ctitle":{"name":"ctitle","label":"Title (content)","element":"text",
-          "format":"oneline","required":true,"max_chars":255},
         "summary":{"name":"summary","label":"HTML Summary to display at this path",
           "element":"textarea","format":"memo"},
         "content":{"name":"content","label":"HTML Content to display at this path",

@@ -397,7 +397,6 @@ Class Admin Extends \LWT\Subapp{
         $this->form->fields->created->value = $path_obj->created;
         $this->form->fields->activated->value = $path_obj->activated;
         $this->form->fields->deactivated->value = $path_obj->deactivated;
-        $this->form->fields->ctitle->value = $path_obj->content->title;
         $this->form->fields->summary->value = $path_obj->content->summary;
         $this->form->fields->content->value = $path_obj->content->content;
         // Make Path list
@@ -464,7 +463,6 @@ Class Admin Extends \LWT\Subapp{
             $path_obj->created = $this->form->fields->created->value;
             $path_obj->activated = $this->form->fields->activated->value;
             $path_obj->deactivated = $this->form->fields->deactivated->value;
-            $path_obj->content->title = $this->form->fields->ctitle->value;
             $path_obj->content->summary = $this->form->fields->summary->value;
             $path_obj->content->content = $this->form->fields->content->value;
             $path_obj->write();

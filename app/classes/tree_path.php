@@ -139,18 +139,27 @@ class Path extends Tree{
               'content' => $field->content,
             ];
           }
-          $this->content = $this->history[0];
         }
         else{
-          $this->content = (object)[
-            'id' => (int) -1,
-            'user_id' => 1,
-            'created' => '',
-            'title' => '',
-            'summary' => '',
-            'content' => '',
+          $this->history = [
+            (object)[
+              'id' => -1,
+              'user_id' => 1,
+              'created' => '',
+              'title' => '',
+              'summary' => '',
+              'content' => '',
+            ],
           ];
         }
+        $this->content = (object)[
+          'id' => $this->history[0]->id,
+          'user_id' => $this->history[0]->user_id,
+          'created' => $this->history[0]->created,
+          'title' => $this->history[0]->title,
+          'summary' => $this->history[0]->summary,
+          'content' => $this->history[0]->content,
+        ];
       }
     }
     else{
@@ -174,7 +183,9 @@ class Path extends Tree{
     $this->app = null;
     $this->id = null;
     $this->root = '';
-    $this->content = '';
+    $this->content = (object) [
+      'content' => '',
+    ];
     foreach ($path as $i => $name){
       if($this->app == null && ($i == 0 || ($i > 0 && $name !== ''))){
         $q = (object)[
@@ -419,8 +430,7 @@ class Path extends Tree{
       }
 
       // Write new content, if new content exists
-      if ($this->content->title != $this->history[0]->title
-          || $this->content->summary != $this->history[0]->summary
+      if ($this->content->summary != $this->history[0]->summary
           || $this->content->content != $this->history[0]->content){
         $this->content->created = date('Y-m-d H:i:s');
         $this->content->user_id = 1;
@@ -431,9 +441,28 @@ class Path extends Tree{
             'path_id' => $this->id,
             'user_id' => $this->content->user_id,
             'created' => $this->content->created,
-            'title' => $this->content->title,
+            'title' => $this->title,
             'summary' => $this->content->summary,
             'content' => $this->content->content,
+          ],
+        ];
+        $db->query($q);
+        $this->history[0]->id = (int) $db->insert_id;
+        $this->content->id = (int) $db->insert_id;
+      }
+      elseif ($this->title != $this->history[0]->title
+          && $this->content->summary == $this->history[0]->summary
+          && $this->content->content == $this->history[0]->content){
+        $q = (object)[
+          'command' => 'update',
+          'table' => 'path_content',
+          'inputs' => (object)[
+            'title' => $this->title,
+          ],
+          'where' => (object)[
+            'type' => 'and', 'items' => [
+              (object)['type' => '=', 'value' => $this->content->id, 'id' => 'id']
+            ]
           ],
         ];
         $db->query($q);
