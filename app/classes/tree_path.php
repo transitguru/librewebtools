@@ -125,7 +125,7 @@ class Path extends Tree{
 
         // Retrieve any path content history, if it exists
         $q->table = 'path_content';
-        $q->sort = (object) ['id' => 'created', 'dir' => 'd'];
+        $q->sort = [ (object) ['id' => 'created', 'dir' => 'd']];
         $db->query($q);
         if ($db->affected_rows > 0){
           $this->history = [];
