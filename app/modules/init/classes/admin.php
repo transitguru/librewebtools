@@ -515,7 +515,97 @@ Class Admin Extends \LWT\Subapp{
       }
     }
     elseif ($this->pathstring == 'module'){
-      $this->form = new \LWT\Form($forms->module);
+      if(isset($this->inputs->post->id) &&
+          (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Close')){
+        $module_id = (int) $this->inputs->post->id;
+        $module_obj = new \LWT\Module($module_id);
+        $this->form = new \LWT\Form($forms->module);
+        if ($module_id == -1){
+          $this->form->fields->submit1->value = 'Create';
+        }
+        $this->form->fields->id->value = $module_obj->id;
+        $this->form->fields->core->value = $module_obj->core;
+        $this->form->fields->code->value = $module_obj->code;
+        $this->form->fields->name->value = $module_obj->name;
+        $this->form->fields->enabled->value = $module_obj->enabled;
+        $this->form->fields->required->value = $module_obj->required;
+      }
+      else{
+        $module_obj = new \LWT\Module(-1);
+        $list = $module_obj->list();
+        $items = [];
+        foreach($list as $r){
+          $items[]= (object)[
+            'name' => $r->name,
+            'value' => $r->id,
+          ];
+        }
+        $items[]= (object)[
+          'name' => '(new module)',
+          'value' => -1,
+        ];
+        $defs = (object)[
+          'title' => 'Module Navigation',
+          'desc' => 'Manage modules for add-on functionality to LWT.',
+          'name' => 'form_module_nav',
+          'fields' => (object)[
+            'id' => (object)['name' => 'id', 'element' => 'select',
+              'label' => 'Select Role', 'format' => 'text', 'list' => $items,
+              'value' => 'Navigate'],
+            'submit1' => (object)['name' => 'submit', 'element' => 'submit',
+              'label' => '', 'format' => 'text', 'value' => 'Navigate'],
+          ],
+        ];
+        $this->form = new \LWT\Form($defs);
+      }
+      if (isset($this->inputs->post->submit)){
+        if(in_array($this->inputs->post->submit, ['Create','Update'])){
+          $this->form->fill($this->inputs->post);
+          $this->form->validate();
+          if ($this->form->error == 0){
+            $module_obj->core = $this->form->fields->core->value;
+            $module_obj->code = $this->form->fields->code->value;
+            $module_obj->name = $this->form->fields->name->value;
+            $module_obj->enabled = $this->form->fields->enabled->value;
+            $module_obj->required = $this->form->fields->required->value;
+            $module_obj->write();
+            $this->form->error = $module_obj->error;
+            $this->form->message = $module_obj->message;
+            if ($module_obj->name_unique == false){
+              $this->form->fields->name->error = 99;
+              $this->form->fields->name->message = $module_obj->name_message;
+            }
+            if($this->inputs->post->submit == 'Create' && $this->form->error == 0){
+              $this->form->fields->id->value = $module_obj->id;
+              $this->form->fields->submit1->value = 'Update';
+            }
+          }
+        }
+        elseif($this->inputs->post->submit == 'Delete'){
+          $this->form->message = 'Are you sure you want to delete this Module?';
+          $this->form->status = 'warning';
+          $this->form->fields->submit1->value = 'Yes';
+          $this->form->fields->submit2->value = 'Cancel';
+        }
+        elseif($this->inputs->post->submit == 'Yes'){
+          $module_obj->delete();
+          $this->form->error = $module_obj->error;
+          $this->form->message = $module_obj->message;
+          if($this->form->error == 0){
+            $this->form->message = 'Module deleted successfully';
+            $this->form->status = 'success';
+            foreach ($this->form->fields as $key => $field){
+              if ($key != 'submit3'){
+                unset($this->form->fields->{$key});
+              }
+            }
+          }
+        }
+      }
+      else{
+        $this->form->message = 'Select a module to begin editing.';
+        $this->form->status = 'warning';
+      }
     }
     elseif ($this->pathstring == 'menu'){
       $this->form = new \LWT\Form($forms->menu);

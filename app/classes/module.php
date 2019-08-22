@@ -196,7 +196,7 @@ class Module{
       'table' => 'modules',
       'fields' => [],
       'sort' => [
-        (object) ['id' => 'core'],
+        (object) ['id' => 'core', 'dir' => 'd'],
         (object) ['id' => 'code'],
       ]
     ];
