@@ -525,7 +525,6 @@ Class Admin Extends \LWT\Subapp{
         }
         $this->form->fields->id->value = $module_obj->id;
         $this->form->fields->core->value = $module_obj->core;
-        $this->form->fields->code->value = $module_obj->code;
         $this->form->fields->name->value = $module_obj->name;
         $this->form->fields->enabled->value = $module_obj->enabled;
         $this->form->fields->required->value = $module_obj->required;
@@ -564,7 +563,6 @@ Class Admin Extends \LWT\Subapp{
           $this->form->validate();
           if ($this->form->error == 0){
             $module_obj->core = $this->form->fields->core->value;
-            $module_obj->code = $this->form->fields->code->value;
             $module_obj->name = $this->form->fields->name->value;
             $module_obj->enabled = $this->form->fields->enabled->value;
             $module_obj->required = $this->form->fields->required->value;

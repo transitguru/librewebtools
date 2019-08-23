@@ -16,14 +16,15 @@ namespace LWT;
 class Module{
   public $id = null; /**< Module's ID in the database */
   public $core = 1;  /**< Set to 1 if it is a core module, 0 if Custom */
-  public $code = 'init'; /**< Name of module's directory */
-  public $name = 'Init'; /**< Human Readable name of module */
+  public $name = 'init'; /**< Name of module's directory */
   public $enabled = 1;  /**< Determines if the module is enabled */
   public $required = 1; /**< Determines if a module is required to be enabled */
   public $javascripts = []; /**< Array of javascripts loaded from modules and themes */
   public $stylesheets = []; /**< Array of stylesheets loaded from modules and themes */
   public $user_input = []; /**< Object of user input (URI, POST, FILES, GET) */
   public $session = []; /**< Object of user session */
+  public $name_unique = true;       /**< Flag to show if the name is unique */
+  public $name_message = '';        /**< Message for error in name unique */
 
   /**
    * Construct the theme
@@ -58,9 +59,8 @@ class Module{
       if ($db->affected_rows > 0){
         $this->id = (int) $id;
         $this->core = (int) $db->output[0]->core;
-        $this->code = $db->output[0]->code;
-        $this->enabled = (int) $db->output[0]->enabled;
         $this->name = $db->output[0]->name;
+        $this->enabled = (int) $db->output[0]->enabled;
         $this->required = (int) $db->output[0]->required;
       }
       else{
@@ -81,7 +81,6 @@ class Module{
    */
   public function clear(){
     $this->core = 0;
-    $this->code = '';
     $this->name = '';
     $this->enabled = 1;
     $this->required = 1;
@@ -98,7 +97,7 @@ class Module{
     $this->loadMods(0);
     if (is_null($path->id) || $path->id < 0 || is_null($this->id)){
       $this->core = 1;
-      $this->code = 'init';
+      $this->name = 'init';
     }
     if ($this->core == 1){
       $dir = 'modules';
@@ -106,7 +105,7 @@ class Module{
     else{
       $dir = 'custom';
     }
-    $file = DOC_ROOT . '/app/' . $dir . '/' . $this->code . '/template.php';
+    $file = DOC_ROOT . '/app/' . $dir . '/' . $this->name . '/template.php';
     $sub_app = new \LWT\Subapp($path, $this->user_input, $this->session);
     if (!is_null($path->app) && $path->app !== '' && class_exists($path->app)){
       $sub_app = new $path->app($path, $this->user_input, $this->session);
@@ -142,7 +141,7 @@ class Module{
     $db->query($q);
     if ($db->affected_rows > 0 ){
       foreach ($db->output as $module){
-        $code = $module->code;
+        $code = $module->name;
         $PATH = DOC_ROOT . '/app/' . $dir . '/' . $code;
         $include = $PATH . '/bootstrap.php';
         if (is_dir($PATH)){
@@ -197,7 +196,7 @@ class Module{
       'fields' => [],
       'sort' => [
         (object) ['id' => 'core', 'dir' => 'd'],
-        (object) ['id' => 'code'],
+        (object) ['id' => 'name'],
       ]
     ];
     $db->query($q);
@@ -206,7 +205,6 @@ class Module{
       $list[]= (object)[
         'id' => (int) $record->id,
         'core' => (int) $record->core,
-        'code' => $record->code,
         'name' => $record->name,
         'enabled' => (int) $record->enabled,
         'required' => (int) $record->required,
@@ -221,14 +219,40 @@ class Module{
   public function write(){
     $db = new Db();
     $q = (object)[
+      'table' => 'modules',
       'inputs' => (object)[
         'core' => $this->core,
-        'code' => $this->code,
         'name' => $this->name,
         'enabled' => $this->enabled,
         'required' => $this->required,
       ]
     ];
+
+    /** Query object for testing for duplicate keys */
+    $t = (object)[
+      'table' => 'modules',
+      'command' => 'select',
+      'fields' => [],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $this->name, 'id' => 'name', 'cs' => false],
+          (object)['type' => '=', 'value' => $this->core, 'id' => 'core', 'cs' => false],
+          (object)['type' => '<>', 'value' => $this->id, 'id' => 'id']
+        ]
+      ]
+    ];
+    $db->query($t);
+    if ($db->affected_rows > 0){
+      $this->error = 99;
+      $this->message = 'The marked values below are already taken';
+      foreach($db->output as $field){
+        if($this->name == $field->name){
+          $this->name_unique = false;
+          $this->name_message = 'The name "' . $this->name . '" is already taken by another module.';
+        }
+      }
+      return;
+    }
     if ($this->id >= 0){
       $q->command = 'update';
       $q->where = (object)[

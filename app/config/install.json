@@ -120,14 +120,13 @@
       "columns":[
         {"name":"id","type":"serial","null":false,"comment":"Unique identifier"},
         {"name":"core","type":"bool","null":false,"default":1,"comment":"Determines if it is core module. Custom is 0"},
-        {"name":"code","type":"varchar","size":100,"null":false,"comment":"Name of module (directory name)"},
-        {"name":"name","type":"varchar","size":255,"null":false,"comment":"Human-friendly name of module"},
+        {"name":"name","type":"varchar","size":100,"null":false,"comment":"Name of module (directory name)"},
         {"name":"enabled","type":"bool","null":false,"default":1,"comment":"Boolean determining if enabled"},
         {"name":"required","type":"bool","null":false,"default":1,"comment":"Boolean if required for application to work"}
       ],
       "constraints":[
         {"name":"pk_module_id","type":"primary","columns":["id"]},
-        {"name":"uk_module_code","type":"unique","columns":["core","code"]}
+        {"name":"uk_module_name","type":"unique","columns":["core","name"]}
       ]
     },
     {
