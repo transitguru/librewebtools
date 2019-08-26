@@ -549,7 +549,7 @@ Class Admin Extends \LWT\Subapp{
           'name' => 'form_module_nav',
           'fields' => (object)[
             'id' => (object)['name' => 'id', 'element' => 'select',
-              'label' => 'Select Role', 'format' => 'text', 'list' => $items,
+              'label' => 'Select Module', 'format' => 'text', 'list' => $items,
               'value' => 'Navigate'],
             'submit1' => (object)['name' => 'submit', 'element' => 'submit',
               'label' => '', 'format' => 'text', 'value' => 'Navigate'],

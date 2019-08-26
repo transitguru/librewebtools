@@ -51,7 +51,7 @@ class Path extends Tree{
       $db = new Db();
       $q = (object)[
         'command' => 'select',
-        'table' => 'paths',
+        'table' => $this->table,
         'fields' => [],
         'where' => (object)[
           'type' => 'and', 'items' => [
@@ -81,7 +81,7 @@ class Path extends Tree{
         while ($db->output[0]->parent_id != 0 && !is_null($db->output[0]->parent_id)){
           $q = (object)[
             'command' => 'select',
-            'table' => 'paths',
+            'table' => $this->table,
             'fields' => ['name', 'parent_id'],
             'where' => (object)[
               'type' => 'and', 'items' => [
@@ -190,7 +190,7 @@ class Path extends Tree{
       if($this->app == null && ($i == 0 || ($i > 0 && $name !== ''))){
         $q = (object)[
           'command' => 'select',
-          'table' => 'paths',
+          'table' => $this->table,
           'fields' => ['id','app'],
         ];
         if ($i == 0){
@@ -265,7 +265,7 @@ class Path extends Tree{
     $db = new Db();
     $q = (object)[
       'command' => 'select',
-      'table' => 'paths',
+      'table' => $this->table,
       'fields' => [],
       'where' => (object)[
         'type' => 'and', 'items' => [
@@ -325,7 +325,7 @@ class Path extends Tree{
 
     /** Query object for writing */
     $q = (object)[
-      'table' => 'paths',
+      'table' => $this->table,
       'inputs' => (object)[
         'parent_id' => $this->parent_id,
         'user_id' => $this->user_id,
@@ -342,7 +342,7 @@ class Path extends Tree{
 
     /** Query object for testing for duplicate keys */
     $t = (object)[
-      'table' => 'paths',
+      'table' => $this->table,
       'command' => 'select',
       'fields' => [],
       'where' => (object)[
@@ -482,7 +482,7 @@ class Path extends Tree{
     $db = new Db();
     $q = (object)[
       'command' => 'select',
-      'table' => 'paths',
+      'table' => $this->table,
       'fields' => ['id'],
       'where' => (object)[
         'type' => 'and', 'items' => [
@@ -513,7 +513,7 @@ class Path extends Tree{
     $db = new Db();
     $q = (object)[
       'command' => 'select',
-      'table' => 'paths',
+      'table' => $this->table,
       'fields' => ['name', 'parent_id'],
       'where' => (object)[
         'type' => 'and', 'items' => [
@@ -527,7 +527,7 @@ class Path extends Tree{
       while ($db->output[0]->parent_id != 0){
         $q = (object)[
           'command' => 'select',
-          'table' => 'paths',
+          'table' => $this->table,
           'fields' => ['name', 'parent_id'],
           'where' => (object)[
             'type' => 'and', 'items' => [
@@ -608,7 +608,7 @@ class Path extends Tree{
       $db = new Db();
       $q = (object)[
         'command' => 'delete',
-        'table' => 'paths',
+        'table' => $this->table,
         'where' => (object)[
           'type' => 'and', 'items' => [
             (object)['type' => '=', 'value' => $this->id, 'id' => 'id']

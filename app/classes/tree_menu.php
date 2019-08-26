@@ -2,9 +2,9 @@
 namespace LWT;
 /**
  * @file
- * Group Class
+ * Menu Class
  *
- * displays and modifies group information
+ * displays hierarchical menu for main container site
  *
  * @category Data Abstraction
  * @package LibreWebTools
@@ -13,14 +13,20 @@ namespace LWT;
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  * @version Release: @package_version@
  */
-class Group extends Tree{
-  public $table = 'groups'; /**< Table name in Database */
-  public $id=0;             /**< Group ID */
-  public $parent_id=null;   /**< Parent ID for group hierarchy*/
-  public $name = '';        /**< Group Name */
+class Menu extends Tree{
+  public $table = 'menus';  /**< Table name in Database */
+  public $id=0;             /**< Menu ID */
+  public $parent_id=null;   /**< Parent ID for menu hierarchy*/
+  public $name = '';        /**< Menu Name (link title) */
   public $sortorder = 0;    /**< Sort order, small number "floats to top" */
-  public $created = '';     /**< Date that the group was created */
-  public $desc = '';        /**< Description */
+  public $path_id=0;        /**< Path ID in which the menu links to */
+  public $external_link=''; /**< External link address */
+  public $sortorder = 0;    /**< Sort order, small number "floats to top" */
+  public $path_id=0;        /**< Path ID in which the menu links to */
+  public $created = '';     /**< Date that the menu was created */
+  public $error = 0;        /**< Error number */
+  public $message = '';     /**< Message for error reporting */
+  public $created = '';     /**< Date that the menu was created */
   public $error = 0;        /**< Error number */
   public $message = '';     /**< Message for error reporting */
   public $name_unique = true;       /**< Flag to show if the name is unique */
@@ -31,7 +37,7 @@ class Group extends Tree{
 
   public function __construct($id = 0){
     if ($id>=0){
-      $this->table = 'groups';
+      $this->table = 'menus';
       $db = new Db();
       $q = (object)[
         'command' => 'select',
@@ -52,10 +58,16 @@ class Group extends Tree{
         else{
           $this->parent_id = (int) $db->output[0]->parent_id;
         }
+        if (is_null($db->output[0]->path_id)){
+          $this->path_id = null;
+        }
+        else{
+          $this->path_id = (int) $db->output[0]->path_id;
+        }
         $this->name = $db->output[0]->name;
         $this->sortorder = (int) $db->output[0]->sortorder;
         $this->created = $db->output[0]->created;
-        $this->desc = $db->output[0]->desc;
+        $this->external_link = $db->output[0]->external_link;
         $this->error = 0;
         $this->message = '';
       }
@@ -63,7 +75,7 @@ class Group extends Tree{
         $this->clear();
         $this->id = -1;
         $this->error = 1;
-        $this->message = 'Group not found';
+        $this->message = 'Menu not found';
       }
     }
     else{
@@ -78,7 +90,7 @@ class Group extends Tree{
    *
    * @param int $parent_id Parent ID of items being searched (default null)
    *
-   * @return array $list All group items as a nested array of objects
+   * @return array $list All menu items as a nested array of objects
    */
   public function list($parent_id = null){
     $db = new Db();
@@ -106,15 +118,22 @@ class Group extends Tree{
         else{
           $pid = (int) $record->parent_id;
         }
+        if (is_null($record->path_id)){
+          $path_id = null;
+        }
+        else{
+          $path_id = (int) $record->path_id;
+        }
         $id = (int) $record->id;
         $children = $this->list($id);
         $list[] = (object)[
           'id' => $id,
           'parent_id' => $pid,
           'sortorder' => (int) $record->sortorder,
+          'path_id' => $path_id,
           'name' => $record->name,
           'created' => $record->created,
-          'desc' => $record->desc,
+          'external_link' => $record->external_link,
           'children' => $children,
         ];
       }
@@ -128,12 +147,13 @@ class Group extends Tree{
    */
   public function clear(){
     $this->id = 0;
-    $this->table = 'groups';
+    $this->table = 'menus';
     $this->parent_id = null;
+    $this->path_id = null;
     $this->name = '';
     $this->sortorder = 0;
     $this->created = '';
-    $this->desc = '';
+    $this->external_link = '';
     $this->error = 0;
     $this->message = '';
   }
@@ -146,7 +166,7 @@ class Group extends Tree{
     if($this->id === $this->parent_id){
       $this->error = 99;
       $this->parent_id_unique = false;
-      $this->parent_id_message = 'The parent cannot equal group (' . $this->name . ').';
+      $this->parent_id_message = 'The parent cannot equal menu (' . $this->name . ').';
       return;
     }
     $db = new Db();
@@ -158,8 +178,9 @@ class Group extends Tree{
       'inputs' => (object)[
         'name' => $this->name,
         'parent_id' => $this->parent_id,
+        'path_id' => $this->path_id,
         'sortorder' => $this->sortorder,
-        'desc' => $this->desc,
+        'external_link' => $this->external_link,
       ],
     ];
 
@@ -171,6 +192,7 @@ class Group extends Tree{
       'where' => (object)[
         'type' => 'and', 'items' => [
           (object)['type' => '=', 'value' => $this->name, 'id' => 'name', 'cs' => false],
+          (object)['type' => '=', 'value' => $this->parent_id, 'id' => 'parent_id'],
           (object)['type' => '<>', 'value' => $this->id, 'id' => 'id']
         ]
       ]
@@ -182,7 +204,7 @@ class Group extends Tree{
       foreach($db->output as $field){
         if($this->name == $field->name){
           $this->name_unique = false;
-          $this->name_message = 'The name "' . $this->name . '" is already taken by another group.';
+          $this->name_message = 'The name "' . $this->name . '" is already taken by another menu.';
         }
       }
       return;
@@ -214,7 +236,7 @@ class Group extends Tree{
    * Deletes the record, then clears the object
    */
   public function delete(){
-    if ($this->id > 2){
+    if ($this->id > 0){
       $db = new Db();
       $q = (object)[
         'command' => 'delete',
@@ -234,7 +256,7 @@ class Group extends Tree{
     }
     else{
       $this->error = 99;
-      $this->message = 'You cannot delete the core group "' . $this->name . '".';
+      $this->message = 'You cannot delete the root menu "' . $this->name . '".';
     }
   }
 }
