@@ -513,7 +513,7 @@ class Path extends Tree{
     $db = new Db();
     $q = (object)[
       'command' => 'select',
-      'table' => $this->table,
+      'table' => 'paths',
       'fields' => ['name', 'parent_id'],
       'where' => (object)[
         'type' => 'and', 'items' => [

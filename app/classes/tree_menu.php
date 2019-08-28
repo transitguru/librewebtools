@@ -21,11 +21,6 @@ class Menu extends Tree{
   public $sortorder = 0;    /**< Sort order, small number "floats to top" */
   public $path_id=0;        /**< Path ID in which the menu links to */
   public $external_link=''; /**< External link address */
-  public $sortorder = 0;    /**< Sort order, small number "floats to top" */
-  public $path_id=0;        /**< Path ID in which the menu links to */
-  public $created = '';     /**< Date that the menu was created */
-  public $error = 0;        /**< Error number */
-  public $message = '';     /**< Message for error reporting */
   public $created = '';     /**< Date that the menu was created */
   public $error = 0;        /**< Error number */
   public $message = '';     /**< Message for error reporting */
