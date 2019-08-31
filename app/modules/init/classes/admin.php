@@ -606,7 +606,117 @@ Class Admin Extends \LWT\Subapp{
       }
     }
     elseif ($this->pathstring == 'menu'){
-      $this->form = new \LWT\Form($forms->menu);
+      if(isset($this->inputs->post->id) && 
+          (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Close')){
+        $menu_id = (int) $this->inputs->post->id;
+        $menu_obj = new \LWT\Menu($menu_id);
+        $this->form = new \LWT\Form($forms->menu);
+        if ($menu_id == 0){
+          $this->form->fields->parent_id->required = false;
+          $this->form->fields->name->format = 'oneline';
+          $this->form->fields->name->disabled = true;
+        }
+        if ($menu_id == -1){
+          $this->form->fields->submit1->value = 'Create';
+          unset($this->form->fields->submit2);
+        }
+        $this->form->fields->id->value = $menu_obj->id;
+        $this->form->fields->parent_id->value = $menu_obj->parent_id;
+        $this->form->fields->sortorder->value = $menu_obj->sortorder;
+        $this->form->fields->name->value = $menu_obj->name;
+        $this->form->fields->path_id->value = $menu_obj->path_id;
+        $this->form->fields->external_link->value = $menu_obj->external_link;
+        // Make Path list
+        $path_obj = new \LWT\Path(-1);
+        $l = $path_obj->list();
+        $this->form->fields->path_id->list = $this->treelist($l);
+        // Make Menu list
+        $l = $menu_obj->list();
+        $ids = $menu_obj->children($menu_obj->id);
+        $this->form->fields->parent_id->list = $this->treelist($l, $ids);
+      }
+      else{
+        $menu_obj = new \LWT\Menu(-1);
+        $list = $menu_obj->list();
+        $items = $this->treeitems($list);
+        $items[]= (object)[
+          'name' => '(new menu)',
+          'value' => -1,
+        ];
+        $defs = (object)[
+          'title' => 'Menu Navigation',
+          'desc' => 'Manage menus within the main application.',
+          'name' => 'form_menu_nav',
+          'fields' => (object)[
+            'id' => (object)['name' => 'id', 'element' => 'select',
+              'label' => 'Select Menu item', 'format' => 'text', 'list' => $items,
+              'value' => 'Navigate'],
+            'submit1' => (object)['name' => 'submit', 'element' => 'submit',
+              'label' => '', 'format' => 'text', 'value' => 'Navigate'],
+          ],
+        ];
+        $this->form = new \LWT\Form($defs);
+      }
+      if (isset($this->inputs->post->submit)){
+        if(in_array($this->inputs->post->submit, ['Create','Update'])){
+          $this->form->fill($this->inputs->post);
+          $this->form->validate();
+          if (is_null($this->form->fields->created->value)){
+            $this->form->fields->created->value = date('Y-m-d H:i:s');
+          }
+          if ($this->form->error == 0){
+            $menu_obj->parent_id = $this->form->fields->parent_id->value;
+            $menu_obj->sortorder = $this->form->fields->sortorder->value;
+            $menu_obj->name = $this->form->fields->name->value;
+            $menu_obj->path_id = $this->form->fields->path_id->value;
+            $menu_obj->external_link = $this->form->fields->external_link->value;
+            $menu_obj->write();
+            // Reload Menu list
+            $l = $menu_obj->list();
+            $ids = $menu_obj->children($menu_obj->id);
+            $this->form->fields->parent_id->list = $this->treelist($l, $ids);
+            // Show errors
+            $this->form->error = $menu_obj->error;
+            $this->form->message = $menu_obj->message;
+            if ($menu_obj->name_unique == false){
+              $this->form->fields->name->error = 99;
+              $this->form->fields->name->message = $menu_obj->name_message;
+            }
+            if ($menu_obj->parent_id_unique == false){
+              $this->form->fields->parent_id->error = 99;
+              $this->form->fields->parent_id->message = $menu_obj->parent_id_message;
+            }
+            if($this->inputs->post->submit == 'Create' && $this->form->error == 0){
+              $this->form->fields->id->value = $menu_obj->id;
+              $this->form->fields->submit1->value = 'Update';
+            }
+          }
+        }
+        elseif($this->inputs->post->submit == 'Delete'){
+          $this->form->message = 'Are you sure you want to delete this Menu item?';
+          $this->form->status = 'warning';
+          $this->form->fields->submit1->value = 'Yes';
+          $this->form->fields->submit2->value = 'Cancel';
+        }
+        elseif($this->inputs->post->submit == 'Yes'){
+          $menu_obj->delete();
+          $this->form->error = $menu_obj->error;
+          $this->form->message = $menu_obj->message;
+          if ($this->form->error == 0){
+            $this->form->message = 'Menu item deleted successfully';
+            $this->form->status = 'success';
+            foreach ($this->form->fields as $key => $field){
+              if ($key != 'submit3'){
+                unset($this->form->fields->{$key});
+              }
+            }
+          }
+        }
+      }
+      else{
+        $this->form->message = 'Select a menu to begin editing.';
+        $this->form->status = 'warning';
+      }
     }
     elseif ($this->pathstring == 'file'){
       $this->form = new \LWT\Form($forms->file);

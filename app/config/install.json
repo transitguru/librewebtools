@@ -497,6 +497,29 @@
         "created":"2013-11-01 15:00:00",
         "content":"<p>Welcome to LibreWebTools</p>"
       }
+    },
+    {
+      "table":"menus",
+      "inputs":{
+        "id":0,
+        "parent_id":null,
+        "sortorder":0,
+        "name":"/",
+        "path_id":null,
+        "external_link":null,
+        "created":"2013-11-01 15:00:00"
+      }
+    },
+    {
+      "table":"menus",
+      "inputs":{
+        "parent_id":0,
+        "sortorder":0,
+        "name":"Home",
+        "path_id":0,
+        "external_link":null,
+        "created":"2013-11-01 15:00:00"
+      }
     }
   ]
 }
