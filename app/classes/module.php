@@ -166,18 +166,18 @@ class Module{
    * Load all Javascripts and CSS in the template
    */
   public function loadScripts(){
-    $path = Path::findapp('\\LWT\\Modules\\Init\\Script');
+    $path = Path::findapp('\\LWT\\Modules\\Init\\File');
     if (is_string($path)){
       if (count($this->javascripts)>0){
         foreach ($this->javascripts as $script){
           echo '    <script type="application/javascript" src="' . BASE_URI;
-          echo $path . '/' . $script . '"></script>' . "\n";
+          echo $path . '/js/' . $script . '"></script>' . "\n";
         }
       }
       if (count($this->stylesheets)>0){
         foreach ($this->stylesheets as $sheet){
           echo '    <link rel="stylesheet" type="text/css" href="' . BASE_URI;
-          echo $path . '/' . $sheet . '" />' . "\n";
+          echo $path . '/css/' . $sheet . '" />' . "\n";
         }
       }
     }

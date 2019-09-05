@@ -414,22 +414,9 @@
         "parent_id":0,
         "module_id":1,
         "user_id":1,
-        "name":"download",
+        "name":"file",
         "title":"Not Found",
-        "app":"\\LWT\\Modules\\Init\\Download",
-        "core":1,
-        "created":"2013-11-01 15:00:00"
-      }
-    },
-    {
-      "table":"paths",
-      "inputs":{
-        "parent_id":0,
-        "module_id":1,
-        "user_id":1,
-        "name":"scripts",
-        "title":"Not Found",
-        "app":"\\LWT\\Modules\\Init\\Script",
+        "app":"\\LWT\\Modules\\Init\\File",
         "core":1,
         "created":"2013-11-01 15:00:00"
       }
