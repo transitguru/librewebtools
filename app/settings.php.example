@@ -3,7 +3,7 @@ namespace LWT;
 /**
  * @file
  * Settings Class
- * 
+ *
  * This object loads default site settings
  *
  * @category Configuration
@@ -26,7 +26,7 @@ class Settings{
   public function __construct(){
     $this->db = (object)[
       'host' => 'localhost',        /**< Host for Database connection (mysql or pgsql) */
-      'type' => 'mysql',            /**< Type of database (sqlite3, mysql, or pgsql) */ 
+      'type' => 'mysql',            /**< Type of database (sqlite3, mysql, or pgsql) */
       'name' => 'librewebtools',    /**< Name for application's database or filename (sqlite3) */
       'user' => 'librewebtools',    /**< Username for application (don't use root!) */
       'pass' => 'somesillystring',  /**< Password for the application (change this!!!) */

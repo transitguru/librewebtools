@@ -429,7 +429,7 @@ class User{
       'fields' => [],
       'where' => (object)[
         'type' => 'and', 'items' => [
-          (object)['type' => 'or', 'items' => 
+          (object)['type' => 'or', 'items' =>
             [
               (object)['type' => '=', 'value' => $this->login, 'id' => 'login', 'cs' => false],
               (object)['type' => '=', 'value' => $this->email, 'id' => 'email', 'cs' => false],

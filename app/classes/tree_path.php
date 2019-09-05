@@ -347,7 +347,7 @@ class Path extends Tree{
       'fields' => [],
       'where' => (object)[
         'type' => 'and', 'items' => [
-          (object)['type' => 'and', 'items' => 
+          (object)['type' => 'and', 'items' =>
             [
               (object)['type' => '=', 'value' => $this->name, 'id' => 'name', 'cs' => false],
               (object)['type' => '=', 'value' => $this->parent_id, 'id' => 'parent_id'],

@@ -29,7 +29,6 @@ class Menu extends Tree{
   public $name_message = '';        /**< Message for error in name unique */
   public $parent_id_message = '';   /**< Message for error in parent_id unique */
 
-
   public function __construct($id = 0){
     if ($id>=0){
       $this->table = 'menus';

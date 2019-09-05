@@ -44,7 +44,7 @@ Class Admin Extends \LWT\Subapp{
 
     // Route request based on path
     if ($this->pathstring == 'role'){
-      if(isset($this->inputs->post->id) && 
+      if(isset($this->inputs->post->id) &&
           (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Close')){
         $role_id = (int) $this->inputs->post->id;
         $role_obj = new \LWT\Role($role_id);
@@ -133,7 +133,7 @@ Class Admin Extends \LWT\Subapp{
       }
     }
     elseif ($this->pathstring == 'group'){
-      if(isset($this->inputs->post->id) && 
+      if(isset($this->inputs->post->id) &&
           (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Close')){
         $group_id = (int) $this->inputs->post->id;
         $group_obj = new \LWT\Group($group_id);
@@ -235,7 +235,7 @@ Class Admin Extends \LWT\Subapp{
       }
     }
     elseif ($this->pathstring == 'user'){
-      if(isset($this->inputs->post->id) && 
+      if(isset($this->inputs->post->id) &&
           (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Close')){
         $user_id = (int) $this->inputs->post->id;
         $user_obj = new \LWT\User($user_id);
@@ -372,7 +372,7 @@ Class Admin Extends \LWT\Subapp{
       }
     }
     elseif ($this->pathstring == 'path'){
-      if(isset($this->inputs->post->id) && 
+      if(isset($this->inputs->post->id) &&
           (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Close')){
         $path_id = (int) $this->inputs->post->id;
         $path_obj = new \LWT\Path($path_id);
@@ -606,7 +606,7 @@ Class Admin Extends \LWT\Subapp{
       }
     }
     elseif ($this->pathstring == 'menu'){
-      if(isset($this->inputs->post->id) && 
+      if(isset($this->inputs->post->id) &&
           (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Close')){
         $menu_id = (int) $this->inputs->post->id;
         $menu_obj = new \LWT\Menu($menu_id);
