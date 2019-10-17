@@ -298,6 +298,19 @@ class Form{
           $html .=  '" value="' . $f->value . '" id="' . $i . '" name="';
           $html .= $f->name . '" ' . $maxlength . $dis . " />\n";
         }
+        elseif($f->element == 'file'){
+          if ($f->multiple == true){
+            $name = $f->name . '[]';
+            $mult = '';
+          }
+          else{
+            $name = $f->name;
+            $mult = 'multiple ';
+          }
+          $html .= '  <input class="' . $class . '" ' . $dis . ' type="file" ';
+          $html .=  'accept="' . $f->format . '" id="' . $i . '" name="';
+          $html .= $name . '" ' . $mult . $dis . " />\n";
+        }
         elseif($f->element == 'checkbox'){
           if (!is_null($f->default) && $f->value === $f->default){
             $checked = 'checked';
@@ -315,8 +328,16 @@ class Form{
           $html .= $f->value . "</textarea>\n";
         }
         elseif($f->element == 'select' && is_array($f->list) && count($f->list)>0){
+          if ($f->multiple == true){
+            $name = $f->name . '[]';
+            $mult = '';
+          }
+          else{
+            $name = $f->name;
+            $mult = 'multiple ';
+          }
           $html .= '  <select class="' . $class . '" ' . $dis;
-          $html .= ' name="' . $f->name . "\">\n";
+          $html .= ' name="' . $name . '" ' . $mult . "\">\n";
           foreach ($f->list as $items){
             $checked = '';
             if ((is_array($f->value) && in_array($items->value, $f->value, true))

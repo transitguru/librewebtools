@@ -719,7 +719,105 @@ Class Admin Extends \LWT\Subapp{
       }
     }
     elseif ($this->pathstring == 'file'){
-      $this->form = new \LWT\Form($forms->file);
+      if(isset($this->inputs->post->id) &&
+          (!isset($this->inputs->post->submit) || $this->inputs->post->submit != 'Close')){
+        $file_id = (int) $this->inputs->post->id;
+        $file_obj = new \LWT\File($file_id);
+        $this->form = new \LWT\Form($forms->file);
+        if ($file_id == -1){
+          $this->form->fields->submit1->value = 'Create';
+        }
+        $this->form->fields->id->value = $file_obj->id;
+        $this->form->fields->user_id->value = $file_obj->user_id;
+        $this->form->fields->name->value = $file_obj->name;
+        $this->form->fields->basename->value = $file_obj->basename;
+        $this->form->fields->uploaded->value = $file_obj->uploaded;
+        $this->form->fields->title->value = $file_obj->title;
+        $this->form->fields->caption->value = $file_obj->caption;
+      }
+      else{
+        $file_obj = new \LWT\File(-1);
+        $list = $file_obj->list();
+        $items = [];
+        foreach($list as $r){
+          $items[]= (object)[
+            'name' => $r->name,
+            'value' => $r->id,
+          ];
+        }
+        $items[]= (object)[
+          'name' => '(new file)',
+          'value' => -1,
+        ];
+        $defs = (object)[
+          'title' => 'File Navigation',
+          'desc' => 'Manage files for simple uploads for LWT.',
+          'name' => 'form_file_nav',
+          'fields' => (object)[
+            'id' => (object)['name' => 'id', 'element' => 'select',
+              'label' => 'Select File', 'format' => 'text', 'list' => $items,
+              'value' => 'Navigate'],
+            'submit1' => (object)['name' => 'submit', 'element' => 'submit',
+              'label' => '', 'format' => 'text', 'value' => 'Navigate'],
+          ],
+        ];
+        $this->form = new \LWT\Form($defs);
+      }
+      if (isset($this->inputs->post->submit)){
+        if(in_array($this->inputs->post->submit, ['Create','Update'])){
+          $this->form->fill($this->inputs->post);
+          $this->form->validate();
+          if ($this->form->error == 0){
+            $file_obj->user_id = $this->form->fields->user_id->value;
+            $file_obj->name = $this->form->fields->name->value;
+            $file_obj->basename = $this->form->fields->basename->value;
+            $file_obj->uploaded = $this->form->fields->uploaded->value;
+            $file_obj->title = $this->form->fields->title->value;
+            $file_obj->caption = $this->form->fields->caption->value;
+            $file_obj->write();
+            $this->form->error = $file_obj->error;
+            $this->form->message = $file_obj->message;
+            if ($file_obj->name_unique == false){
+              $this->form->fields->name->error = 99;
+              $this->form->fields->name->message = $file_obj->name_message;
+            }
+            if($this->inputs->post->submit == 'Create' && $this->form->error == 0){
+              $this->form->fields->id->value = $file_obj->id;
+              $this->form->fields->submit1->value = 'Update';
+            }
+            elseif($this->form->error == 0 && isset($this->inputs->files->thefile)){
+              //TODO: Find then move the file
+              $destination = DOC_ROOT . '/files/' . $file_obj->name;
+              $tmpname = $this->inputs->files->thefile->tmp_name;
+              move_uploaded_file($tmpname,$destination);
+            }
+          }
+        }
+        elseif($this->inputs->post->submit == 'Delete'){
+          $this->form->message = 'Are you sure you want to delete this File?';
+          $this->form->status = 'warning';
+          $this->form->fields->submit1->value = 'Yes';
+          $this->form->fields->submit2->value = 'Cancel';
+        }
+        elseif($this->inputs->post->submit == 'Yes'){
+          $file_obj->delete();
+          $this->form->error = $file_obj->error;
+          $this->form->message = $file_obj->message;
+          if($this->form->error == 0){
+            $this->form->message = 'File deleted successfully';
+            $this->form->status = 'success';
+            foreach ($this->form->fields as $key => $field){
+              if ($key != 'submit3'){
+                unset($this->form->fields->{$key});
+              }
+            }
+          }
+        }
+      }
+      else{
+        $this->form->message = 'Select a file to begin editing.';
+        $this->form->status = 'warning';
+      }
     }
     elseif ($this->pathstring == ''){
     }

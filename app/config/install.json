@@ -224,7 +224,7 @@
         {"name":"id","type":"serial","null":false,"comment":"Unique identifier"},
         {"name":"user_id","type":"int","comment":"User who originally uploaded the file (references users.id)"},
         {"name":"basename","type":"varchar","size":255,"null":false,"comment":"File basename as uploaded"},
-        {"name":"path","type":"varchar","size":255,"null":false,"comment":"File name adjusted to prevent repeats"},
+        {"name":"name","type":"varchar","size":255,"null":false,"comment":"File name adjusted to prevent repeats"},
         {"name":"size","type":"bigint","null":false,"default":0,"comment":"File size in bytes"},
         {"name":"mimetype","type":"varchar","size":255,"comment":"File type"},
         {"name":"uploaded","type":"datetime","null":false,"comment":"Date was initially uploaded"},
@@ -233,7 +233,7 @@
       ],
       "constraints":[
         {"name":"pk_file_id","type":"primary","columns":["id"]},
-        {"name":"uk_file_path","type":"unique","columns":["path"]},
+        {"name":"uk_file_name","type":"unique","columns":["name"]},
         {"name":"fk_file_userid","type":"foreign","columns":["user_id"],"ref_table":"users","ref_columns":["id"],"delete":"null","update":"cascade"}
       ]
     },

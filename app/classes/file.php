@@ -18,12 +18,14 @@ class File{
   public $id = 0; /**< File id as found in the database */
   public $user_id = 1; /**< User ID that uploaded the file */
   public $basename = ''; /**< Basename of original file */
-  public $path = ''; /**< Unique name of file */
+  public $name = ''; /**< Unique name of file */
   public $size = 0; /**< Size of file in bytes */
   public $mimetype = ''; /**< Mimetype as stored in the database */
   public $uploaded = ''; /**< Upload date */
   public $title = ''; /**< User applied title to file */
   public $caption = ''; /**< User applied caption to file */
+  public $name_unique = true;       /**< Flag to show if the path name is unique */
+  public $name_message = '';        /**< Message for error in path name unique */
 
   /**
    * Creates the file
@@ -47,7 +49,7 @@ class File{
         $this->id = (int) $db->output[0]->id;
         $this->user_id = (int) $db->output[0]->user_id;
         $this->basename = $db->output[0]->basename;
-        $this->path = $db->output[0]->path;
+        $this->name = $db->output[0]->name;
         $this->size = (int) $db->output[0]->size;
         $this->mimetype = $db->output[0]->mimetype;
         $this->uploaded = $db->output[0]->uploaded;
@@ -77,7 +79,7 @@ class File{
     $this->id = 0;
     $this->user_id = 1;
     $this->basename = '';
-    $this->path = '';
+    $this->name = '';
     $this->size = 0;
     $this->mimetype = '';
     $this->uploaded = '';
@@ -85,6 +87,39 @@ class File{
     $this->caption = '';
     $this->error = 0;
     $this->message = '';
+  }
+
+  /**
+   * Lists all files in an array
+   *
+   * @return array $list All modules as an array of objects
+   */
+  public function list(){
+    $db = new Db();
+    $q = (object)[
+      'command' => 'select',
+      'table' => 'files',
+      'fields' => [],
+      'sort' => [
+        (object) ['id' => 'name'],
+      ]
+    ];
+    $db->query($q);
+    $list = [];
+    foreach($db->output as $record){
+      $list[]= (object)[
+        'id' => (int) $record->id,
+        'user_id' => (int) $record->user_id,
+        'basename' => $record->basename,
+        'name' => $record->name,
+        'size' => (int) $record->size,
+        'mimetype' => $record->mimetype,
+        'uploaded' => $record->uploaded,
+        'title' => $record->title,
+        'caption' => $record->caption,
+      ];
+    }
+    return $list;
   }
 
   /**
@@ -98,13 +133,38 @@ class File{
       'inputs' => (object)[
         'user_id' => $this->user_id,
         'basename' => $this->basename,
-        'path' => $this->path,
+        'name' => $this->name,
         'size' => $this->size,
         'mimetype' => $this->mimetype,
         'title' => $this->title,
         'caption' => $this->caption,
       ]
     ];
+
+    /** Query object for testing for duplicate keys */
+    $t = (object)[
+      'table' => 'files',
+      'command' => 'select',
+      'fields' => [],
+      'where' => (object)[
+        'type' => 'and', 'items' => [
+          (object)['type' => '=', 'value' => $this->name, 'id' => 'name', 'cs' => false],
+          (object)['type' => '<>', 'value' => $this->id, 'id' => 'id']
+        ]
+      ]
+    ];
+    $db->query($t);
+    if ($db->affected_rows > 0){
+      $this->error = 99;
+      $this->message = 'The marked values below are already taken';
+      foreach($db->output as $field){
+        if($this->name == $field->name){
+          $this->name_unique = false;
+          $this->name_message = 'The name "' . $this->name . '" is already taken by another module.';
+        }
+      }
+      return;
+    }
     if ($this->id >= 0){
       $q->command = 'update';
       $q->where = (object)[
