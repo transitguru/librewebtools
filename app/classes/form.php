@@ -232,7 +232,8 @@ class Form{
     if (!is_null($object->desc)){
       $html .= '<p>' . $object->desc . "</p>\n";
     }
-    $html .= '<form action="' . $object->action . '" method="' . $object->method . '" ';
+    $html .= '<form action="' . $object->action . '" method="' . $object->method;
+    $html .= '" enctype="multipart/form-data" ';
     if (count($object->onstar) > 0){
       foreach ($object->onstar as $key => $value){
         $html .= 'on' . $key . '="' . $value . '" ';

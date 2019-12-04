@@ -785,7 +785,7 @@ Class Admin Extends \LWT\Subapp{
               $this->form->fields->id->value = $file_obj->id;
               $this->form->fields->submit1->value = 'Update';
             }
-            elseif($this->form->error == 0 && isset($this->inputs->files->thefile)){
+            if($this->form->error == 0 && isset($this->inputs->files->thefile)){
               //TODO: Find then move the file
               $destination = DOC_ROOT . '/files/' . $file_obj->name;
               $tmpname = $this->inputs->files->thefile->tmp_name;
