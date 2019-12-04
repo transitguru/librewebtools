@@ -1,10 +1,11 @@
 # Changelog
 
-## LibreWebTools v0.6, 2019-??-??
+## LibreWebTools v0.6, 2019-12-04
 - Change direction to make this a toolbox, not a content management system
 - Target PHP 7.1 as minimum requirements for use of this toolbox
 - Each module should be able to stand alone except for a few core modules
 - Simplified data structure and reduced code duplication
+- Database engine can now be MariaDB/MySQL, PostgreSQL, or SQLite
 
 ## LibreWebTools v0.5.0, 2014-12-15
 - Converted most of the functions to use OOP style
